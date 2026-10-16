@@ -26,6 +26,7 @@ import net.thunderbird.components.ui.bolt.atom.DividerHorizontal
 import net.thunderbird.components.ui.bolt.atom.Surface
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
 import net.thunderbird.feature.navigation.drawer.dropdown.domain.entity.DisplayAccount
+import net.thunderbird.feature.navigation.drawer.dropdown.domain.entity.MailDisplayAccount
 import net.thunderbird.feature.navigation.drawer.dropdown.domain.entity.UnifiedDisplayAccount
 import net.thunderbird.feature.navigation.drawer.dropdown.ui.DrawerContract.Event
 import net.thunderbird.feature.navigation.drawer.dropdown.ui.DrawerContract.State
@@ -92,6 +93,11 @@ internal fun DrawerContent(
                     account = selectedAccount,
                     onClick = { onEvent(Event.OnAccountSelectorClick) },
                     onAvatarClick = { onEvent(Event.OnAccountViewClick(selectedAccount)) },
+                    onEditAccountClick = {
+                        if (selectedAccount is MailDisplayAccount) {
+                            onEvent(Event.OnEditAccountName(selectedAccount.id))
+                        }
+                    },
                     showAccountSelection = state.showAccountSelection,
                     isShowAnimations = areAnimationsEnabled,
                 )

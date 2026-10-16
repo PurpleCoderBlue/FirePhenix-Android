@@ -1,5 +1,7 @@
 package net.thunderbird.feature.navigation.drawer.dropdown
 
+import android.view.MotionEvent
+import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.GravityCompat
@@ -31,8 +33,11 @@ class DropDownDrawer(
     private val openUnifiedFolder: () -> Unit,
     private val openManageFolders: () -> Unit,
     private val openSettings: () -> Unit,
+    private val openAccountSettings: (accountId: String) -> Unit,
     private val openAddAccount: () -> Unit,
     createDrawerListener: () -> DrawerLayout.DrawerListener,
+    motionDurationMillis: () -> Long,
+    onMotion: (String) -> Unit = {},
 ) : NavigationDrawer, KoinComponent {
 
     private val themeProvider: FeatureThemeProvider by inject()
@@ -40,9 +45,24 @@ class DropDownDrawer(
     private val drawerContent: ComposeView = parent.findViewById(R.id.navigation_drawer_content)
 
     private val drawerState = MutableStateFlow(FolderDrawerState())
+    private val motion = DrawerMotion(
+        drawerContent,
+        { isOpen },
+        { open ->
+            if (open) drawer.openDrawer(GravityCompat.START, false) else drawer.closeDrawer(GravityCompat.START, false)
+        },
+        motionDurationMillis,
+        onMotion,
+    )
 
     init {
         drawer.addDrawerListener(createDrawerListener())
+        drawer.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
+            override fun onDrawerStateChanged(newState: Int) {
+                if (newState == DrawerLayout.STATE_DRAGGING) motion.cancel()
+            }
+        })
+        installOutsideClose()
 
         // Make insets available to the drawer's Compose content
         ViewCompat.setOnApplyWindowInsetsListener(drawer) { _, insets ->
@@ -61,9 +81,32 @@ class DropDownDrawer(
                     openUnifiedFolder = openUnifiedFolder,
                     openManageFolders = openManageFolders,
                     openSettings = openSettings,
+                    openAccountSettings = openAccountSettings,
                     openAddAccount = openAddAccount,
                     closeDrawer = { close() },
                 )
+            }
+        }
+    }
+
+    private fun installOutsideClose() {
+        var downX = 0f
+        var downY = 0f
+        var outside = false
+        val slop = ViewConfiguration.get(parent).scaledTouchSlop
+        drawer.setOnTouchListener { view, event ->
+            if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                downX = event.x
+                downY = event.y
+                outside = isOpen && (event.x < drawerContent.left || event.x > drawerContent.right)
+            }
+            val tap = kotlin.math.abs(event.x - downX) < slop && kotlin.math.abs(event.y - downY) < slop
+            if (event.actionMasked == MotionEvent.ACTION_UP && outside && tap) {
+                view.performClick()
+                close()
+                true
+            } else {
+                false
             }
         }
     }
@@ -104,14 +147,15 @@ class DropDownDrawer(
     }
 
     override fun open() {
-        drawer.openDrawer(GravityCompat.START)
+        motion.show(true)
     }
 
     override fun close() {
-        drawer.closeDrawer(GravityCompat.START)
+        motion.show(false)
     }
 
     override fun lock() {
+        motion.cancel()
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
     }
 

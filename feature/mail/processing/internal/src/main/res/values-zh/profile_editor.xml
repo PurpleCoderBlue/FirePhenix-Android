@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="processing_profile_name">名称（可选）</string>
+    <string name="processing_saving">正在保存…</string>
+    <string name="processing_invalid_endpoint">请填写有效的 HTTPS API 地址，不要包含用户名、密码或片段标记。</string>
+    <string name="processing_missing_model">请填写该服务提供的模型名称。</string>
+    <string name="processing_missing_key">请填写 API 密钥；留空仅能保留相同服务商、相同地址的已有密钥。</string>
+    <string name="processing_invalid_parameters">可选参数需要是 JSON 对象，也可以直接留空。</string>
+    <string name="processing_copy_optional">选择配置（可选）</string>
+    <string name="processing_copy_summary">从总结服务复制</string>
+    <string name="processing_copy_translation">从翻译服务复制</string>
+    <string name="processing_copy_notice">已复制地址、模型、参数及密钥。保存后两份配置独立管理，密钥不回显。</string>
+    <string name="processing_manage_service">编辑或删除服务</string>
+    <string name="processing_service_long_press">点选默认服务；长按已有服务可编辑或删除。</string>
+    <string name="processing_options">翻译与总结选项</string>
+</resources>

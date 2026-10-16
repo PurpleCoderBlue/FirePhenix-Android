@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Drafts
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
@@ -131,6 +132,8 @@ object Icons {
         val Drafts: ImageVector = Icons.Outlined.Drafts
         val Download: ImageVector = OutlinedDownloadIcon
         val DriveFileMove: ImageVector = OutlinedDriveFileMove
+
+        val Edit: ImageVector = Icons.Outlined.Edit
 
         val Encrypted: ImageVector = OutlinedEncrypted
         val ErrorOutline: ImageVector = Icons.Outlined.ErrorOutline

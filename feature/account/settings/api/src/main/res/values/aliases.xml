@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="account_settings_api_alias_title">Sender aliases</string>
+    <string name="account_settings_api_alias_notice">Add only existing aliases belonging to this account. This app does not create Microsoft aliases or verify SMTP acceptance. Default and favorites are independent. Automatic enumeration is unavailable with the existing mail authentication scopes; add aliases manually.</string>
+    <string name="account_settings_api_alias_error">The alias operation failed. Check the address, account and connection. The primary identity cannot be removed here.</string>
+    <string name="account_settings_api_alias_default">Default sender</string>
+    <string name="account_settings_api_alias_make_default">Use by default</string>
+    <string name="account_settings_api_alias_favorite">Favorite</string>
+    <string name="account_settings_api_alias_unfavorite">Remove favorite</string>
+    <string name="account_settings_api_alias_remove">Remove</string>
+    <string name="account_settings_api_alias_existing_address">Existing account alias address</string>
+    <string name="account_settings_api_alias_add">Add existing alias</string>
+    <string name="account_settings_api_alias_history_recipient">Recipient address for sent-mail lookup</string>
+    <string name="account_settings_api_alias_search_sent">Search sent mail on server</string>
+    <string name="account_settings_api_alias_choose">Choose the sender address before continuing</string>
+    <string name="account_settings_api_alias_invalid">The previous sender address is no longer available. Choose an existing alias.</string>
+</resources>

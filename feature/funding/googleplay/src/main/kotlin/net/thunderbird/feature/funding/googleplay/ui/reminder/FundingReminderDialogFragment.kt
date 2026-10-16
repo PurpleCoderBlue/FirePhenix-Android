@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
+import app.k9mail.core.ui.legacy.designsystem.LiquidGlassAlertDialogBuilder
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import net.thunderbird.feature.funding.googleplay.R
 
@@ -12,7 +13,7 @@ internal class FundingReminderDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val contentView = layoutInflater.inflate(R.layout.funding_googleplay_contribution_reminder, null)
 
-        return MaterialAlertDialogBuilder(requireContext())
+        return LiquidGlassAlertDialogBuilder(requireContext())
             .setIcon(R.drawable.funding_googleplay_contribution_reminder_icon)
             .setTitle(R.string.funding_googleplay_contribution_reminder_title)
             .setView(contentView)

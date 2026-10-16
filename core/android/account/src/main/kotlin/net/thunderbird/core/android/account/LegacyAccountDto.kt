@@ -54,7 +54,7 @@ open class LegacyAccountDto(
 
     // [AccountProfile]
     val displayName: String
-        get() = name ?: email
+        get() = resolveAccountDisplayName(name, email, internalIncomingServerSettings?.host)
 
     @get:Synchronized
     @set:Synchronized

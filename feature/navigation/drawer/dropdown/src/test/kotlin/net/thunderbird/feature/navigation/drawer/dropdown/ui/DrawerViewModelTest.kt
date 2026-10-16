@@ -439,6 +439,30 @@ internal class DrawerViewModelTest {
         }
     }
 
+    @Test
+    fun `nickname shortcut opens settings for the selected real account`() = runMviTest {
+        val initialState =
+            State(accounts = persistentListOf(MAIL_DISPLAY_ACCOUNT), selectedAccountId = MAIL_DISPLAY_ACCOUNT.id)
+        val testSubject = createTestSubject(
+            initialState = initialState,
+            displayAccountsFlow = flow { emit(listOf(MAIL_DISPLAY_ACCOUNT)) },
+        )
+        val turbines = turbinesWithInitialStateCheck(testSubject, initialState)
+        testSubject.event(Event.OnEditAccountName(MAIL_DISPLAY_ACCOUNT.id))
+        turbines.assertThatAndEffectTurbineConsumed {
+            isEqualTo(Effect.OpenAccountSettings(MAIL_DISPLAY_ACCOUNT.id))
+        }
+    }
+
+    @Test
+    fun `nickname shortcut ignores an unknown account`() = runMviTest {
+        val testSubject = createTestSubject()
+        val turbines = turbinesWithInitialStateCheck(testSubject, State())
+        testSubject.event(Event.OnEditAccountName("missing-account"))
+        turbines.stateTurbine.ensureAllEventsConsumed()
+        turbines.effectTurbine.ensureAllEventsConsumed()
+    }
+
     private fun createTestSubject(
         initialState: State = State(),
         drawerConfigFlow: Flow<DrawerConfig> = flow { emit(createDrawerConfig()) },

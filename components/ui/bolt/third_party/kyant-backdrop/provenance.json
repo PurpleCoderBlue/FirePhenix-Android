@@ -1,0 +1,33 @@
+{
+  "project": "https://github.com/Kyant0/AndroidLiquidGlass",
+  "archive_sha256": "df22f63891ce588a0d381144cc16f7ba6ea581c680abf990d02a008a63e9d76f",
+  "archive_commit": "65ab177e90e5c1d8c62e70cf7755841982da65f6",
+  "renderer_version": "io.github.kyant0:backdrop:2.0.0",
+  "license": "Apache-2.0",
+  "sample_sources_sha256": {
+    "InteractiveHighlight.kt": "d0af46b531eba19bd0fed886892f02193f05d5a61db0925da016ff6059984f83",
+    "DragGestureInspector.kt": "01548ab5604d89bd9a8ee66a69d716036e94559c842461fbee4afc97915770c1",
+    "DampedDragAnimation.kt": "8310075ee00a9b5021935f6da1f016cb38eac61a527d27f5318c34250402c44e",
+    "LiquidToggle.kt": "69cb82d74297f1b390ea3c820691656ac892f9f3593f4b47b8bf5736e69d0f05",
+    "LiquidSlider.kt": "a32f0edb2be42148e804a1e136f1737849518acfb7f420866fb5f99c35ef58f5"
+  },
+  "changes": "Package/import relocation, Kotlin formatting; wrapper adaptations recorded in project implementation document.",
+  "native_shader_source": "Maven backdrop 2.0.0 sources: commonMain/com/kyant/backdrop/internal/Shaders.kt",
+  "native_shader_source_sha256": "0a842e52a5b8f5cd70ecd846741f9395ecc0202b075d676ef0eff610d84cc9b8",
+  "native_shader_changes": "Package and constant naming adaptation, removal of IDE-only annotations; shader math unchanged",
+  "helper_adaptation": "awaitFrame uses Compose withFrameNanos for both project targets",
+  "figma_kit": {
+    "url": "https://liquidglassdesign.com/resources/ios-and-ipados-27-figma-kit",
+    "original_file_http_status": 403,
+    "file_imported": false,
+    "overview_image_reviewed": true
+  },
+  "wrapper_adaptations": [
+    "Use actual Bolt color scheme for explicit light/dark modes",
+    "Disable toggle pointer handler while disabled",
+    "Read updated callbacks and selected state; rebind drag geometry after resize",
+    "Do not commit toggle on cancelled scroll gesture",
+    "Keep standard semantics and minimum touch height"
+  ],
+  "sample_modularity": "Shared LiquidThumbMaterial and ToggleDragState; named parameters and named animation constants; shader and deformation equations preserved."
+}

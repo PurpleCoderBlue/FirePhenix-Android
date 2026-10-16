@@ -1,5 +1,6 @@
 package net.thunderbird.components.ui.bolt.atom
 
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -7,6 +8,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.LocalGlassAppearance
+import net.thunderbird.components.ui.bolt.theme.liquidGlass
 import androidx.compose.material3.Surface as Material3Surface
 
 /**
@@ -30,12 +33,16 @@ fun ClickableSurface(
     tonalElevation: Dp = BoltTheme.elevations.level0,
     content: @Composable () -> Unit,
 ) {
+    val glass = LocalGlassAppearance.current.enabled
+    val page = color == BoltTheme.colors.surface && shape == RectangleShape &&
+        tonalElevation == BoltTheme.elevations.level0
     Material3Surface(
         onClick = onClick,
-        modifier = modifier,
+        modifier = if (glass && !page) modifier.liquidGlass(shape, color, interactive = true) else modifier,
         shape = shape,
         content = content,
         tonalElevation = tonalElevation,
-        color = color,
+        color = if (glass) Color.Transparent else color,
+        contentColor = contentColorFor(color),
     )
 }

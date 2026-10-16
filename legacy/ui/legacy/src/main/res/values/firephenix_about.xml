@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="firephenix_about_intro">FirePhenix is a personal email client based on Thunderbird for Android and K-9 Mail.</string>
+    <string name="firephenix_about_features_title">Mail and processing</string>
+    <string name="firephenix_about_features">Multiple accounts, sender aliases, translation, independent summaries, automatic processing rules, and Liquid glass appearance.</string>
+    <string name="firephenix_about_privacy_title">Service configuration and privacy</string>
+    <string name="firephenix_about_privacy">Translation and summary API configurations and cached results are encrypted on this device. Online services require your own configuration. Saving a configuration does not send email content.</string>
+    <string name="firephenix_about_upstream">Upstream projects and open source</string>
+    <string name="firephenix_about_upstream_website">Thunderbird upstream project</string>
+    <string name="firephenix_about_upstream_forum">Upstream community</string>
+    <string name="firephenix_about_libraries_show">Show %1$d components and licenses</string>
+    <string name="firephenix_about_libraries_hide">Hide %1$d components and licenses</string>
+</resources>

@@ -11,15 +11,16 @@ val testCoverageEnabled = providers
 
 android {
     namespace = "net.thunderbird.android"
+    testOptions.unitTests.isIncludeAndroidResources = true
 
     defaultConfig {
-        applicationId = "net.thunderbird.android"
-        testApplicationId = "net.thunderbird.android.tests"
+        applicationId = "app.firephenix.android"
+        testApplicationId = "app.firephenix.android.tests"
 
-        versionCode = 33
-        versionName = "24.0"
+        versionCode = 34
+        versionName = "0.1.0-alpha.1"
 
-        buildConfigField("String", "CLIENT_INFO_APP_NAME", "\"Thunderbird for Android\"")
+        buildConfigField("String", "CLIENT_INFO_APP_NAME", "\"FirePhenix for Android\"")
     }
 
     androidResources {
@@ -223,6 +224,9 @@ val fullReleaseImplementation = configurations.create("fullReleaseImplementation
 dependencies {
     implementation(projects.appCommon)
     implementation(projects.core.ui.compose.common)
+    implementation(projects.core.ui.theme.api)
+    implementation(projects.core.ui.theme.manager)
+    implementation(projects.core.preference.api)
     implementation(projects.core.ui.legacy.theme2.thunderbird)
     implementation(projects.feature.launcher)
 
@@ -235,6 +239,9 @@ dependencies {
     implementation(projects.feature.mail.message.list.api)
     implementation(projects.feature.mail.message.list.internal)
     implementation(projects.feature.mail.message.reader.api)
+    implementation(projects.feature.mail.processing.api)
+    implementation(projects.feature.mail.processing.internal)
+    implementation(projects.core.android.account)
 
     implementation(projects.feature.widget.messageList)
     implementation(projects.feature.widget.messageListGlance)
@@ -276,6 +283,7 @@ dependencies {
     testImplementation(projects.plugins.openpgpApiLib.openpgpApi)
     testImplementation(projects.feature.changelog.internal)
 
+    testImplementation(libs.robolectric)
     testImplementation(libs.appauth)
 }
 

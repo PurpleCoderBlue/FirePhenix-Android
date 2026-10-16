@@ -23,6 +23,7 @@ import androidx.preference.SwitchPreference
 import app.k9mail.feature.launcher.FeatureLauncherActivity
 import app.k9mail.feature.launcher.FeatureLauncherTarget
 import com.fsck.k9.activity.ManageIdentities
+import net.thunderbird.feature.account.settings.alias.AliasService
 import com.fsck.k9.activity.setup.AccountSetupComposition
 import com.fsck.k9.controller.MessagingController
 import com.fsck.k9.crypto.OpenPgpApiHelper
@@ -134,6 +135,7 @@ class AccountSettingsFragment : PreferenceFragmentCompat(), ConfirmationDialogFr
                             onDeleteAccount()
                             true
                         }
+
                         else -> false
                     }
                 }
@@ -217,7 +219,9 @@ class AccountSettingsFragment : PreferenceFragmentCompat(), ConfirmationDialogFr
 
     private fun initializeManageIdentities() {
         findPreference<Preference>(PREFERENCE_MANAGE_IDENTITIES)?.onClick {
-            ManageIdentities.start(requireActivity(), accountUuid)
+            val aliases = app.k9mail.legacy.di.DI.getOrNull(AliasService::class.java)
+            if (aliases != null) aliases.openManagement(requireActivity(), accountUuid)
+            else ManageIdentities.start(requireActivity(), accountUuid)
         }
     }
 

@@ -1,5 +1,7 @@
 package com.fsck.k9.ui.settings.account;
 
+import app.k9mail.core.ui.legacy.designsystem.LiquidGlassAlertDialogBuilder;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -162,7 +164,7 @@ public class OpenPgpAppSelectDialog extends BaseActivity {
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity());
+            MaterialAlertDialogBuilder builder = new LiquidGlassAlertDialogBuilder(getActivity());
 
             builder.setTitle(R.string.account_settings_crypto_app_select_title);
 
@@ -230,7 +232,7 @@ public class OpenPgpAppSelectDialog extends BaseActivity {
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireActivity());
+            MaterialAlertDialogBuilder builder = new LiquidGlassAlertDialogBuilder(requireActivity());
 
             builder.setTitle(R.string.dialog_openkeychain_info_title);
             builder.setView(getLayoutInflater().inflate(

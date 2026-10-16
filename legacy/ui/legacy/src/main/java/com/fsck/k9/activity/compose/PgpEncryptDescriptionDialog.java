@@ -1,5 +1,7 @@
 package com.fsck.k9.activity.compose;
 
+import app.k9mail.core.ui.legacy.designsystem.LiquidGlassAlertDialogBuilder;
+
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -34,7 +36,7 @@ public class PgpEncryptDescriptionDialog extends HighlightDialogFragment {
         @SuppressLint("InflateParams")
         View view = LayoutInflater.from(activity).inflate(R.layout.openpgp_encrypt_description_dialog, null);
 
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireActivity());
+        MaterialAlertDialogBuilder builder = new LiquidGlassAlertDialogBuilder(requireActivity());
         builder.setView(view);
 
         builder.setPositiveButton(R.string.openpgp_sign_only_ok, new OnClickListener() {

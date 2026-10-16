@@ -29,6 +29,10 @@ object DI {
         return koinGet(clazz)
     }
 
+    @JvmStatic
+    fun <T : Any> getOrNull(clazz: Class<T>): T? =
+        org.koin.core.context.GlobalContext.getOrNull()?.getOrNull(clazz.kotlin)
+
     inline fun <reified T : Any> get(): T {
         return koinGet(T::class.java)
     }

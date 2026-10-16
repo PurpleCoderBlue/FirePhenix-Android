@@ -182,6 +182,12 @@ internal class DrawerViewModel(
 
             Event.OnSettingsClick -> emitEffect(Effect.OpenSettings)
 
+            is Event.OnEditAccountName -> {
+                if (state.value.accounts.any { it is MailDisplayAccount && it.id == event.accountId }) {
+                    emitEffect(Effect.OpenAccountSettings(event.accountId))
+                }
+            }
+
             Event.OnSyncAccount -> onSyncAccount()
 
             Event.OnSyncAllAccounts -> onSyncAllAccounts()

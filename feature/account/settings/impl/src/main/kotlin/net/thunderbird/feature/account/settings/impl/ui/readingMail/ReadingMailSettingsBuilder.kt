@@ -12,13 +12,23 @@ import net.thunderbird.feature.account.settings.R
 
 class ReadingMailSettingsBuilder(
     private val resources: StringsResourceManager,
+    private val remoteImages: net.thunderbird.feature.account.settings.api.RemoteImageSettingsNavigation? = null,
 ) : ReadingMailSettingsContract.SettingsBuilder {
     override fun build(
         state: ReadingMailSettingsContract.State,
         onEvent: (ReadingMailSettingsContract.Event) -> Unit,
     ): Settings {
         val settings = mutableListOf<Setting>()
-        settings += alwaysShowImage(value = state.showPictures)
+        settings += remoteImages?.let { navigation ->
+            net.thunderbird.core.ui.setting.SettingDecoration.Custom(ReadingMailSettingId.SHOW_PICTURES) { modifier ->
+                val context = androidx.compose.ui.platform.LocalContext.current
+                net.thunderbird.components.ui.bolt.atom.button.ButtonText(
+                    text = resources.stringResource(R.string.account_settings_remote_images_rules),
+                    onClick = { navigation.open(context) },
+                    modifier = modifier,
+                )
+            }
+        } ?: alwaysShowImage(value = state.showPictures)
         settings += markedAsReadOnView(value = state.isMarkMessageAsReadOnView)
         return settings.toImmutableList()
     }

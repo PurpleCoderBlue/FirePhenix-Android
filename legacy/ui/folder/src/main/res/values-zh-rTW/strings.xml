@@ -5,4 +5,6 @@
     <string name="special_mailbox_name_sent">寄件備份</string>
     <string name="special_mailbox_name_trash">垃圾桶</string>
     <string name="special_mailbox_name_inbox">收件匣</string>
+    <string name="special_mailbox_name_archive">封存</string>
+    <string name="special_mailbox_name_spam">垃圾郵件</string>
 </resources>

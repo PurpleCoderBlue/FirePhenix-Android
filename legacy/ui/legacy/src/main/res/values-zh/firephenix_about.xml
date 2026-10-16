@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="firephenix_about_intro">火凤凰是一款基于 Thunderbird for Android 与 K-9 Mail 的个人邮件客户端。</string>
+    <string name="firephenix_about_features_title">邮件与内容处理</string>
+    <string name="firephenix_about_features">支持多账户、发件别名、翻译、独立总结和自动处理规则，采用液态玻璃外观。</string>
+    <string name="firephenix_about_privacy_title">服务配置与隐私</string>
+    <string name="firephenix_about_privacy">翻译、总结的 API 配置及处理结果在本机加密保存。在线服务需要自行配置，保存配置不会发送邮件正文。</string>
+    <string name="firephenix_about_upstream">上游项目与开源致谢</string>
+    <string name="firephenix_about_upstream_website">Thunderbird 上游项目</string>
+    <string name="firephenix_about_upstream_forum">上游社区</string>
+    <string name="firephenix_about_libraries_show">展开 %1$d 项开源组件与许可证</string>
+    <string name="firephenix_about_libraries_hide">收起 %1$d 项开源组件与许可证</string>
+</resources>

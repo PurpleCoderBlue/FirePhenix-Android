@@ -453,7 +453,7 @@ public class MessagingController implements MessagingControllerRegistry, Messagi
 
     public Future<?> searchRemoteMessages(String acctUuid, long folderId, String query, Set<Flag> requiredFlags,
         Set<Flag> forbiddenFlags, MessagingListener listener) {
-        Log.i("searchRemoteMessages (acct = %s, folderId = %d, query = %s)", acctUuid, folderId, query);
+        Log.i("searchRemoteMessages (folderId = %d)", folderId);
 
         return threadPool.submit(() ->
             searchRemoteMessagesSynchronous(acctUuid, folderId, query, requiredFlags, forbiddenFlags, listener)

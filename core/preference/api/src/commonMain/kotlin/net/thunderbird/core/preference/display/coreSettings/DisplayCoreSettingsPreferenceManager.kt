@@ -10,6 +10,12 @@ enum class DisplayCoreSettingKey(val value: String) {
     AppLanguage("language"),
     SplitViewMode("splitViewMode"),
     Theme("theme"),
+    GlassBlur("firephenixGlassBlur"),
+    GlassBackground("firephenixGlassBackground"),
+    GlassBackgroundImage("firephenixGlassBackgroundImage"),
+    GlassBackgroundBlur("firephenixGlassBackgroundBlur"),
+    GlassAutomaticColor("firephenixGlassAutomaticColor"),
+    GlassThemeColor("firephenixGlassThemeColor"),
 }
 
 interface DisplayCoreSettingsPreferenceManager : PreferenceManager<DisplayCoreSettings>

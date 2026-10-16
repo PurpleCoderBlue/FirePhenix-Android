@@ -1,5 +1,6 @@
 package com.fsck.k9.ui.settings
 
+import com.fsck.k9.ui.base.extensions.glassNavOptions
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -174,7 +175,11 @@ class SettingsListFragment : Fragment(), ItemTouchCallback {
         when (item) {
             is AccountItem -> launchAccountSettings(item.account)
             is IntentItem -> startActivity(item.intent)
-            is SettingsActionItem -> findNavController().navigate(item.navigationAction)
+            is SettingsActionItem -> findNavController().navigate(
+                item.navigationAction,
+                null,
+                requireActivity().glassNavOptions(),
+            )
             is UrlActionItem -> openUrl(item.url)
         }
     }

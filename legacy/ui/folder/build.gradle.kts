@@ -4,6 +4,8 @@ plugins {
 
 android {
     namespace = "app.k9mail.legacy.ui.folder"
+
+    testOptions.unitTests.isIncludeAndroidResources = true
 }
 
 dependencies {
@@ -16,6 +18,8 @@ dependencies {
     implementation(projects.feature.mail.folder.api)
 
     implementation(libs.androidx.lifecycle.livedata.ktx)
+
+    testImplementation(libs.robolectric)
 }
 
 codeCoverage {

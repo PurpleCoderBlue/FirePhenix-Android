@@ -1,5 +1,7 @@
 package com.fsck.k9.fragment;
 
+import app.k9mail.core.ui.legacy.designsystem.LiquidGlassAlertDialogBuilder;
+
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -59,7 +61,7 @@ public class ConfirmationDialogFragment extends DialogFragment implements OnClic
         String confirmText = args.getString(ARG_CONFIRM_TEXT);
         String cancelText = args.getString(ARG_CANCEL_TEXT);
 
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity());
+        MaterialAlertDialogBuilder builder = new LiquidGlassAlertDialogBuilder(getActivity());
         builder.setTitle(title);
         builder.setMessage(message);
         if (confirmText != null && cancelText != null) {

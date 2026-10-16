@@ -65,7 +65,7 @@ class TbOAuthConfigurationFactory : OAuthConfigurationFactory {
             "smtp.office365.com",
             "smtp-mail.outlook.com",
         ) to OAuthConfiguration(
-            clientId = "e6f8716e-299d-4ed9-bbf3-453f192f44e5",
+            clientId = "7f186507-2d63-4f98-8f55-7ca2f6baad3d",
             scopes = listOf(
                 "profile",
                 "openid",
@@ -76,7 +76,7 @@ class TbOAuthConfigurationFactory : OAuthConfigurationFactory {
             ),
             authorizationEndpoint = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
             tokenEndpoint = "https://login.microsoftonline.com/common/oauth2/v2.0/token",
-            redirectUri = "msauth://net.thunderbird.android.debug/eaXDuh6T3KFWjcJhsoaObT9OayU%3D",
+            redirectUri = "msauth://app.firephenix.android.debug/0mSO1xhKsrgx%2B%2FX6ZN3aIoNgiOM%3D",
         )
     }
 

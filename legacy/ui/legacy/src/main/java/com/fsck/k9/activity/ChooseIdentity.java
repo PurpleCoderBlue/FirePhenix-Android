@@ -61,6 +61,14 @@ public class ChooseIdentity extends BaseListActivity {
         adapter.clear();
 
         identities = mAccount.getIdentities();
+        net.thunderbird.feature.account.settings.alias.AliasService aliases = DI.getOrNull(
+                net.thunderbird.feature.account.settings.alias.AliasService.class);
+        if (aliases != null) {
+            identities = new java.util.ArrayList<>();
+            for (net.thunderbird.feature.account.settings.alias.SenderAlias alias : aliases.aliases(mAccount.getUuid())) {
+                identities.add(alias.getIdentity());
+            }
+        }
         for (Identity identity : identities) {
             String identityDisplayName = identityFormatter.getDisplayName(identity);
             adapter.add(identityDisplayName);
@@ -72,12 +80,12 @@ public class ChooseIdentity extends BaseListActivity {
     protected void setupClickListeners() {
         this.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Identity identity = mAccount.getIdentity(position);
+                Identity identity = identities.get(position);
                 String email = identity.getEmail();
                 if (email != null && !email.trim().equals("")) {
                     Intent intent = new Intent();
 
-                    intent.putExtra(EXTRA_IDENTITY, mAccount.getIdentity(position));
+                    intent.putExtra(EXTRA_IDENTITY, identities.get(position));
                     setResult(RESULT_OK, intent);
                     finish();
                 } else {

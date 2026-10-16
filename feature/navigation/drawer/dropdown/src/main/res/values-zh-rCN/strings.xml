@@ -10,4 +10,5 @@
     <string name="navigation_drawer_dropdown_action_add_account">添加账号</string>
     <string name="navigation_drawer_dropdown_unified_account_title">统一账号</string>
     <string name="navigation_drawer_dropdown_action_sync_account">同步账号</string>
+    <string name="navigation_drawer_dropdown_action_edit_account_name">修改账户显示昵称</string>
 </resources>

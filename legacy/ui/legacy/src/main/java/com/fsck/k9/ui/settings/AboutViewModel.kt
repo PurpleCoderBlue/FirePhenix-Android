@@ -25,6 +25,7 @@ internal class AboutViewModel(
 }
 
 private val USED_LIBRARIES = persistentListOf(
+    Library("Kyant Backdrop / shapes", "https://github.com/Kyant0/AndroidLiquidGlass", "Apache License, Version 2.0"),
     Library(
         "Android Jetpack libraries",
         "https://developer.android.com/jetpack",

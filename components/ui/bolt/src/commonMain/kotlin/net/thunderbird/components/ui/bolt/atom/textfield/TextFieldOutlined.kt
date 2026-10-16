@@ -1,7 +1,6 @@
 package net.thunderbird.components.ui.bolt.atom.textfield
 
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.OutlinedTextField as Material3OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
@@ -9,6 +8,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import net.thunderbird.components.ui.bolt.PreviewWithThemes
 import net.thunderbird.components.ui.bolt.atom.icon.Icon
 import net.thunderbird.components.ui.bolt.atom.icon.Icons
+import net.thunderbird.components.ui.bolt.theme.glassField
+import net.thunderbird.components.ui.bolt.theme.glassFieldColors
+import net.thunderbird.components.ui.bolt.theme.glassFieldShape
+import androidx.compose.material3.OutlinedTextField as Material3OutlinedTextField
 
 @Suppress("LongParameterList")
 @Composable
@@ -26,9 +29,11 @@ fun TextFieldOutlined(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     Material3OutlinedTextField(
+        shape = glassFieldShape(),
+        colors = glassFieldColors(),
         value = value,
         onValueChange = if (isSingleLine) stripLineBreaks(onValueChange) else onValueChange,
-        modifier = modifier,
+        modifier = modifier.glassField(),
         enabled = isEnabled,
         label = selectLabel(label, isRequired),
         trailingIcon = trailingIcon,
@@ -58,9 +63,11 @@ fun TextFieldOutlined(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     Material3OutlinedTextField(
+        shape = glassFieldShape(),
+        colors = glassFieldColors(),
         value = value,
         onValueChange = if (isSingleLine) stripTextFieldValueLineBreaks(onValueChange) else onValueChange,
-        modifier = modifier,
+        modifier = modifier.glassField(),
         enabled = isEnabled,
         label = selectLabel(label, isRequired),
         trailingIcon = trailingIcon,

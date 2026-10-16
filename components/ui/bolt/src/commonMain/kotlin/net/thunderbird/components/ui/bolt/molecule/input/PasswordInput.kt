@@ -19,6 +19,7 @@ fun PasswordInput(
     isRequired: Boolean = false,
     errorMessage: String? = null,
     contentPadding: PaddingValues = inputContentPadding(),
+    label: String? = null,
 ) {
     InputLayout(
         modifier = modifier,
@@ -28,7 +29,7 @@ fun PasswordInput(
         TextFieldOutlinedPassword(
             value = password,
             onValueChange = onPasswordChange,
-            label = stringResource(Res.string.bolt_molecule_password_input_label),
+            label = label ?: stringResource(Res.string.bolt_molecule_password_input_label),
             isRequired = isRequired,
             hasError = errorMessage != null,
             modifier = Modifier.fillMaxWidth(),

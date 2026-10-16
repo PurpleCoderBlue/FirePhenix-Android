@@ -1,7 +1,5 @@
 package net.thunderbird.components.ui.bolt.atom.button
 
-import androidx.compose.material3.Text as Material3Text
-import androidx.compose.material3.TextButton as Material3TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -9,6 +7,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import net.thunderbird.components.ui.bolt.PreviewWithThemes
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.glassAction
+import androidx.compose.material3.Text as Material3Text
+import androidx.compose.material3.TextButton as Material3TextButton
 
 @Composable
 fun ButtonText(
@@ -21,7 +22,7 @@ fun ButtonText(
 ) {
     Material3TextButton(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.glassAction(interactive = enabled),
         enabled = enabled,
         colors = ButtonDefaults.textButtonColors(
             contentColor = color ?: BoltTheme.colors.primary,

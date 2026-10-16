@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="migration_qrcode_scanning_instructions">Align the QR code provided by a compatible desktop client</string>
+    <string name="onboarding_migration_thunderbird_new_account_title">火凤凰가 처음이신가요?</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_instructions_intro">In a compatible desktop client, go to:</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_instructions_learn_update">Read the compatible desktop client import instructions.</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_instructions_require_latest">Import requires a compatible desktop client with QR account export (Thunderbird Desktop 128 or later). %s</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_title">Import from a compatible desktop client</string>
+    <string name="settings_list_action_support">%s의 업스트림 프로젝트 Thunderbird 후원</string>
+    <string name="onboarding_welcome_developed_by">Thunderbird for Android 기반 파생 버전입니다. 원본 개발자는 MZLA Technologies 팀과 전 세계 자원봉사자이며 Mozilla 제품군에 속합니다. 이 프로젝트의 이름은 火凤凰입니다.</string>
+</resources>

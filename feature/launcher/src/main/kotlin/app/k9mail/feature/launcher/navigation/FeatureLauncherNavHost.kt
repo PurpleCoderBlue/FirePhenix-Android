@@ -13,6 +13,8 @@ import app.k9mail.feature.account.setup.navigation.AccountSetupRoute
 import app.k9mail.feature.launcher.FeatureLauncherExternalContract.MessageListLauncher
 import app.k9mail.feature.onboarding.main.navigation.OnboardingNavigation
 import app.k9mail.feature.onboarding.main.navigation.OnboardingRoute
+import net.thunderbird.components.ui.bolt.theme.GlassPageMotion
+import net.thunderbird.components.ui.bolt.theme.LocalGlassAppearance
 import net.thunderbird.feature.account.settings.api.AccountSettingsNavigation
 import net.thunderbird.feature.debug.settings.navigation.SecretDebugSettingsNavigation
 import net.thunderbird.feature.debug.settings.navigation.SecretDebugSettingsRoute
@@ -40,7 +42,13 @@ fun FeatureLauncherNavHost(
 ) {
     val activity = LocalActivity.current as ComponentActivity
 
+    val appearance = LocalGlassAppearance.current
+    val motion = GlassPageMotion(appearance.motionEnabled)
     NavHost(
+        enterTransition = { motion.enter() },
+        exitTransition = { motion.exit() },
+        popEnterTransition = { motion.enter(back = true) },
+        popExitTransition = { motion.exit(back = true) },
         navController = navController,
         startDestination = OnboardingRoute.Onboarding(),
         modifier = modifier,

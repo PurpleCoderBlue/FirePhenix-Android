@@ -5,4 +5,6 @@
     <string name="special_mailbox_name_sent">已发送邮件</string>
     <string name="special_mailbox_name_trash">已删除邮件</string>
     <string name="special_mailbox_name_inbox">收件箱</string>
+    <string name="special_mailbox_name_archive">归档</string>
+    <string name="special_mailbox_name_spam">垃圾邮件</string>
 </resources>

@@ -1,5 +1,7 @@
 package com.fsck.k9.ui.settings.account
 
+import app.k9mail.core.ui.legacy.designsystem.LiquidGlassAlertDialogBuilder
+
 import android.app.Dialog
 import android.os.Build
 import android.os.Bundle
@@ -53,7 +55,7 @@ class VibrationDialogFragment : PreferenceDialogFragmentCompat() {
             vibrationTimes,
         )
 
-        return MaterialAlertDialogBuilder(context)
+        return LiquidGlassAlertDialogBuilder(context)
             .setAdapter(adapter, null)
             .setPositiveButton(BaseR.string.okay_action, ::onClick)
             .setNegativeButton(BaseR.string.cancel_action, ::onClick)

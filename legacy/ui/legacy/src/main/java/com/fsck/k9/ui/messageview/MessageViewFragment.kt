@@ -100,7 +100,11 @@ import net.thunderbird.feature.mail.message.reader.api.ui.MessageReaderViewContr
 import net.thunderbird.feature.mail.message.reader.api.ui.MessageReaderViewContract.Effect
 import net.thunderbird.feature.mail.message.reader.api.ui.MessageReaderViewContract.Event
 import net.thunderbird.feature.mail.message.reader.api.ui.bridge.MessageReaderBottomSheet
+import net.thunderbird.feature.mail.processing.api.MailProcessingExtension
+import net.thunderbird.feature.mail.processing.api.ProcessingMessage
+import net.thunderbird.feature.mail.processing.api.ReaderContentSlot
 import net.thunderbird.legacy.logging.Log
+import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.compose.koinInject
@@ -153,6 +157,7 @@ class MessageViewFragment :
     private lateinit var messageCryptoPresenter: MessageCryptoPresenter
     private var showProgressThreshold: Long? = null
     private var mMessageViewInfo: MessageViewInfo? = null
+    private val processingInput = MutableStateFlow<ProcessingMessage?>(null)
     private var preferredUnsubscribeUri: UnsubscribeUri? = null
 
     private val messageExporter: MessageExporter by inject()
@@ -177,6 +182,9 @@ class MessageViewFragment :
     // Tracks whether the current Create Document flow is for exporting EML (and not for attachments)
     private var pendingEmlExport: Boolean = false
 
+    private var pendingPresentation: MessageViewInfo? = null
+    private var displayedProcessingHtml: String? = null
+    private var bodyLoadStarted = false
     private var isActive: Boolean = false
 
     private val attachmentListBottomSheetState = MutableStateFlow(persistentListOf<AttachmentListItemModel>())
@@ -225,63 +233,87 @@ class MessageViewFragment :
         setFragmentResultListener(MessageDetailsFragment.FRAGMENT_RESULT_KEY, ::onMessageDetailsResult)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val messageViewThemeResourceId = themeManager.messageViewThemeResourceId
-        val themedContext = ContextThemeWrapper(inflater.context, messageViewThemeResourceId)
-        val layoutInflater = LayoutInflater.from(themedContext)
-
-        val view = layoutInflater.inflate(R.layout.message, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        val context = ContextThemeWrapper(requireContext(), themeManager.messageViewThemeResourceId)
+        val view = LayoutInflater.from(context).inflate(R.layout.message, container, false)
         messageTopView = view.findViewById(R.id.message_view)
-
         initializeMessageTopView(messageTopView)
-
         return view
+    }
+
+    private fun initializeProcessingView(messageTopView: MessageTopView) {
+        val processingExtension = getKoin().getOrNull<MailProcessingExtension>()
+        if (processingExtension != null) {
+            GlassReaderHeader.apply(messageTopView, true)
+            val slots = listOf(
+                R.id.mail_processing_compose_view to ReaderContentSlot.RESULTS,
+                R.id.mail_processing_actions to ReaderContentSlot.ACTIONS,
+            )
+            messageTopView.findViewById<View>(R.id.mail_processing_actions).visibility = View.VISIBLE
+            slots.forEach { (id, slot) ->
+                messageTopView.findViewById<ComposeView>(id).apply {
+                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                    setContent {
+                        val input by processingInput.collectAsState()
+                        input?.let { current ->
+                            themeProvider.WithContentTheme {
+                                processingExtension.Content(current, ::displayProcessedHtml, slot = slot)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun initializeMessageTopView(messageTopView: MessageTopView) {
         messageTopView.setShowAccountIndicator(showAccountIndicator)
+
+        initializeProcessingView(messageTopView)
 
         val sizeFormatter = SizeFormatter(resources)
         val composeView = messageTopView.findViewById<ComposeView>(R.id.bottom_sheet_compose_view)
         composeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                themeProvider.WithTheme {
-                    val attachments by attachmentListBottomSheetState.collectAsState()
-                    val (stateHolder, dispatch) = messageReaderViewModel.observe { effect ->
-                        when (effect) {
-                            Effect.TriggerOnReplyAllListener -> onReplyAll()
-                            Effect.TriggerOnReplyListener -> onReply(forceReplyAction = true)
-                        }
+                val attachments by attachmentListBottomSheetState.collectAsState()
+                val (stateHolder, dispatch) = messageReaderViewModel.observe { effect ->
+                    when (effect) {
+                        Effect.TriggerOnReplyAllListener -> onReplyAll()
+                        Effect.TriggerOnReplyListener -> onReply(forceReplyAction = true)
                     }
-                    val state by stateHolder
-                    val messageReaderBottomSheetContent = koinInject<MessageReaderBottomSheet>()
+                }
+                val state by stateHolder
+                val messageReaderBottomSheetContent = koinInject<MessageReaderBottomSheet>()
 
-                    when {
-                        attachments.isNotEmpty() -> {
-                            AttachmentListModalBottomSheet(
-                                attachments = attachments,
-                                sizeFormatter = sizeFormatter,
-                                onDismissRequest = {
-                                    attachmentListBottomSheetState.update { persistentListOf() }
-                                },
-                                onAttachmentClick = { attachment ->
-                                    attachmentListBottomSheetState.update { persistentListOf() }
-                                    onViewAttachment(attachment)
-                                },
-                                onSaveClick = { attachment ->
-                                    onSaveAttachment(attachment)
-                                },
-                                onSaveAllClick = { onSaveAllAttachments() },
+                if (attachments.isNotEmpty() || state.showReaderActionsBottomSheet) {
+                    themeProvider.WithTheme {
+                        when {
+                            attachments.isNotEmpty() -> {
+                                AttachmentListModalBottomSheet(
+                                    attachments = attachments,
+                                    sizeFormatter = sizeFormatter,
+                                    onDismissRequest = {
+                                        attachmentListBottomSheetState.update { persistentListOf() }
+                                    },
+                                    onAttachmentClick = { attachment ->
+                                        attachmentListBottomSheetState.update { persistentListOf() }
+                                        onViewAttachment(attachment)
+                                    },
+                                    onSaveClick = { attachment ->
+                                        onSaveAttachment(attachment)
+                                    },
+                                    onSaveAllClick = { onSaveAllAttachments() },
+                                )
+                            }
+
+                            state.showReaderActionsBottomSheet -> messageReaderBottomSheetContent.Content(
+                                actions = state.messageReaderActions,
+                                onClick = { action -> dispatch(Event.OnMessageReaderBottomSheetActionClick(action)) },
+                                onDismiss = { dispatch(Event.CloseMessageReaderBottomSheet()) },
+                                modifier = Modifier.fillMaxWidth(),
                             )
                         }
-
-                        state.showReaderActionsBottomSheet -> messageReaderBottomSheetContent.Content(
-                            actions = state.messageReaderActions,
-                            onClick = { action -> dispatch(Event.OnMessageReaderBottomSheetActionClick(action)) },
-                            onDismiss = { dispatch(Event.CloseMessageReaderBottomSheet()) },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
                     }
                 }
             }
@@ -326,8 +358,13 @@ class MessageViewFragment :
             viewLifecycleOwner,
             Lifecycle.State.RESUMED,
         )
+    }
 
-        loadMessage(messageReference)
+    override fun onDestroyView() {
+        bodyLoadStarted = false
+        pendingPresentation = null
+        processingInput.value = null
+        super.onDestroyView()
     }
 
     private fun loadMessage(messageReference: MessageReference) {
@@ -363,8 +400,14 @@ class MessageViewFragment :
 
     override fun onResume() {
         super.onResume()
+        if (!bodyLoadStarted) {
+            bodyLoadStarted = true
+            net.thunderbird.core.ui.theme.manager.GlassMotion.trace(requireContext(), "mail-visible-body-start")
+            loadMessage(messageReference)
+        }
         markMessageAsOpened()
         messageCryptoPresenter.onResume()
+        presentPendingBody()
     }
 
     override fun onDestroy() {
@@ -414,17 +457,17 @@ class MessageViewFragment :
 
             menu.findItem(R.id.archive).isVisible =
                 canMessageBeArchived &&
-                    generalSettingsManager.getConfig()
-                        .display
-                        .visualSettings
-                        .isMessageViewArchiveActionVisible
+                generalSettingsManager.getConfig()
+                    .display
+                    .visualSettings
+                    .isMessageViewArchiveActionVisible
 
             menu.findItem(R.id.spam).isVisible =
                 canMessageBeMovedToSpam &&
-                    generalSettingsManager.getConfig()
-                        .display
-                        .visualSettings
-                        .isMessageViewSpamActionVisible
+                generalSettingsManager.getConfig()
+                    .display
+                    .visualSettings
+                    .isMessageViewSpamActionVisible
 
             menu.findItem(R.id.refile_move).isVisible = true
             menu.findItem(R.id.refile_archive).isVisible = canMessageBeArchived
@@ -479,21 +522,37 @@ class MessageViewFragment :
 
         when (item.itemId) {
             R.id.toggle_message_view_theme -> onToggleTheme()
+
             R.id.delete -> onDelete()
+
             R.id.reply -> onReply()
+
             R.id.reply_all -> onReplyAll()
+
             R.id.forward -> onForward()
+
             R.id.forward_as_attachment -> onForwardAsAttachment()
+
             R.id.edit_as_new_message -> onEditAsNewMessage()
+
             R.id.share -> onSendAlternate()
+
             R.id.toggle_unread -> onToggleRead()
+
             R.id.archive, R.id.refile_archive -> onArchive()
+
             R.id.spam, R.id.refile_spam -> onSpam()
+
             R.id.move, R.id.refile_move -> onMove()
+
             R.id.copy, R.id.refile_copy -> onCopy()
+
             R.id.move_to_drafts -> onMoveToDrafts()
+
             R.id.unsubscribe -> onUnsubscribe()
+
             R.id.show_headers -> onShowHeaders()
+
             R.id.print -> {
                 printMessage()
                 return true
@@ -508,8 +567,11 @@ class MessageViewFragment :
             }
 
             R.id.set_format_plain -> onDisplayPlainText()
+
             R.id.set_format_html -> onDisplayHTML()
+
             R.id.view_compose -> MessageActions.actionCompose(requireActivity(), account)
+
             else -> return false
         }
 
@@ -536,6 +598,10 @@ class MessageViewFragment :
     }
 
     private fun showMessage(messageViewInfo: MessageViewInfo) {
+        if ((parentFragment as? MessageViewContainerFragment)?.bodyPresentationReady == false) {
+            pendingPresentation = messageViewInfo
+            return
+        }
         hideKeyboard()
 
         val handledByCryptoPresenter = messageCryptoPresenter.maybeHandleShowMessage(
@@ -545,7 +611,24 @@ class MessageViewFragment :
         )
 
         if (!handledByCryptoPresenter) {
+            displayedProcessingHtml = null
+            val start = SystemClock.elapsedRealtime()
             messageTopView.showMessage(account, messageViewInfo)
+            net.thunderbird.core.ui.theme.manager.GlassMotion.trace(
+                requireContext(),
+                "mail-body-create",
+                SystemClock.elapsedRealtime() - start,
+            )
+            processingInput.value = ProcessingMessage(
+                accountId = account.uuid,
+                messageId = messageReference.uid,
+                folder = messageReference.folderId.toString(),
+                sender = messageViewInfo.message.from?.firstOrNull()?.address.orEmpty(),
+                subject = messageViewInfo.subject.orEmpty(),
+                html = messageViewInfo.text ?: messageViewInfo.textPlainFormatted.orEmpty(),
+                isSpam = account.spamFolderId == messageReference.folderId,
+                isComplete = !messageViewInfo.isMessageIncomplete,
+            )
 
             if (account.isOpenPgpProviderConfigured) {
                 messageTopView.messageHeaderView.setCryptoStatusDisabled()
@@ -559,12 +642,52 @@ class MessageViewFragment :
         }
     }
 
+    internal fun presentPendingBody() {
+        val info = pendingPresentation ?: return
+        val root = view ?: return
+        root.postOnAnimation {
+            val samePresentation = view === root && pendingPresentation === info
+            val transitionReady = (parentFragment as? MessageViewContainerFragment)?.bodyPresentationReady != false
+            if (isResumed && samePresentation && transitionReady) {
+                pendingPresentation = null
+                showMessage(info)
+            }
+        }
+    }
+
     private fun hideKeyboard() {
         val activity = activity ?: return
 
         val inputMethodManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         val decorView = activity.window.decorView
         inputMethodManager.hideSoftInputFromWindow(decorView.applicationWindowToken, 0)
+    }
+
+    private fun displayProcessedHtml(html: String?) {
+        val original = mMessageViewInfo ?: return
+        // Initial ORIGINAL effects and state echoes must not recreate the already displayed WebView.
+        if (html == displayedProcessingHtml) return
+        displayedProcessingHtml = html
+        val displayed = if (html == null) {
+            original
+        } else {
+            MessageViewInfo(
+                original.message,
+                original.isMessageIncomplete,
+                original.rootPart,
+                original.subject,
+                original.isSubjectEncrypted,
+                html,
+                html,
+                original.attachments,
+                original.cryptoResultAnnotation,
+                original.attachmentResolver,
+                original.extraText,
+                original.extraAttachments,
+                original.preferredUnsubscribeUri,
+            )
+        }
+        messageTopView.showMessage(account, displayed)
     }
 
     private fun displayHeaderForLoadingMessage(message: LocalMessage) {
@@ -639,8 +762,10 @@ class MessageViewFragment :
         val message = checkNotNull(message)
 
         if (interactionSettings.isConfirmDelete ||
-            interactionSettings.isConfirmDeleteStarred &&
-            message.isSet(Flag.FLAGGED)
+            (
+                interactionSettings.isConfirmDeleteStarred &&
+                    message.isSet(Flag.FLAGGED)
+                )
         ) {
             showDialog(R.id.dialog_confirm_delete)
         } else {

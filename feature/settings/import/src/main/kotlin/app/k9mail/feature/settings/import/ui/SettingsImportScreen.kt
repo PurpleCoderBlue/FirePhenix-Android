@@ -16,6 +16,8 @@ import net.thunderbird.components.ui.bolt.atom.button.ButtonIcon
 import net.thunderbird.components.ui.bolt.atom.icon.Icons
 import net.thunderbird.components.ui.bolt.organism.TopAppBar
 import net.thunderbird.components.ui.bolt.template.Scaffold
+import net.thunderbird.feature.account.settings.alias.AliasService
+import org.koin.core.context.GlobalContext
 
 @Composable
 fun SettingsImportScreen(
@@ -51,6 +53,7 @@ private fun SettingsImportContent(
     paddingValues: PaddingValues,
 ) {
     val activity = LocalActivity.current as FragmentActivity
+    val aliases = GlobalContext.getOrNull()?.getOrNull<AliasService>()
 
     activity.supportFragmentManager.setFragmentResultListener(
         SettingsImportFragment.FRAGMENT_RESULT_KEY,
@@ -58,6 +61,7 @@ private fun SettingsImportContent(
     ) { _, result: Bundle ->
         if (result.getBoolean(SettingsImportFragment.FRAGMENT_RESULT_ACCOUNT_IMPORTED, false)) {
             onImportSuccess()
+            aliases?.openManagement(activity, "")
         } else {
             onBack()
         }

@@ -1,5 +1,7 @@
 package com.fsck.k9.activity;
 
+import app.k9mail.core.ui.legacy.designsystem.LiquidGlassAlertDialogBuilder;
+
 
 import java.io.File;
 import java.util.ArrayList;
@@ -72,6 +74,8 @@ import kotlin.Unit;
 import net.thunderbird.core.android.account.LegacyAccountDto;
 import app.k9mail.legacy.di.DI;
 import net.thunderbird.core.android.account.Identity;
+import net.thunderbird.feature.account.settings.alias.AliasService;
+import net.thunderbird.feature.account.settings.alias.AliasRequest;
 import com.fsck.k9.K9;
 import com.fsck.k9.Preferences;
 import com.fsck.k9.activity.MessageLoaderHelper.MessageLoaderCallbacks;
@@ -267,6 +271,13 @@ public class MessageCompose extends BaseActivity implements OnClickListener,
     private LegacyAccountDto account;
     private Identity identity;
     private boolean identityChanged = false;
+    private final AliasService aliasService = DI.getOrNull(AliasService.class);
+    private boolean aliasManuallySelected = false;
+    private boolean aliasChoicePending = false;
+    private int aliasRequestEpoch = 0;
+    private String aliasRequestFingerprint = "";
+    private List<String> aliasOriginalFrom = new ArrayList<>();
+    private List<String> aliasReplyRecipients = new ArrayList<>();
     private boolean signatureChanged = false;
 
     // relates to the message being replied to, forwarded, or edited TODO split up?
@@ -520,7 +531,8 @@ public class MessageCompose extends BaseActivity implements OnClickListener,
         }
 
         if (identity == null) {
-            identity = account.getIdentity(0);
+            identity = aliasService == null ? account.getIdentity(0) : aliasService.defaultIdentity(account.getUuid());
+            if (identity == null) identity = account.getIdentity(0);
         }
 
         if (account.isSignatureBeforeQuotedText()) {
@@ -745,6 +757,9 @@ public class MessageCompose extends BaseActivity implements OnClickListener,
         }
         outState.putParcelable(STATE_IDENTITY, identity);
         outState.putBoolean(STATE_IDENTITY_CHANGED, identityChanged);
+        outState.putBoolean("firephenix.manualAlias", aliasManuallySelected);
+        outState.putStringArrayList("firephenix.aliasOriginalFrom", new ArrayList<>(aliasOriginalFrom));
+        outState.putStringArrayList("firephenix.aliasReplyRecipients", new ArrayList<>(aliasReplyRecipients));
         outState.putString(STATE_IN_REPLY_TO, repliedToMessageId);
         outState.putString(STATE_REFERENCES, referencedMessageIds);
         outState.putBoolean(STATE_KEY_READ_RECEIPT, requestReadReceipt);
@@ -787,6 +802,11 @@ public class MessageCompose extends BaseActivity implements OnClickListener,
         }
         identity = BundleCompat.getParcelable(savedInstanceState, STATE_IDENTITY, Identity.class);
         identityChanged = savedInstanceState.getBoolean(STATE_IDENTITY_CHANGED);
+        aliasManuallySelected = savedInstanceState.getBoolean("firephenix.manualAlias", false);
+        ArrayList<String> original = savedInstanceState.getStringArrayList("firephenix.aliasOriginalFrom");
+        ArrayList<String> recipients = savedInstanceState.getStringArrayList("firephenix.aliasReplyRecipients");
+        if (original != null) aliasOriginalFrom = original;
+        if (recipients != null) aliasReplyRecipients = recipients;
         repliedToMessageId = savedInstanceState.getString(STATE_IN_REPLY_TO);
         referencedMessageIds = savedInstanceState.getString(STATE_REFERENCES);
         changesMadeSinceLastSave = savedInstanceState.getBoolean(STATE_KEY_CHANGES_MADE_SINCE_LAST_SAVE);
@@ -858,7 +878,29 @@ public class MessageCompose extends BaseActivity implements OnClickListener,
         return builder;
     }
 
+    private boolean isCurrentAliasAvailable() {
+        if (identity == null || identity.getEmail() == null) return false;
+        for (net.thunderbird.feature.account.settings.alias.SenderAlias candidate :
+                aliasService.aliases(account.getUuid())) {
+            if (identity.getEmail().equalsIgnoreCase(candidate.getIdentity().getEmail())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void checkToSendMessage() {
+        reconsiderSenderAlias();
+        if (aliasChoicePending) {
+            Toast.makeText(this, net.thunderbird.feature.account.settings.api.R.string.account_settings_api_alias_choose,
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (aliasService != null && !isCurrentAliasAvailable()) {
+            aliasRequestFingerprint = "";
+            reconsiderSenderAlias();
+            return;
+        }
         if (subjectView.getText().length() == 0 && !alreadyNotifiedUserOfEmptySubject) {
             Toast.makeText(this, R.string.empty_subject, Toast.LENGTH_LONG).show();
             alreadyNotifiedUserOfEmptySubject = true;
@@ -1043,6 +1085,11 @@ public class MessageCompose extends BaseActivity implements OnClickListener,
 
 
     private void onAccountChosen(LegacyAccountDto account, Identity identity) {
+        aliasManuallySelected = true;
+        aliasChoicePending = false;
+        aliasRequestEpoch++;
+        subjectView.setEnabled(true);
+        messageContentView.setEnabled(true);
         if (!this.account.equals(account)) {
             Log.v("Switching account from %s to %s", this.account, account);
 
@@ -1179,6 +1226,7 @@ public class MessageCompose extends BaseActivity implements OnClickListener,
     private Unit triggerNonRecipientFieldFocused() {
         replyToPresenter.onNonRecipientFieldFocused();
         recipientPresenter.onNonRecipientFieldFocused();
+        reconsiderSenderAlias();
         return Unit.INSTANCE;
     }
 
@@ -1351,7 +1399,7 @@ public class MessageCompose extends BaseActivity implements OnClickListener,
         final MaterialAlertDialogBuilder builder;
         switch (id) {
             case DIALOG_SAVE_OR_DISCARD_DRAFT_MESSAGE:
-                builder = new MaterialAlertDialogBuilder(this)
+                builder = new LiquidGlassAlertDialogBuilder(this)
                         .setTitle(R.string.save_or_discard_draft_message_dlg_title);
                 if (draftMessageId == null) {
                     builder
@@ -1384,7 +1432,7 @@ public class MessageCompose extends BaseActivity implements OnClickListener,
                         })
                         .create();
             case DIALOG_CONFIRM_DISCARD_ON_BACK:
-                return new MaterialAlertDialogBuilder(this)
+                return new LiquidGlassAlertDialogBuilder(this)
                         .setTitle(R.string.confirm_discard_draft_message_title)
                         .setMessage(R.string.confirm_discard_draft_message)
                         .setPositiveButton(com.fsck.k9.ui.base.R.string.cancel_action, new DialogInterface.OnClickListener() {
@@ -1407,7 +1455,7 @@ public class MessageCompose extends BaseActivity implements OnClickListener,
             case DIALOG_CHOOSE_IDENTITY:
                 int dialogThemeResourceId = getThemeManager().getDialogThemeResourceId();
                 Context context = new ContextThemeWrapper(this, dialogThemeResourceId);
-                builder = new MaterialAlertDialogBuilder(context);
+                builder = new LiquidGlassAlertDialogBuilder(context);
                 builder.setTitle(R.string.send_as);
                 final IdentityAdapter adapter = new IdentityAdapter(context);
                 builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
@@ -1420,7 +1468,7 @@ public class MessageCompose extends BaseActivity implements OnClickListener,
 
                 return builder.create();
             case DIALOG_CONFIRM_DISCARD: {
-                return new MaterialAlertDialogBuilder(this)
+                return new LiquidGlassAlertDialogBuilder(this)
                         .setTitle(R.string.dialog_confirm_delete_title)
                         .setMessage(R.string.dialog_confirm_delete_message)
                         .setPositiveButton(R.string.dialog_confirm_delete_confirm_button,
@@ -1577,6 +1625,17 @@ public class MessageCompose extends BaseActivity implements OnClickListener,
     }
 
     private void setIdentityFromMessage(Message message) {
+        if (aliasService != null) {
+            aliasReplyRecipients = new ArrayList<>();
+            for (Message.RecipientType type : Message.RecipientType.values()) {
+                for (com.fsck.k9.mail.Address address : message.getRecipients(type)) {
+                    aliasReplyRecipients.add(address.getAddress());
+                }
+            }
+            aliasRequestFingerprint = "";
+            reconsiderSenderAlias();
+            return;
+        }
         Identity useIdentity = IdentityHelper.getRecipientIdentityFromMessage(account, message);
         Identity defaultIdentity = account.getIdentity(0);
         if (useIdentity != defaultIdentity) {
@@ -1681,6 +1740,50 @@ public class MessageCompose extends BaseActivity implements OnClickListener,
         replyToPresenter.setIdentity(identity);
 
         quotedMessagePresenter.processDraftMessage(messageViewInfo, k9identity);
+        aliasOriginalFrom = java.util.Collections.singletonList(identity.getEmail());
+        aliasRequestFingerprint = "";
+        reconsiderSenderAlias();
+    }
+
+    public void onAliasRecipientsChanged() {
+        if (action == Action.COMPOSE) reconsiderSenderAlias();
+    }
+
+    private void reconsiderSenderAlias() {
+        if (aliasService == null || account == null || identity == null || recipientPresenter == null) return;
+        List<String> recipients = new ArrayList<>();
+        for (com.fsck.k9.mail.Address address : recipientPresenter.getToAddresses()) recipients.add(address.getAddress());
+        for (com.fsck.k9.mail.Address address : recipientPresenter.getCcAddresses()) recipients.add(address.getAddress());
+        for (com.fsck.k9.mail.Address address : recipientPresenter.getBccAddresses()) recipients.add(address.getAddress());
+        String explicit = aliasManuallySelected ? identity.getEmail() : null;
+        String fingerprint = account.getUuid() + explicit + aliasOriginalFrom + aliasReplyRecipients + recipients;
+        if (fingerprint.equals(aliasRequestFingerprint)) return;
+        aliasRequestFingerprint = fingerprint;
+        int epoch = ++aliasRequestEpoch;
+        aliasChoicePending = true;
+        subjectView.setEnabled(false);
+        messageContentView.setEnabled(false);
+        AliasRequest request = new AliasRequest(account.getUuid(), explicit, aliasOriginalFrom, aliasReplyRecipients, recipients);
+        aliasService.resolve(this, request, resolution -> {
+            if (epoch != aliasRequestEpoch || isFinishing() || isDestroyed()) return;
+            if (resolution.getRequiresChoice()) {
+                int text = resolution.getInvalid() == null
+                        ? net.thunderbird.feature.account.settings.api.R.string.account_settings_api_alias_choose
+                        : net.thunderbird.feature.account.settings.api.R.string.account_settings_api_alias_invalid;
+                Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+                showDialog(DIALOG_CHOOSE_IDENTITY);
+                return;
+            }
+            for (Identity candidate : account.getIdentities()) {
+                if (candidate.getEmail().equalsIgnoreCase(resolution.getSelected())) {
+                    if (!candidate.getEmail().equalsIgnoreCase(identity.getEmail())) switchToIdentity(candidate);
+                    aliasChoicePending = false;
+                    subjectView.setEnabled(true);
+                    messageContentView.setEnabled(true);
+                    return;
+                }
+            }
+        });
     }
 
     static class SendMessageTask extends AsyncTask<Void, Void, Void> {

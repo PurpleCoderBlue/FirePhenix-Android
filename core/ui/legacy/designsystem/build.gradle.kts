@@ -8,6 +8,8 @@ android {
 
 dependencies {
     api(projects.core.ui.legacy.theme2.common)
+
+    testImplementation(libs.robolectric)
 }
 
 codeCoverage {

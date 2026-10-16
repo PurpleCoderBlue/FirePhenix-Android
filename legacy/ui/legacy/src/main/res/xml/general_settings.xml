@@ -29,6 +29,11 @@
                 android:title="@string/settings_language_label"
                 />
 
+            <Preference
+                android:key="firephenix_appearance"
+                android:title="@string/firephenix_appearance_settings"
+                />
+
             <ListPreference
                 android:dialogTitle="@string/settings_theme_label"
                 android:entries="@array/theme_entries"
@@ -411,6 +416,15 @@
             android:title="@string/general_settings_post_mark_as_unread_action_title"
             app:useSimpleSummaryProvider="true"
             />
+
+        <Preference
+            android:key="firephenix_mail_processing"
+            android:title="@string/mail_processing_settings_title"
+            />
+
+        <Preference
+            android:key="firephenix_remote_images"
+            android:title="@string/firephenix_remote_images_title" />
 
         <MultiSelectListPreference
             android:dialogTitle="@string/global_settings_confirm_actions_title"

@@ -9,6 +9,7 @@ android {
 
 dependencies {
     implementation(projects.core.common)
+    implementation(projects.core.ui.theme.api)
     implementation(projects.feature.onboarding.migration.api)
 }
 

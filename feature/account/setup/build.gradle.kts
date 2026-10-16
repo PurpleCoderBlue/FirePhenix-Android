@@ -33,6 +33,7 @@ dependencies {
 
     api(projects.feature.account.common)
     implementation(projects.feature.account.oauth)
+    implementation(projects.feature.account.settings.api)
     implementation(projects.feature.account.server.settings)
     implementation(projects.feature.account.server.certificate)
     implementation(projects.feature.settings.import)

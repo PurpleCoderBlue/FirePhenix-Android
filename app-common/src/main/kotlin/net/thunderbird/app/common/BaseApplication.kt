@@ -28,6 +28,7 @@ import net.thunderbird.core.logging.Logger
 import net.thunderbird.core.logging.file.FileLogSink
 import net.thunderbird.core.ui.theme.manager.ThemeManager
 import net.thunderbird.legacy.logging.Log
+import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
@@ -42,6 +43,10 @@ abstract class BaseApplication : Application(), WorkManagerConfiguration.Provide
     private val notificationChannelManager: NotificationChannelManager by inject()
     private val messageListWidgetManager: MessageListWidgetManager by inject()
     private val workManagerConfigurationProvider: WorkManagerConfigurationProvider by inject()
+    protected fun addDiagnosticLogSink(sink: net.thunderbird.core.logging.LogSink) {
+        getKoin().get<net.thunderbird.core.logging.composite.CompositeLogSink>().manager.add(sink)
+    }
+
     protected val logger: Logger by inject()
     private val syncDebugFileLogSink: FileLogSink by inject(named("syncDebug"))
 

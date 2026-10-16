@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_migration_thunderbird_qr_code_import_title">Import from a compatible desktop client</string>
+    <string name="settings_list_action_support">Support Thunderbird, the upstream project of %s</string>
+    <string name="onboarding_welcome_developed_by">Based on Thunderbird for Android, by MZLA Technologies and community volunteers (Mozilla). FirePhenix is a derivative of the upstream project.</string>
+</resources>

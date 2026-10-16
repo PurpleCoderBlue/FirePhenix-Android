@@ -1,0 +1,10 @@
+<resources>
+    <string name="appearance_content_blur">Content background blur: %1$d</string>
+    <string name="appearance_content_blur_value">Content blur value (0–512)</string>
+    <string name="appearance_content_opacity">Content background opacity: %1$d%%</string>
+    <string name="appearance_content_opacity_value">Content opacity (0–100)</string>
+    <string name="appearance_content_notice">Shared by the message list and reader. Blur affects only the wallpaper; opacity controls its light or dark overlay. Mail text and images stay sharp.</string>
+    <string name="appearance_automatic_color">Theme color from background</string>
+    <string name="appearance_theme_color">Theme color (#RRGGBB)</string>
+    <string name="appearance_theme_color_format">Enter a color in #RRGGBB format.</string>
+</resources>

@@ -1,5 +1,6 @@
 package com.fsck.k9.ui.settings.general
 
+import net.thunderbird.feature.mail.processing.api.R as ProcessingR
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -28,7 +29,9 @@ import java.util.Calendar
 import java.util.Locale
 import net.thunderbird.core.featureflag.FeatureFlagProvider
 import net.thunderbird.core.featureflag.keys.GeneratedFeatureFlagKey
+import net.thunderbird.feature.mail.processing.api.MailProcessingExtension
 import org.koin.android.ext.android.inject
+import org.koin.android.ext.android.getKoin
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class GeneralSettingsFragment : PreferenceFragmentCompat() {
@@ -79,6 +82,7 @@ class GeneralSettingsFragment : PreferenceFragmentCompat() {
         preferenceManager.preferenceDataStore = dataStore
         this.rootKey = rootKey
         setPreferencesFromResource(R.xml.general_settings, rootKey)
+        addFirePhenixPreferences()
 
         findPreference<Preference>("notification_actions_settings")?.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {
@@ -124,6 +128,21 @@ class GeneralSettingsFragment : PreferenceFragmentCompat() {
         viewModel.uiState.observe(this) { uiState ->
             updateUiState(uiState)
         }
+    }
+
+    override fun onDisplayPreferenceDialog(preference: Preference) {
+        if (preference.key == "language" && preference is androidx.preference.ListPreference) {
+            val tag = "firephenix-language-dialog"
+            if (parentFragmentManager.findFragmentByTag(tag) == null) {
+                CompactLanguagePreferenceDialog().apply {
+                    arguments = Bundle().apply { putString("key", preference.key) }
+                    @Suppress("DEPRECATION")
+                    setTargetFragment(this@GeneralSettingsFragment, 0)
+                }.show(parentFragmentManager, tag)
+            }
+            return
+        }
+        super.onDisplayPreferenceDialog(preference)
     }
 
     override fun onDestroyView() {
@@ -233,3 +252,31 @@ class GeneralSettingsFragment : PreferenceFragmentCompat() {
         fun create(rootKey: String? = null) = GeneralSettingsFragment().withArguments(ARG_PREFERENCE_ROOT to rootKey)
     }
 }
+
+private fun GeneralSettingsFragment.addFirePhenixPreferences() {
+        getKoin().getOrNull<net.thunderbird.core.ui.theme.api.AppearanceSettings>()?.let { appearance ->
+            findPreference<Preference>("firephenix_appearance")?.apply {
+                title = appearance.title
+                onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    appearance.open(requireContext())
+                    true
+                }
+            }
+            // The shared appearance editor includes the existing light/dark setting.
+            findPreference<Preference>("theme")?.isVisible = false
+        }
+        getKoin().getOrNull<MailProcessingExtension>()?.let { extension ->
+            findPreference<Preference>("firephenix_remote_images")?.onPreferenceClickListener =
+                Preference.OnPreferenceClickListener {
+                    extension.openRemoteImageSettings(requireContext())
+                    true
+                }
+            findPreference<Preference>("firephenix_mail_processing")?.apply {
+                title = getString(ProcessingR.string.mail_processing_settings_title)
+                onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    extension.openSettings(requireContext())
+                    true
+                }
+            }
+        }
+    }

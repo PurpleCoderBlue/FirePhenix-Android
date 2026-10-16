@@ -1,0 +1,8 @@
+{
+  "tool": "built-in image_gen edit",
+  "input": "phoenix-carrying-mail-glass-before-edge-cleanup.png",
+  "generated": "exec-f8fc4141-58e6-4b20-ae94-3dfbe5a5a778.png",
+  "prompt": "Targeted transparent alpha cleanup: remove white matte, fringe and detached speckles; preserve colored glass phoenix and envelope; no backing or halo.",
+  "sha256": "e3003b466d4e29e6d2fb4bf83db9f2c00e1cf74a3a376bce74e960e60a4e602e",
+  "validation": "RGBA corners alpha 0; visually checked on navy, white, magenta and teal backgrounds at 512px."
+}

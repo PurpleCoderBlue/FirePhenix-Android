@@ -59,6 +59,7 @@ enum class BackgroundOps {
  * Controls when to use the message list split view.
  */
 enum class SplitViewMode {
+    AUTOMATIC,
     ALWAYS,
     NEVER,
     WHEN_IN_LANDSCAPE,

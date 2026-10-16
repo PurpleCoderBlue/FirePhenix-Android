@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -32,9 +31,10 @@ import net.thunderbird.components.ui.bolt.common.window.calculateWindowSizeInfo
 import net.thunderbird.components.ui.bolt.template.LazyColumnWithHeaderFooter
 import net.thunderbird.components.ui.bolt.template.ResponsiveContent
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.core.ui.theme.api.AppearanceSettings
 import org.jetbrains.compose.resources.painterResource
+import org.koin.core.context.GlobalContext
 
-private const val CIRCLE_COLOR = 0xFFEEEEEE
 private const val CIRCLE_SIZE_DP = 200
 private const val CIRCLE_SIZE_SMALL_DP = 125
 private const val LOGO_SIZE_DP = 125
@@ -66,6 +66,10 @@ internal fun WelcomeContent(
                 },
                 content = {
                     item { WelcomeMessageItem() }
+                    item {
+                        GlobalContext.getOrNull()?.getOrNull<AppearanceSettings>()
+                            ?.Content(compact = true, modifier = Modifier.defaultItemModifier())
+                    }
                 },
             )
         }
@@ -114,7 +118,7 @@ private fun WelcomeLogo(
         Box(
             modifier = Modifier
                 .clip(CircleShape)
-                .background(Color(CIRCLE_COLOR))
+                .background(BoltTheme.colors.surfaceContainerHigh)
                 .size(circleSize.dp),
         ) {
             Image(

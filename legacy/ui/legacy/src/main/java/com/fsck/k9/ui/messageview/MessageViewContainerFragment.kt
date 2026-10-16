@@ -25,6 +25,15 @@ import com.fsck.k9.ui.messagelist.MessageListViewModel
  * Individual messages are displayed using a [MessageViewFragment].
  */
 class MessageViewContainerFragment : Fragment() {
+    var bodyPresentationReady: Boolean = true
+        set(value) {
+            field = value
+            if (value && isAdded) {
+                childFragmentManager.fragments.filterIsInstance<MessageViewFragment>()
+                    .forEach { it.presentPendingBody() }
+            }
+        }
+
     var isActive: Boolean = false
         set(value) {
             field = value
@@ -112,6 +121,9 @@ class MessageViewContainerFragment : Fragment() {
         )
 
         val recyclerView = viewPager.getChildAt(0) as? RecyclerView
+        // Adjacent WebView creation competes with the same frame budget as the page entrance.
+        // Both appearances keep swipe navigation and create pages when actually requested.
+        recyclerView?.layoutManager?.isItemPrefetchEnabled = false
         recyclerView?.reduceHorizontalDragSensitivity(
             viewPager = viewPager,
             threshold = VIEW_PAGER_SWIPE_THRESHOLD,

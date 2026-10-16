@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appearance_title">Appearance</string>
+    <string name="appearance_system">Follow system</string>
+    <string name="appearance_light">Light</string>
+    <string name="appearance_dark">Dark</string>
+    <string name="appearance_mode">Light and dark mode</string>
+    <string name="appearance_blur">Glass material blur: %1$d</string>
+    <string name="appearance_reset">Reset blur to 16</string>
+    <string name="appearance_preview">Message text and controls stay sharp</string>
+    <string name="appearance_blur_notice">Blur affects the background scene, not message text or images. Zero keeps the material readable without blur.</string>
+    <string name="appearance_fallback">This Android version uses a static frosted background where GPU blur is unavailable.</string>
+    <string name="appearance_refraction_fallback">Android 13 and newer use live lens refraction. This Android version uses a readable frosted fallback.</string>
+    <string name="appearance_more">More appearance options</string>
+    <string name="appearance_blur_preview_notice">The same icons and text are clear on the left and seen through glass on the right. Drag the slider to compare; foreground text stays sharp.</string>
+    <string name="appearance_preview_background">Clear background</string>
+    <string name="appearance_background">Underlying background</string>
+    <string name="appearance_background_blue">Slate blue (default)</string>
+    <string name="appearance_background_warm">Warm neutral</string>
+    <string name="appearance_background_phoenix">Phoenix colors</string>
+    <string name="appearance_background_custom">Custom image</string>
+    <string name="appearance_background_pick">Choose background image</string>
+    <string name="appearance_background_notice">The image is centered and cropped to fill the screen. The background applies to Liquid glass.</string>
+    <string name="appearance_background_importing">Importing image…</string>
+    <string name="appearance_background_error">Could not import this image. Choose another image.</string>
+    <string name="appearance_background_missing">The saved image is unavailable. Choose it again.</string>
+    <string name="appearance_background_blur">Overall background blur: %1$d</string>
+    <string name="appearance_background_contrast_notice">Blurs only the background. A light or dark overlay follows the theme to keep text readable.</string>
+    <string name="appearance_background_blur_value">Custom background blur (0–512)</string>
+    <string name="appearance_value_range">Enter a number from 0 to %1$d.</string>
+</resources>

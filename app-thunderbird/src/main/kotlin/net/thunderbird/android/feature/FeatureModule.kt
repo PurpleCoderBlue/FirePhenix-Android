@@ -10,6 +10,7 @@ import net.thunderbird.feature.funding.api.FundingSettings
 import net.thunderbird.feature.funding.featureFundingModule
 import net.thunderbird.feature.mail.message.list.internal.featureMessageListModule
 import net.thunderbird.feature.mail.message.reader.api.css.CssClassNameProvider
+import net.thunderbird.feature.mail.processing.internal.mailProcessingModule
 import net.thunderbird.feature.thundermail.thunderbird.inject.featureThundermailModule
 import org.koin.dsl.module
 
@@ -20,7 +21,13 @@ internal val featureModule = module {
     includes(onboardingMigrationModule)
     includes(featureMigrationModule)
     includes(featureMessageListModule)
+    includes(mailProcessingModule)
     includes(featureThundermailModule)
+
+    single<net.thunderbird.feature.account.settings.api.RemoteImageSettingsNavigation> {
+        val processing = get<net.thunderbird.feature.mail.processing.api.MailProcessingExtension>()
+        net.thunderbird.feature.account.settings.api.RemoteImageSettingsNavigation(processing::openRemoteImageSettings)
+    }
 
     single<FundingSettings> { TbFundingSettings() }
 

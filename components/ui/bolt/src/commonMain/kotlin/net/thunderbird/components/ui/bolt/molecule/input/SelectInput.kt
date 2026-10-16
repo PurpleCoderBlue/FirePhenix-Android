@@ -13,6 +13,7 @@ import net.thunderbird.components.ui.bolt.PreviewWithThemes
 import net.thunderbird.components.ui.bolt.atom.textfield.TextFieldOutlinedSelect
 
 @Composable
+@Suppress("LongParameterList")
 fun <T> SelectInput(
     options: ImmutableList<T>,
     selectedOption: T,
@@ -21,6 +22,10 @@ fun <T> SelectInput(
     optionToStringTransformation: (T) -> String = { it.toString() },
     label: String? = null,
     contentPadding: PaddingValues = inputContentPadding(),
+    onOptionLongClick: ((T) -> Unit)? = null,
+    optionLongClickLabel: String? = null,
+    onAddOption: (() -> Unit)? = null,
+    addOptionLabel: String? = null,
 ) {
     Column(
         modifier = Modifier
@@ -35,6 +40,10 @@ fun <T> SelectInput(
             modifier = Modifier.fillMaxWidth(),
             optionToStringTransformation = optionToStringTransformation,
             label = label,
+            onOptionLongClick = onOptionLongClick,
+            optionLongClickLabel = optionLongClickLabel,
+            onAddOption = onAddOption,
+            addOptionLabel = addOptionLabel,
         )
     }
 }

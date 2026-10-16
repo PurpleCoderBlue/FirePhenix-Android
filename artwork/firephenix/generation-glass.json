@@ -1,0 +1,6 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Edit the reference FirePhenix app icon into a premium Apple Liquid Glass material variant. Preserve its recognizable composition: heroic upward open wings, red-orange-gold fire phoenix, vivid eye, curved flaming tail, and an ivory envelope held in its beak. The phoenix itself and envelope should become sculpted, polished translucent colored optical glass, with clear refractive beveled edges, restrained specular reflections, realistic internal thickness, warm amber gold and ruby gradients. Keep rich color; do not turn it into a white silhouette. Simplify fine feather texture for legibility at 48px. No text, no new symbols, no white circular backing, no opaque background, no surrounding squircle or tile: transparent alpha cutout of only the phoenix and envelope, centered, generous safe padding. Keep original silhouette and pose closely so this looks like the glass mode of the same app identity.",
+  "source": "phoenix-carrying-mail.png",
+  "generated": "exec-50fe5f83-b543-42fe-bdf1-698c48840771.png"
+}

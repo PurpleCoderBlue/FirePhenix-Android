@@ -1,0 +1,10 @@
+<resources>
+    <string name="appearance_content_blur">内容背景模糊：%1$d</string>
+    <string name="appearance_content_blur_value">内容模糊数值（0–512）</string>
+    <string name="appearance_content_opacity">内容背景不透明度：%1$d%%</string>
+    <string name="appearance_content_opacity_value">内容不透明度（0–100）</string>
+    <string name="appearance_content_notice">邮件列表和阅读页共用。模糊只作用于背景，不透明度控制浅色或深色遮罩，邮件文字和图片保持清晰。</string>
+    <string name="appearance_automatic_color">从背景自动提取主题色</string>
+    <string name="appearance_theme_color">主题色（#RRGGBB）</string>
+    <string name="appearance_theme_color_format">请输入 #RRGGBB 格式的颜色。</string>
+</resources>

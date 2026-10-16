@@ -34,6 +34,7 @@ class DefaultDisplayCoreSettingsPreferenceManager(
     init {
         preferenceChangeBroker.subscribe(this)
     }
+
     private val configState: MutableStateFlow<DisplayCoreSettings> = MutableStateFlow(value = loadConfig())
     private val mutex = Mutex()
     private val storage: Storage
@@ -50,6 +51,13 @@ class DefaultDisplayCoreSettingsPreferenceManager(
     }
 
     private fun loadConfig(): DisplayCoreSettings = DisplayCoreSettings(
+        glassBlur = storage.getInt(DisplayCoreSettingKey.GlassBlur.value, 16).coerceIn(0, 32),
+        glassBackground = storage.getEnumOrDefault(DisplayCoreSettingKey.GlassBackground.value, GlassBackground.BLUE),
+        glassBackgroundImage = storage.getStringOrDefault(DisplayCoreSettingKey.GlassBackgroundImage.value, ""),
+        glassBackgroundBlur = storage.getInt(DisplayCoreSettingKey.GlassBackgroundBlur.value, 12).coerceIn(0, 512),
+        glassAutomaticColor = storage.getBoolean(DisplayCoreSettingKey.GlassAutomaticColor.value, true),
+        glassThemeColor =
+        storage.getInt(DisplayCoreSettingKey.GlassThemeColor.value, 0xFF3576A5.toInt()) or 0xFF000000.toInt(),
         fixedMessageViewTheme = storage.getBoolean(
             DisplayCoreSettingKey.FixedMessageViewTheme.value,
             DISPLAY_SETTINGS_DEFAULT_FIXED_MESSAGE_VIEW_THEME,
@@ -78,6 +86,18 @@ class DefaultDisplayCoreSettingsPreferenceManager(
         scope.launch(ioDispatcher) {
             mutex.withLock {
                 storageEditor.putEnum(DisplayCoreSettingKey.Theme.value, config.appTheme)
+                storageEditor.putInt(DisplayCoreSettingKey.GlassBlur.value, config.glassBlur.coerceIn(0, 32))
+                storageEditor.putEnum(DisplayCoreSettingKey.GlassBackground.value, config.glassBackground)
+                storageEditor.putString(DisplayCoreSettingKey.GlassBackgroundImage.value, config.glassBackgroundImage)
+                storageEditor.putInt(
+                    DisplayCoreSettingKey.GlassBackgroundBlur.value,
+                    config.glassBackgroundBlur.coerceIn(0, 512),
+                )
+                storageEditor.putBoolean(DisplayCoreSettingKey.GlassAutomaticColor.value, config.glassAutomaticColor)
+                storageEditor.putInt(
+                    DisplayCoreSettingKey.GlassThemeColor.value,
+                    config.glassThemeColor or 0xFF000000.toInt(),
+                )
                 storageEditor.putEnum(DisplayCoreSettingKey.MessageViewTheme.value, config.messageViewTheme)
                 storageEditor.putEnum(
                     DisplayCoreSettingKey.MessageComposeTheme.value,

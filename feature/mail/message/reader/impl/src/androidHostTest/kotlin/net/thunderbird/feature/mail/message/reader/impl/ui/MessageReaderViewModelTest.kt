@@ -4,11 +4,14 @@ import app.cash.turbine.test
 import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.isEmpty
+import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
+import assertk.assertions.isTrue
 import com.fsck.k9.mail.Part
 import kotlin.test.Test
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.test.runTest
+import net.thunderbird.feature.mail.message.reader.api.domain.MessageReaderAction
 import net.thunderbird.feature.mail.message.reader.api.domain.mapper.AttachmentViewInfoMapper
 import net.thunderbird.feature.mail.message.reader.api.domain.mapper.AttachmentViewInfoMapper.AttachmentMetadata
 import net.thunderbird.feature.mail.message.reader.api.ui.MessageReaderViewContract
@@ -16,6 +19,17 @@ import net.thunderbird.feature.mail.message.reader.api.ui.attachment.AttachmentI
 import net.thunderbird.feature.mail.message.reader.api.ui.attachment.AttachmentUiItem
 
 class MessageReaderViewModelTest {
+
+    @Test
+    fun `choosing either reply action closes the sheet before navigating`() = runTest {
+        for (action in listOf(MessageReaderAction.Reply, MessageReaderAction.ReplyAll)) {
+            val testSubject = createTestSubject()
+            testSubject.event(MessageReaderViewContract.Event.OpenMessageReaderBottomSheet())
+            assertThat(testSubject.state.value.showReaderActionsBottomSheet).isTrue()
+            testSubject.event(MessageReaderViewContract.Event.OnMessageReaderBottomSheetActionClick(action))
+            assertThat(testSubject.state.value.showReaderActionsBottomSheet).isFalse()
+        }
+    }
 
     @Test
     fun `state should start with empty attachments`() = runTest {

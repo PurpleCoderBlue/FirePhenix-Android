@@ -16,6 +16,8 @@ import app.k9mail.feature.onboarding.permissions.ui.PermissionsScreen
 import app.k9mail.feature.onboarding.welcome.ui.WelcomeScreen
 import app.k9mail.feature.settings.import.ui.SettingsImportAction
 import app.k9mail.feature.settings.import.ui.SettingsImportScreen
+import net.thunderbird.components.ui.bolt.theme.GlassPageMotion
+import net.thunderbird.components.ui.bolt.theme.LocalGlassAppearance
 import org.koin.compose.koinInject
 
 const val NESTED_NAVIGATION_ROUTE_WELCOME = "welcome"
@@ -58,7 +60,13 @@ fun OnboardingNavHost(
         navController.navigateToPermissions()
     }
 
+    val appearance = LocalGlassAppearance.current
+    val motion = GlassPageMotion(appearance.motionEnabled)
     NavHost(
+        enterTransition = { motion.enter() },
+        exitTransition = { motion.exit() },
+        popEnterTransition = { motion.enter(back = true) },
+        popExitTransition = { motion.exit(back = true) },
         navController = navController,
         startDestination = NESTED_NAVIGATION_ROUTE_WELCOME,
     ) {

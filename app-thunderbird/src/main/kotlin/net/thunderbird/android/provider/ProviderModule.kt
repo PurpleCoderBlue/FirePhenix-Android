@@ -17,7 +17,10 @@ internal val providerModule = module {
 
     single<ThemeProvider> { TbThemeProvider() }
 
-    single<FeatureThemeProvider> { TbFeatureThemeProvider() }
+    single<FeatureThemeProvider> { TbFeatureThemeProvider(get()) }
+    single<net.thunderbird.core.ui.theme.api.AppearanceSettings> {
+        net.thunderbird.core.ui.theme.manager.DefaultAppearanceSettings(androidContext(), get(), get())
+    }
 
     single<NotificationIconResourceProvider> {
         TbAppIconNotificationProvider()

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="processing_profile_name">Name (optional)</string>
+    <string name="processing_saving">Saving…</string>
+    <string name="processing_invalid_endpoint">Enter a valid HTTPS API address without a username, password or fragment.</string>
+    <string name="processing_missing_model">Enter a model name supplied by this service.</string>
+    <string name="processing_missing_key">Enter an API key. Leaving it blank only retains a key for the same provider and address.</string>
+    <string name="processing_invalid_parameters">Optional parameters must be a JSON object. You can leave this field blank.</string>
+    <string name="processing_copy_optional">Choose a configuration (optional)</string>
+    <string name="processing_copy_summary">Copy from a summary service</string>
+    <string name="processing_copy_translation">Copy from a translation service</string>
+    <string name="processing_copy_notice">Address, model, parameters and key copied. After saving, the two configurations are managed independently. The key remains hidden.</string>
+    <string name="processing_manage_service">Edit or delete service</string>
+    <string name="processing_service_long_press">Select a default service. Long-press a saved service to edit or delete it.</string>
+    <string name="processing_options">Translation and summary options</string>
+</resources>

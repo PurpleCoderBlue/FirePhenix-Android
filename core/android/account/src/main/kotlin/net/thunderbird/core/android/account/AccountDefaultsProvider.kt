@@ -18,7 +18,7 @@ interface AccountDefaultsProvider {
     fun applyOverwrites(account: LegacyAccountDto, storage: Storage)
 
     companion object {
-        const val DEFAULT_MAXIMUM_AUTO_DOWNLOAD_MESSAGE_SIZE = 131072
+        const val DEFAULT_MAXIMUM_AUTO_DOWNLOAD_MESSAGE_SIZE = 5 * 1024 * 1024
 
         @JvmStatic
         val DEFAULT_MESSAGE_FORMAT = MessageFormat.HTML

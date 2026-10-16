@@ -32,6 +32,7 @@ dependencies {
 
     implementation(projects.legacy.logging)
     implementation(projects.core.ui.contract)
+    implementation(projects.core.ui.theme.api)
     implementation(projects.core.ui.navigation)
     implementation(projects.core.common)
 

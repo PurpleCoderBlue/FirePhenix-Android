@@ -84,6 +84,8 @@ import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
 
 private const val TAG = "MainActivity"
+private const val ADAPTIVE_MIN_WIDTH_DP = 840
+private const val ADAPTIVE_MIN_HEIGHT_DP = 480
 
 /**
  * The primary user interface of the application, responsible for displaying and managing the main screen.
@@ -173,11 +175,19 @@ open class MessageHomeActivity :
             setLayout(R.layout.split_message_list)
         } else {
             setLayout(R.layout.message_list)
+            val config = generalSettingsManager.getConfig().display
+            val motion = net.thunderbird.core.ui.theme.manager.GlassMotion.animationResources
             viewSwitcher = findViewById<ViewSwitcher>(R.id.container).apply {
-                firstInAnimation = AnimationUtils.loadAnimation(this@MessageHomeActivity, R.anim.slide_in_left)
-                firstOutAnimation = AnimationUtils.loadAnimation(this@MessageHomeActivity, R.anim.slide_out_right)
-                secondInAnimation = AnimationUtils.loadAnimation(this@MessageHomeActivity, R.anim.slide_in_right)
-                secondOutAnimation = AnimationUtils.loadAnimation(this@MessageHomeActivity, R.anim.slide_out_left)
+                setAnimationManager(object : net.thunderbird.core.ui.animation.manager.AnimationManager {
+                    override fun shouldShowAnimations(): Boolean =
+                        net.thunderbird.core.ui.theme.manager.GlassMotion.enabled(
+                            this@MessageHomeActivity, config.visualSettings.animationPreference,
+                        )
+                })
+                firstInAnimation = AnimationUtils.loadAnimation(this@MessageHomeActivity, motion.popEnter)
+                firstOutAnimation = AnimationUtils.loadAnimation(this@MessageHomeActivity, motion.popExit)
+                secondInAnimation = AnimationUtils.loadAnimation(this@MessageHomeActivity, motion.enter)
+                secondOutAnimation = AnimationUtils.loadAnimation(this@MessageHomeActivity, motion.exit)
                 setOnSwitchCompleteListener(this@MessageHomeActivity)
             }
         }
@@ -382,6 +392,9 @@ open class MessageHomeActivity :
         val splitViewMode = generalSettingsManager.getConfig().display.coreSettings.splitViewMode
         val orientation = resources.configuration.orientation
         return when (splitViewMode) {
+            SplitViewMode.AUTOMATIC -> resources.configuration.screenWidthDp >= ADAPTIVE_MIN_WIDTH_DP &&
+                resources.configuration.screenHeightDp >= ADAPTIVE_MIN_HEIGHT_DP
+
             SplitViewMode.ALWAYS -> true
             SplitViewMode.NEVER -> false
             SplitViewMode.WHEN_IN_LANDSCAPE -> orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -679,7 +692,22 @@ open class MessageHomeActivity :
             openUnifiedFolder = { openUnifiedFolders() },
             openManageFolders = { launchManageFoldersScreen() },
             openSettings = { SettingsActivity.launch(this) },
+            openAccountSettings = { accountId ->
+                FeatureLauncherActivity.launch(
+                    context = this,
+                    target = FeatureLauncherTarget.AccountSettings(accountId),
+                )
+            },
             createDrawerListener = { createDrawerListener() },
+            motionDurationMillis = {
+                val enabled = net.thunderbird.core.ui.theme.manager.GlassMotion.enabled(
+                    this, generalSettingsManager.getConfig().display.visualSettings.animationPreference,
+                )
+                if (enabled) resources.getInteger(
+                    app.k9mail.core.ui.legacy.designsystem.R.integer.firephenix_page_motion_duration,
+                ).toLong() else 0L
+            },
+            onMotion = { stage -> net.thunderbird.core.ui.theme.manager.GlassMotion.trace(this, stage) },
         )
     }
 
@@ -691,7 +719,10 @@ open class MessageHomeActivity :
                 }
             }
 
-            override fun onDrawerStateChanged(newState: Int) = Unit
+            override fun onDrawerStateChanged(newState: Int) {
+                val stage = if (newState == DrawerLayout.STATE_IDLE) "drawer-motion-end" else "drawer-motion-begin"
+                net.thunderbird.core.ui.theme.manager.GlassMotion.trace(this@MessageHomeActivity, stage)
+            }
 
             override fun onDrawerOpened(drawerView: View) {
                 collapseSearchView()
@@ -1094,6 +1125,8 @@ open class MessageHomeActivity :
     }
 
     override fun openMessage(messageReference: MessageReference) {
+        val motionStart = android.os.SystemClock.elapsedRealtime()
+        net.thunderbird.core.ui.theme.manager.GlassMotion.trace(this, "mail-create-begin")
         val account = accountManager.getAccount(messageReference.accountUuid) ?: error("Account not found")
         val folderId = messageReference.folderId
 
@@ -1105,11 +1138,17 @@ open class MessageHomeActivity :
             val fragment = MessageViewContainerFragment.newInstance(
                 reference = messageReference,
                 isShowAccountIndicator = isShowAccountIndicator,
-            )
+            ).apply {
+                bodyPresentationReady = displayMode == DisplayMode.SPLIT_VIEW || !messageListWasDisplayed ||
+                    viewSwitcher?.animationManager?.shouldShowAnimations() != true
+            }
             supportFragmentManager.commitNow {
                 replace(R.id.message_view_container, fragment, FRAGMENT_TAG_MESSAGE_VIEW_CONTAINER)
             }
 
+            net.thunderbird.core.ui.theme.manager.GlassMotion.trace(
+                this, "mail-create-end", android.os.SystemClock.elapsedRealtime() - motionStart,
+            )
             messageViewContainerFragment = fragment
 
             messageListFragment?.let { messageListFragment ->
@@ -1340,10 +1379,12 @@ open class MessageHomeActivity :
     }
 
     private fun showMessageList() {
+        net.thunderbird.core.ui.theme.manager.GlassMotion.trace(this, "mail-exit-begin")
         messageViewOnly = false
         messageListWasDisplayed = true
         displayMode = DisplayMode.MESSAGE_LIST
 
+        messageViewContainerFragment?.bodyPresentationReady = false
         messageViewContainerFragment?.isActive = false
         messageListFragment!!.isActive = true
         messageListFragment!!.setActiveMessage(null)
@@ -1368,6 +1409,7 @@ open class MessageHomeActivity :
     }
 
     private fun showMessageView() {
+        net.thunderbird.core.ui.theme.manager.GlassMotion.trace(this, "mail-enter-begin")
         val messageViewContainerFragment = checkNotNull(this.messageViewContainerFragment)
 
         displayMode = DisplayMode.MESSAGE_VIEW
@@ -1397,6 +1439,10 @@ open class MessageHomeActivity :
     }
 
     override fun onSwitchComplete(displayedChild: Int) {
+        net.thunderbird.core.ui.theme.manager.GlassMotion.trace(this, "mail-switch-end-$displayedChild")
+        if (displayedChild == 1) {
+            messageViewContainerFragment?.bodyPresentationReady = true
+        }
         if (displayedChild == 0) {
             removeMessageViewContainerFragment()
             messageListFragment?.onFullyActive()

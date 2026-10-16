@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="migration_qrcode_scanning_instructions">Align the QR code provided by a compatible desktop client</string>
+    <string name="onboarding_migration_thunderbird_new_account_title">火凤凰 は初めてですか？</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_instructions_intro">In a compatible desktop client, go to:</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_instructions_learn_update">Read the compatible desktop client import instructions.</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_instructions_require_latest">Import requires a compatible desktop client with QR account export (Thunderbird Desktop 128 or later). %s</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_title">Import from a compatible desktop client</string>
+    <string name="settings_list_action_support">%s の上流プロジェクト Thunderbird を支援</string>
+    <string name="onboarding_welcome_developed_by">Thunderbird for Android を基にした派生版です。上流の開発者は MZLA Technologies と世界のボランティアで、Mozilla ファミリーに属します。本プロジェクトの名称は火凤凰です。</string>
+</resources>

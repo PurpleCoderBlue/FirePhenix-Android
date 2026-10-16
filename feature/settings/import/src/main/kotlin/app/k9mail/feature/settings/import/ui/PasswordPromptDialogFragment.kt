@@ -11,6 +11,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import app.k9mail.core.ui.legacy.designsystem.LiquidGlassAlertDialogBuilder
 import app.k9mail.feature.settings.importing.R
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -47,7 +48,7 @@ class PasswordPromptDialogFragment : DialogFragment() {
             outgoingServerName,
         )
 
-        return MaterialAlertDialogBuilder(requireContext())
+        return LiquidGlassAlertDialogBuilder(requireContext())
             .setView(dialogView)
             .setPositiveButton(BaseR.string.okay_action) { _, _ -> deliverPasswordPromptResult() }
             .setNegativeButton(BaseR.string.cancel_action, null)

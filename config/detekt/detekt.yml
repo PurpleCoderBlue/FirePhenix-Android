@@ -877,6 +877,9 @@ Compose:
   CompositionLocalAllowlist:
     active: true
     allowedCompositionLocals: [
+      LocalGlassAppearance,
+      LocalGlassBackdrop,
+      LocalGlassToolbar,
       LocalColors,
       LocalDateTimeConfiguration,
       LocalElevations,

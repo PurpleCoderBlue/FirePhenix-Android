@@ -2,6 +2,8 @@ package net.thunderbird.components.ui.bolt.theme.k9mail
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import net.thunderbird.components.ui.bolt.resources.Res
+import net.thunderbird.components.ui.bolt.resources.bolt_k9mail_logo
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
 import net.thunderbird.components.ui.bolt.theme.ThemeColorSchemeVariants
 import net.thunderbird.components.ui.bolt.theme.ThemeConfig
@@ -12,8 +14,6 @@ import net.thunderbird.components.ui.bolt.theme.default.defaultThemeShapes
 import net.thunderbird.components.ui.bolt.theme.default.defaultThemeSizes
 import net.thunderbird.components.ui.bolt.theme.default.defaultThemeSpacings
 import net.thunderbird.components.ui.bolt.theme.default.defaultTypography
-import net.thunderbird.components.ui.bolt.resources.Res
-import net.thunderbird.components.ui.bolt.resources.bolt_k9mail_logo
 
 @Composable
 fun K9MailBoltTheme(

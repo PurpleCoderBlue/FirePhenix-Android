@@ -26,6 +26,7 @@ class MessageReaderViewModel(
     }
 
     private fun handleOnMessageReaderBottomSheetActionClick(action: MessageReaderAction) {
+        updateState { it.copy(showReaderActionsBottomSheet = false) }
         when (action) {
             MessageReaderAction.Reply -> emitEffect(MessageReaderViewContract.Effect.TriggerOnReplyListener)
             MessageReaderAction.ReplyAll -> emitEffect(MessageReaderViewContract.Effect.TriggerOnReplyAllListener)

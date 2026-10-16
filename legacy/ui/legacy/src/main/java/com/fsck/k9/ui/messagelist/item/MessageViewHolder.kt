@@ -2,6 +2,8 @@ package com.fsck.k9.ui.messagelist.item
 
 import android.content.res.Resources
 import android.graphics.Typeface
+import android.graphics.Color
+import com.fsck.k9.ui.resolveColorAttribute
 import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -111,7 +113,10 @@ class MessageViewHolder(
             if (appearance.showContactPicture && contactPictureView.isVisible) {
                 setContactPicture(contactPictureView, displayAddress)
             }
-            itemView.setBackgroundColor(selectBackgroundColor(isSelected, isRead, isActive))
+            val accent = app.k9mail.core.ui.legacy.designsystem.GlassThemePalette.forContext(itemView.context)?.accent
+                ?: theme.resolveColorAttribute(androidx.appcompat.R.attr.colorPrimary)
+            val selectedBackground = androidx.core.graphics.ColorUtils.setAlphaComponent(accent, SELECTED_GLASS_ALPHA)
+            itemView.setBackgroundColor(if (isSelected || isActive) selectedBackground else Color.TRANSPARENT)
             updateWithThreadCount(displayThreadCount)
             val beforePreviewText = if (appearance.senderAboveSubject) subject else displayName
             val messageStringBuilder = SpannableStringBuilder(beforePreviewText)
@@ -242,17 +247,6 @@ class MessageViewHolder(
         }
     }
 
-    private fun selectBackgroundColor(selected: Boolean, read: Boolean, active: Boolean): Int {
-        val backGroundAsReadIndicator = appearance().backGroundAsReadIndicator
-        return when {
-            selected -> colors.selectedBackground
-            active -> colors.activeBackground
-            backGroundAsReadIndicator && read -> colors.readBackground
-            backGroundAsReadIndicator && !read -> colors.unreadBackground
-            else -> colors.regularBackground
-        }
-    }
-
     private fun selectPreviewTextColor(active: Boolean, selected: Boolean): Int {
         return when {
             selected -> colors.previewSelectedText
@@ -274,6 +268,7 @@ class MessageViewHolder(
     }
 
     companion object {
+        private const val SELECTED_GLASS_ALPHA = 64
 
         @Suppress("LongParameterList")
         fun create(

@@ -26,6 +26,8 @@ import app.k9mail.feature.account.setup.ui.options.sync.SyncOptionsScreen
 import app.k9mail.feature.account.setup.ui.options.sync.SyncOptionsViewModel
 import app.k9mail.feature.account.setup.ui.specialfolders.SpecialFoldersScreen
 import app.k9mail.feature.account.setup.ui.specialfolders.SpecialFoldersViewModel
+import net.thunderbird.components.ui.bolt.theme.GlassPageMotion
+import net.thunderbird.components.ui.bolt.theme.LocalGlassAppearance
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -50,7 +52,13 @@ fun AccountSetupNavHost(
     var isAutomaticConfig by rememberSaveable { mutableStateOf(skipToIncomingValidation) }
     var hasSpecialFolders by rememberSaveable { mutableStateOf(false) }
 
+    val appearance = LocalGlassAppearance.current
+    val motion = GlassPageMotion(appearance.motionEnabled)
     NavHost(
+        enterTransition = { motion.enter() },
+        exitTransition = { motion.exit() },
+        popEnterTransition = { motion.enter(back = true) },
+        popExitTransition = { motion.exit(back = true) },
         navController = navController,
         startDestination = if (skipToIncomingValidation) {
             NESTED_NAVIGATION_INCOMING_SERVER_VALIDATION

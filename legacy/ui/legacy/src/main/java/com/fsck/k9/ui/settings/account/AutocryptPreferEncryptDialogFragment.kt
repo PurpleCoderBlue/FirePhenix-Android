@@ -1,5 +1,7 @@
 package com.fsck.k9.ui.settings.account
 
+import app.k9mail.core.ui.legacy.designsystem.LiquidGlassAlertDialogBuilder
+
 import android.app.Dialog
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
@@ -30,7 +32,7 @@ class AutocryptPreferEncryptDialogFragment : PreferenceDialogFragmentCompat() {
             preferEncryptCheckbox.performClick()
         }
 
-        return MaterialAlertDialogBuilder(requireContext())
+        return LiquidGlassAlertDialogBuilder(requireContext())
             .setView(view)
             .setPositiveButton(BaseR.string.okay_action, ::onClick)
             .setNegativeButton(BaseR.string.cancel_action, ::onClick)

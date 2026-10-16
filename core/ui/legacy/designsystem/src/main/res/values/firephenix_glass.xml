@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="firephenixLiquidGlass" format="boolean" />
+    <attr name="firephenixGlassDark" format="boolean" />
+    <style name="FirePhenixGlassPopups">
+        <item name="firephenixLiquidGlass">true</item>
+        <item name="firephenixGlassDark">false</item>
+        <item name="popupMenuStyle">@style/FirePhenixGlassPopupMenu</item>
+        <item name="actionOverflowMenuStyle">@style/FirePhenixGlassPopupMenu</item>
+        <item name="listPopupWindowStyle">@style/FirePhenixGlassPopupMenu</item>
+        <item name="alertDialogTheme">@style/FirePhenixGlassDialogLight</item>
+        <item name="materialAlertDialogTheme">@style/FirePhenixGlassDialogLight</item>
+    </style>
+    <style name="FirePhenixGlassPopupsDark" parent="FirePhenixGlassPopups">
+        <item name="firephenixGlassDark">true</item>
+        <item name="alertDialogTheme">@style/FirePhenixGlassDialogDark</item>
+        <item name="materialAlertDialogTheme">@style/FirePhenixGlassDialogDark</item>
+    </style>
+    <style name="FirePhenixGlassPopupMenu">
+        <item name="android:popupBackground">@drawable/firephenix_liquid_popup</item>
+    </style>
+    <style name="FirePhenixGlassDialogLight" parent="Theme.Material3.Light.Dialog.Alert">
+        <item name="android:windowAnimationStyle">@style/FirePhenixGlassWindowAnimations</item>
+        <item name="android:windowBackground">@drawable/firephenix_liquid_popup</item>
+        <item name="android:colorBackground">#FFF8F8FC</item>
+        <item name="colorSurface">#FFF8F8FC</item>
+        <item name="colorOnSurface">#FF1B1B1F</item>
+        <item name="android:textColorPrimary">#FF1B1B1F</item>
+        <item name="android:textColorSecondary">#FF49454F</item>
+    </style>
+    <style name="FirePhenixGlassDialogDark" parent="Theme.Material3.Dark.Dialog.Alert">
+        <item name="android:windowAnimationStyle">@style/FirePhenixGlassWindowAnimations</item>
+        <item name="android:windowBackground">@drawable/firephenix_liquid_popup</item>
+        <item name="android:colorBackground">#FF15171D</item>
+        <item name="colorSurface">#FF15171D</item>
+        <item name="colorOnSurface">#FFE6E1E5</item>
+        <item name="android:textColorPrimary">#FFE6E1E5</item>
+        <item name="android:textColorSecondary">#FFCAC4D0</item>
+    </style>
+    <style name="FirePhenixGlassWindowAnimations">
+        <item name="android:activityOpenEnterAnimation">@anim/firephenix_forward_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/firephenix_forward_exit</item>
+        <item name="android:activityCloseEnterAnimation">@anim/firephenix_back_enter</item>
+        <item name="android:activityCloseExitAnimation">@anim/firephenix_back_exit</item>
+        <item name="android:windowEnterAnimation">@anim/firephenix_popup_enter</item>
+        <item name="android:windowExitAnimation">@anim/firephenix_popup_exit</item>
+    </style>
+    <style name="FirePhenixGlassDialogLightNoMotion" parent="FirePhenixGlassDialogLight">
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+    <style name="FirePhenixGlassDialogDarkNoMotion" parent="FirePhenixGlassDialogDark">
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+    <style name="FirePhenixGlassPopupsNoMotion" parent="FirePhenixGlassPopups">
+        <item name="alertDialogTheme">@style/FirePhenixGlassDialogLightNoMotion</item>
+        <item name="materialAlertDialogTheme">@style/FirePhenixGlassDialogLightNoMotion</item>
+    </style>
+    <style name="FirePhenixGlassPopupsDarkNoMotion" parent="FirePhenixGlassPopupsDark">
+        <item name="alertDialogTheme">@style/FirePhenixGlassDialogDarkNoMotion</item>
+        <item name="materialAlertDialogTheme">@style/FirePhenixGlassDialogDarkNoMotion</item>
+    </style>
+</resources>

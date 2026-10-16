@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="migration_qrcode_scanning_instructions">Align the QR code provided by a compatible desktop client</string>
+    <string name="onboarding_migration_thunderbird_new_account_title">Νέος χρήστης του FirePhenix;</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_instructions_intro">In a compatible desktop client, go to:</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_instructions_learn_update">Read the compatible desktop client import instructions.</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_instructions_require_latest">Import requires a compatible desktop client with QR account export (Thunderbird Desktop 128 or later). %s</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_title">Import from a compatible desktop client</string>
+    <string name="settings_list_action_support">Support Thunderbird, the upstream project of %s</string>
+    <string name="onboarding_welcome_developed_by">Based on Thunderbird for Android, by MZLA Technologies and community volunteers (Mozilla). FirePhenix is a derivative of the upstream project.</string>
+</resources>

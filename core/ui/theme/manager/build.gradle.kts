@@ -1,9 +1,10 @@
 plugins {
-    id(ThunderbirdPlugins.Library.android)
+    id(ThunderbirdPlugins.Library.androidCompose)
 }
 
 android {
     namespace = "net.thunderbird.core.ui.theme.manager"
+    testOptions.unitTests.isIncludeAndroidResources = true
 }
 
 dependencies {

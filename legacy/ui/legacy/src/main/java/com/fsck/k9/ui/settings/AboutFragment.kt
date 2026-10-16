@@ -25,6 +25,10 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -35,6 +39,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import net.thunderbird.components.ui.bolt.atom.Surface
+import net.thunderbird.components.ui.bolt.atom.button.ButtonText
+import androidx.compose.ui.graphics.ColorFilter
 import net.thunderbird.components.ui.bolt.atom.text.TextBodyMedium
 import net.thunderbird.components.ui.bolt.atom.text.TextTitleMedium
 import net.thunderbird.components.ui.bolt.atom.text.TextTitleSmall
@@ -66,7 +72,7 @@ class AboutFragment : Fragment() {
             )
             val appLogoResId = resolveAppLogoResId(requireContext())
             val aboutTitle = context.getString(R.string.about_title, appNameProvider.appName)
-            val projectTitle = context.getString(R.string.about_project_title)
+            val projectTitle = context.getString(R.string.firephenix_about_upstream)
             val librariesTitle = context.getString(R.string.about_libraries)
 
             setContent {
@@ -208,6 +214,7 @@ fun AboutScreen(
                 .verticalScroll(scrollState),
         ) {
             AppLogo(logoResId = appLogoResId)
+            AboutIntroduction()
             SectionTitle(title = aboutTitle)
             SectionContent(
                 sectionLabel = stringResource(R.string.version),
@@ -215,6 +222,8 @@ fun AboutScreen(
                 sectionImageId = DesignSystemR.drawable.ic_info,
                 onClick = displayChangeLog,
             )
+            AboutCapabilities()
+            SectionTitle(title = projectTitle)
             SectionContent(
                 sectionLabel = stringResource(R.string.authors),
                 sectionText = stringResource(R.string.about_app_authors_k9),
@@ -222,7 +231,6 @@ fun AboutScreen(
                 sectionImageId = DesignSystemR.drawable.ic_group,
                 onClick = displayAuthors,
             )
-
             SectionContent(
                 sectionLabel = stringResource(R.string.license),
                 sectionText = stringResource(R.string.app_license),
@@ -230,25 +238,68 @@ fun AboutScreen(
                 onClick = displayLicense,
             )
 
-            SectionTitle(title = projectTitle)
-
             SectionContent(
-                sectionLabel = stringResource(R.string.about_website_title),
+                sectionLabel = stringResource(R.string.firephenix_about_upstream_website),
                 sectionText = stringResource(R.string.app_webpage_url),
                 sectionImageId = DesignSystemR.drawable.ic_link,
                 onClick = displayWebSite,
             )
 
             SectionContent(
-                sectionLabel = stringResource(R.string.user_forum_title),
+                sectionLabel = stringResource(R.string.firephenix_about_upstream_forum),
                 sectionText = stringResource(R.string.user_forum_url),
                 sectionImageId = DesignSystemR.drawable.ic_forum,
                 onClick = displayForum,
             )
 
-            SectionTitle(title = librariesTitle)
-            LibraryList(libraries = libraries)
+            AboutLibraries(librariesTitle, libraries)
         }
+    }
+}
+
+@Composable
+private fun AboutLibraries(librariesTitle: String, libraries: ImmutableList<Library>) {
+    var showLibraries by rememberSaveable { mutableStateOf(false) }
+    val toggle = if (showLibraries) {
+        R.string.firephenix_about_libraries_hide
+    } else {
+        R.string.firephenix_about_libraries_show
+    }
+    Column {
+        SectionTitle(title = librariesTitle)
+        ButtonText(
+            text = stringResource(toggle, libraries.size),
+            onClick = { showLibraries = !showLibraries },
+            modifier = Modifier.padding(horizontal = BoltTheme.spacings.default),
+        )
+        if (showLibraries) LibraryList(libraries = libraries)
+    }
+}
+
+@Composable
+private fun AboutIntroduction() {
+            TextBodyMedium(
+                stringResource(R.string.firephenix_about_intro),
+                modifier = Modifier.padding(
+                    horizontal = BoltTheme.spacings.double,
+                    vertical = BoltTheme.spacings.default,
+                ),
+            )
+}
+
+@Composable
+private fun AboutCapabilities() {
+    Column {
+            SectionContent(
+                sectionLabel = stringResource(R.string.firephenix_about_features_title),
+                sectionText = stringResource(R.string.firephenix_about_features),
+                sectionImageId = DesignSystemR.drawable.ic_info,
+            )
+            SectionContent(
+                sectionLabel = stringResource(R.string.firephenix_about_privacy_title),
+                sectionText = stringResource(R.string.firephenix_about_privacy),
+                sectionImageId = DesignSystemR.drawable.ic_code,
+            )
     }
 }
 
@@ -293,11 +344,11 @@ fun SectionContent(
     sectionImageId: Int,
     modifier: Modifier = Modifier,
     secondarySectionText: String? = null,
-    onClick: () -> Unit = {},
+    onClick: (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
-            .clickable(onClick = onClick)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(horizontal = BoltTheme.spacings.double, vertical = BoltTheme.spacings.default)
             .fillMaxWidth()
             .wrapContentHeight(),
@@ -306,6 +357,7 @@ fun SectionContent(
     ) {
         Image(
             painter = painterResource(id = sectionImageId),
+            colorFilter = ColorFilter.tint(BoltTheme.colors.onSurfaceVariant),
             modifier = Modifier
                 .size(BoltTheme.sizes.icon),
             contentDescription = null,

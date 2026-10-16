@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="account_settings_api_alias_title">发件别名</string>
+    <string name="account_settings_api_alias_notice">仅添加此账户已有的真实别名。App 不创建微软别名，也不代表服务器已接受该地址发信。默认地址与收藏互相独立。现有邮件认证权限无法可靠自动列出完整别名，请手动添加。</string>
+    <string name="account_settings_api_alias_error">操作失败，请检查地址、账户和网络。此处不能移除账户原有的首个身份。</string>
+    <string name="account_settings_api_alias_default">默认发件地址</string>
+    <string name="account_settings_api_alias_make_default">设为默认</string>
+    <string name="account_settings_api_alias_favorite">收藏</string>
+    <string name="account_settings_api_alias_unfavorite">取消收藏</string>
+    <string name="account_settings_api_alias_remove">移除</string>
+    <string name="account_settings_api_alias_existing_address">账户已有的别名地址</string>
+    <string name="account_settings_api_alias_add">添加已有别名</string>
+    <string name="account_settings_api_alias_history_recipient">查询已发送记录的收件地址</string>
+    <string name="account_settings_api_alias_search_sent">搜索服务器已发送邮件</string>
+    <string name="account_settings_api_alias_choose">继续编辑前请选择发件地址</string>
+    <string name="account_settings_api_alias_invalid">原发件地址已不可用，请选择已有别名。</string>
+</resources>

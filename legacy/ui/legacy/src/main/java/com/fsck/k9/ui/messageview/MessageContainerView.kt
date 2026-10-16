@@ -97,6 +97,7 @@ class MessageContainerView(context: Context, attrs: AttributeSet?) :
         layoutInflater = LayoutInflater.from(context)
 
         messageContentView = findViewById<MessageWebView>(R.id.message_content).apply {
+            bodyViewportEnabled = true
             if (!isInEditMode) {
                 configure(webViewConfigProvider.createForMessageView())
             }
@@ -504,6 +505,7 @@ class MessageContainerView(context: Context, attrs: AttributeSet?) :
         viewModel: MessageReaderViewContract.ViewModel<Part>,
         messageViewInfo: MessageViewInfo,
     ) {
+        if (messageViewInfo.attachments.isNullOrEmpty() && messageViewInfo.extraAttachments.isNullOrEmpty()) return
         attachmentsContainer.addView(
             ComposeView(context).apply {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)

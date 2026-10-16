@@ -84,11 +84,20 @@ class RecipientMvpView(private val activity: MessageCompose) : View.OnFocusChang
         this.presenter = presenter
         toView.setTokenListener(
             object : RecipientSelectView.TokenListener<Recipient> {
-                override fun onTokenAdded(recipient: Recipient) = presenter.onToTokenAdded()
+                override fun onTokenAdded(recipient: Recipient) {
+                    presenter.onToTokenAdded();
+                    activity.onAliasRecipientsChanged()
+                }
 
-                override fun onTokenRemoved(recipient: Recipient) = presenter.onToTokenRemoved()
+                override fun onTokenRemoved(recipient: Recipient) {
+                    presenter.onToTokenRemoved();
+                    activity.onAliasRecipientsChanged()
+                }
 
-                override fun onTokenChanged(recipient: Recipient) = presenter.onToTokenChanged()
+                override fun onTokenChanged(recipient: Recipient) {
+                    presenter.onToTokenChanged();
+                    activity.onAliasRecipientsChanged()
+                }
 
                 override fun onTokenIgnored(token: Recipient) = Unit
             },
@@ -96,11 +105,20 @@ class RecipientMvpView(private val activity: MessageCompose) : View.OnFocusChang
 
         ccView.setTokenListener(
             object : RecipientSelectView.TokenListener<Recipient> {
-                override fun onTokenAdded(recipient: Recipient) = presenter.onCcTokenAdded()
+                override fun onTokenAdded(recipient: Recipient) {
+                    presenter.onCcTokenAdded();
+                    activity.onAliasRecipientsChanged()
+                }
 
-                override fun onTokenRemoved(recipient: Recipient) = presenter.onCcTokenRemoved()
+                override fun onTokenRemoved(recipient: Recipient) {
+                    presenter.onCcTokenRemoved();
+                    activity.onAliasRecipientsChanged()
+                }
 
-                override fun onTokenChanged(recipient: Recipient) = presenter.onCcTokenChanged()
+                override fun onTokenChanged(recipient: Recipient) {
+                    presenter.onCcTokenChanged();
+                    activity.onAliasRecipientsChanged()
+                }
 
                 override fun onTokenIgnored(token: Recipient) = Unit
             },
@@ -108,11 +126,20 @@ class RecipientMvpView(private val activity: MessageCompose) : View.OnFocusChang
 
         bccView.setTokenListener(
             object : RecipientSelectView.TokenListener<Recipient> {
-                override fun onTokenAdded(recipient: Recipient) = presenter.onBccTokenAdded()
+                override fun onTokenAdded(recipient: Recipient) {
+                    presenter.onBccTokenAdded();
+                    activity.onAliasRecipientsChanged()
+                }
 
-                override fun onTokenRemoved(recipient: Recipient) = presenter.onBccTokenRemoved()
+                override fun onTokenRemoved(recipient: Recipient) {
+                    presenter.onBccTokenRemoved();
+                    activity.onAliasRecipientsChanged()
+                }
 
-                override fun onTokenChanged(recipient: Recipient) = presenter.onBccTokenChanged()
+                override fun onTokenChanged(recipient: Recipient) {
+                    presenter.onBccTokenChanged();
+                    activity.onAliasRecipientsChanged()
+                }
 
                 override fun onTokenIgnored(token: Recipient) = Unit
             },

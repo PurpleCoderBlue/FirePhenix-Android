@@ -14,6 +14,8 @@ import android.widget.BaseAdapter;
 import net.thunderbird.core.android.account.LegacyAccountDto;
 import app.k9mail.legacy.di.DI;
 import net.thunderbird.core.android.account.Identity;
+import net.thunderbird.feature.account.settings.alias.AliasService;
+import net.thunderbird.feature.account.settings.alias.SenderAlias;
 import com.fsck.k9.Preferences;
 import com.fsck.k9.ui.R;
 import com.fsck.k9.ui.identity.IdentityFormatter;
@@ -41,7 +43,12 @@ public class IdentityAdapter extends BaseAdapter {
         Collection<LegacyAccountDto> accounts = prefs.getAccounts();
         for (LegacyAccountDto account : accounts) {
             items.add(account);
+            AliasService aliasService = DI.getOrNull(AliasService.class);
             List<Identity> identities = account.getIdentities();
+            if (aliasService != null) {
+                identities = new ArrayList<>();
+                for (SenderAlias alias : aliasService.aliases(account.getUuid())) identities.add(alias.getIdentity());
+            }
             for (Identity identity : identities) {
                 items.add(new IdentityContainer(identity, account));
             }

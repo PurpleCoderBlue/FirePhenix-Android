@@ -32,15 +32,19 @@ the 'message view theme' setting).
             <!-- Header area -->
             <include layout="@layout/message_view_header" />
 
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/mail_processing_compose_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
             <FrameLayout
                 android:id="@+id/extra_header_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingVertical="4dp"
                 android:visibility="gone"
-                tools:visibility="visible"
-                >
-
+                tools:visibility="visible">
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/show_pictures"
                     style="?attr/materialButtonOutlinedStyle"
@@ -48,9 +52,7 @@ the 'message view theme' setting).
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="@string/message_view_show_remote_images_action"
-                    app:icon="@drawable/ic_image"
-                    />
-
+                    app:icon="@drawable/ic_image" />
             </FrameLayout>
 
             <Space
@@ -123,8 +125,7 @@ the 'message view theme' setting).
         android:layout_height="wrap_content"
         android:visibility="gone"
         android:layout_width="fill_parent"
-        tools:visibility="visible"
-        />
+        tools:visibility="visible" />
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/bottom_sheet_compose_view"

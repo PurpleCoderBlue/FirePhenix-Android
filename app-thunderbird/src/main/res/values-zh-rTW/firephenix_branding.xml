@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="migration_qrcode_scanning_instructions">将兼容桌面客户端提供的二维码对准扫描框</string>
+    <string name="onboarding_migration_thunderbird_new_account_title">是 火凤凰 新手嗎？</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_instructions_intro">在兼容的桌面客户端中，打开：</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_instructions_learn_update">查看兼容桌面客户端的导入说明。</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_instructions_require_latest">需要支持二维码导出账户的兼容桌面客户端（Thunderbird Desktop 128 或更新版本）。%s</string>
+    <string name="onboarding_migration_thunderbird_qr_code_import_title">从兼容的桌面客户端导入</string>
+    <string name="settings_list_action_support">支持 %s 的上游项目 Thunderbird</string>
+    <string name="onboarding_welcome_developed_by">基于 Thunderbird for Android。上游作者为 MZLA Technologies 团队和全球社区志愿者，属于 Mozilla 家族。火凤凰是本项目的衍生版本。</string>
+</resources>

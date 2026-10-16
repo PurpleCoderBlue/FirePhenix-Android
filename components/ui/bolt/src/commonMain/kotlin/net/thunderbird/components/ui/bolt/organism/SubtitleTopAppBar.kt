@@ -2,15 +2,20 @@ package net.thunderbird.components.ui.bolt.organism
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.TopAppBar as Material3TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import net.thunderbird.components.ui.bolt.PreviewWithThemes
 import net.thunderbird.components.ui.bolt.atom.button.ButtonIcon
 import net.thunderbird.components.ui.bolt.atom.icon.Icons
@@ -19,7 +24,10 @@ import net.thunderbird.components.ui.bolt.atom.text.TextTitleMedium
 import net.thunderbird.components.ui.bolt.resources.Res
 import net.thunderbird.components.ui.bolt.resources.bolt_organism_subtitle_top_app_bar_up_description
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.LocalGlassAppearance
+import net.thunderbird.components.ui.bolt.theme.liquidGlass
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.material3.TopAppBar as Material3TopAppBar
 
 /**
  * A top app bar with a title, subtitle, navigation icon, and actions.
@@ -40,6 +48,7 @@ fun SubtitleTopAppBar(
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     Material3TopAppBar(
+        windowInsets = if (LocalGlassAppearance.current.enabled) WindowInsets(0) else TopAppBarDefaults.windowInsets,
         title = {
             Column(
                 modifier = Modifier.padding(end = BoltTheme.spacings.double),
@@ -52,11 +61,21 @@ fun SubtitleTopAppBar(
                 )
             }
         },
-        modifier = modifier,
+        modifier = if (LocalGlassAppearance.current.enabled) {
+            modifier.windowInsetsPadding(TopAppBarDefaults.windowInsets)
+                .padding(horizontal = 12.dp, vertical = 6.dp)
+                .liquidGlass(RoundedCornerShape(28.dp))
+        } else {
+            modifier
+        },
         navigationIcon = navigationIcon,
         actions = actions,
         colors = topAppBarColors(
-            containerColor = BoltTheme.colors.surfaceContainer,
+            containerColor = if (LocalGlassAppearance.current.enabled) {
+                Color.Transparent
+            } else {
+                BoltTheme.colors.surfaceContainer
+            },
         ),
     )
 }

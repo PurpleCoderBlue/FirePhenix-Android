@@ -3,8 +3,6 @@ package net.thunderbird.components.ui.bolt.atom.textfield
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.OutlinedTextField as Material3OutlinedTextField
-import androidx.compose.material3.Text as Material3Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -13,6 +11,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import net.thunderbird.components.ui.bolt.PreviewWithThemes
 import net.thunderbird.components.ui.bolt.atom.icon.Icon
 import net.thunderbird.components.ui.bolt.atom.icon.Icons
+import net.thunderbird.components.ui.bolt.theme.glassField
+import net.thunderbird.components.ui.bolt.theme.glassFieldColors
+import net.thunderbird.components.ui.bolt.theme.glassFieldShape
+import androidx.compose.material3.OutlinedTextField as Material3OutlinedTextField
+import androidx.compose.material3.Text as Material3Text
 
 @Composable
 fun TextFieldOutlinedFakeSelect(
@@ -22,11 +25,13 @@ fun TextFieldOutlinedFakeSelect(
     label: String? = null,
 ) {
     Material3OutlinedTextField(
+        shape = glassFieldShape(),
+        colors = glassFieldColors(),
         value = text,
         onValueChange = { },
         modifier = Modifier
             .fillMaxWidth()
-            .then(modifier),
+            .then(modifier).glassField(),
         readOnly = true,
         label = optionalLabel(label),
         trailingIcon = { Icon(Icons.Outlined.ExpandMore) },
@@ -59,7 +64,7 @@ internal fun TextFieldOutlinedFakeSelectPreview() {
 
 @Composable
 @Preview(showBackground = true)
-internal fun TextFieldOutlinedFakeSelectPreviewWithLabel() {
+internal fun TextFieldOutlinedFakeSelectWithLabelPreview() {
     PreviewWithThemes {
         TextFieldOutlinedFakeSelect(
             text = "Current value",

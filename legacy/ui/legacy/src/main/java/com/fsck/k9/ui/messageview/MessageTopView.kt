@@ -1,6 +1,9 @@
 package com.fsck.k9.ui.messageview
 
 import android.animation.Animator
+import app.k9mail.core.android.common.contact.ContactRepository
+import net.thunderbird.core.android.account.ShowPictures
+import net.thunderbird.core.common.mail.toEmailAddressOrNull
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
@@ -15,7 +18,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import app.k9mail.core.android.common.contact.ContactRepository
 import com.fsck.k9.mail.Message
 import com.fsck.k9.mail.Part
 import com.fsck.k9.mailstore.AttachmentViewInfo
@@ -29,9 +31,6 @@ import com.fsck.k9.view.ToolableViewAnimator
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import net.thunderbird.core.android.account.LegacyAccountDto
-import net.thunderbird.core.android.account.ShowPictures
-import net.thunderbird.core.common.mail.EmailAddress
-import net.thunderbird.core.common.mail.toEmailAddressOrNull
 import net.thunderbird.core.preference.BodyContentType
 import net.thunderbird.core.preference.display.visualSettings.DisplayVisualSettingsPreferenceManager
 import net.thunderbird.core.ui.animation.manager.AnimationManager
@@ -65,6 +64,7 @@ class MessageTopView(
 
     private var isShowingProgress = false
     private var showPicturesButtonClicked = false
+    private var displayedMessageKey: String? = null
     var renderPlainFormat = false
 
     private var showAccountIndicator = false
@@ -127,9 +127,16 @@ class MessageTopView(
     fun showMessage(account: LegacyAccountDto, messageViewInfo: MessageViewInfo) {
         resetAndPrepareMessageView(messageViewInfo)
 
-        val showPicturesSetting = account.showPictures
-        val loadPictures = shouldAutomaticallyLoadPictures(showPicturesSetting, messageViewInfo.message) ||
-            showPicturesButtonClicked
+        val message = messageViewInfo.message
+        val identity = (message as? com.fsck.k9.mailstore.LocalMessage)?.databaseId?.toString()
+            ?: "${message.messageId}/${message.uid}/${System.identityHashCode(message)}"
+        val key = "${account.uuid}/$identity"
+        if (displayedMessageKey != key) showPicturesButtonClicked = false
+        displayedMessageKey = key
+        val extension = getKoin().getOrNull<net.thunderbird.feature.mail.processing.api.MailProcessingExtension>()
+        val automatic = extension?.shouldLoadRemoteImages(account.uuid, message.from.orEmpty().map { it.address })
+            ?: legacyPicturesPolicy(account.showPictures, message)
+        val loadPictures = automatic || showPicturesButtonClicked
 
         val view = layoutInflater.inflate(
             R.layout.message_container,
@@ -321,25 +328,10 @@ class MessageTopView(
         extraHeaderContainer.visibility = GONE
     }
 
-    private fun shouldAutomaticallyLoadPictures(showPicturesSetting: ShowPictures, message: Message): Boolean {
-        return showPicturesSetting === ShowPictures.ALWAYS || shouldShowPicturesFromSender(showPicturesSetting, message)
-    }
-
-    private fun shouldShowPicturesFromSender(showPicturesSetting: ShowPictures, message: Message): Boolean {
-        if (showPicturesSetting !== ShowPictures.ONLY_FROM_CONTACTS) {
-            return false
-        }
-        val senderEmailAddress = getSenderEmailAddress(message) ?: return false
-        return contactRepository.hasContactFor(senderEmailAddress)
-    }
-
-    private fun getSenderEmailAddress(message: Message): EmailAddress? {
-        val from = message.from
-        return if (from == null || from.isEmpty()) {
-            null
-        } else {
-            from[0].address.toEmailAddressOrNull()
-        }
+    private fun legacyPicturesPolicy(setting: ShowPictures, message: Message): Boolean {
+        val sender = message.from?.firstOrNull()?.address?.toEmailAddressOrNull()
+        return setting == ShowPictures.ALWAYS ||
+            (setting == ShowPictures.ONLY_FROM_CONTACTS && sender != null && contactRepository.hasContactFor(sender))
     }
 
     @SuppressLint("ObjectAnimatorBinding")
@@ -392,6 +384,7 @@ class MessageTopView(
         val superState = super.onSaveInstanceState()
         val savedState = SavedState(superState)
         savedState.showPicturesButtonClicked = showPicturesButtonClicked
+        savedState.displayedMessageKey = displayedMessageKey
         return savedState
     }
 
@@ -399,6 +392,7 @@ class MessageTopView(
         val savedState = state as SavedState
         super.onRestoreInstanceState(savedState.superState)
         showPicturesButtonClicked = savedState.showPicturesButtonClicked
+        displayedMessageKey = savedState.displayedMessageKey
     }
 
     fun refreshAttachmentThumbnail(attachment: AttachmentViewInfo) {
@@ -410,16 +404,19 @@ class MessageTopView(
 
     private class SavedState : BaseSavedState {
         var showPicturesButtonClicked = false
+        var displayedMessageKey: String? = null
 
         constructor(superState: Parcelable?) : super(superState)
 
         private constructor(`in`: Parcel) : super(`in`) {
             showPicturesButtonClicked = `in`.readInt() != 0
+            displayedMessageKey = `in`.readString()
         }
 
         override fun writeToParcel(out: Parcel, flags: Int) {
             super.writeToParcel(out, flags)
             out.writeInt(if (showPicturesButtonClicked) 1 else 0)
+            out.writeString(displayedMessageKey)
         }
 
         companion object {

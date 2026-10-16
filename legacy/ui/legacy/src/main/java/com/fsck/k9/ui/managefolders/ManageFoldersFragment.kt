@@ -1,5 +1,6 @@
 package com.fsck.k9.ui.managefolders
 
+import com.fsck.k9.ui.base.extensions.glassNavOptions
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -120,7 +121,11 @@ class ManageFoldersFragment : Fragment() {
             FolderSettingsFragment.EXTRA_ACCOUNT to account.uuid,
             FolderSettingsFragment.EXTRA_FOLDER_ID to folderId,
         )
-        findNavController().navigate(R.id.action_manageFoldersScreen_to_folderSettingsScreen, folderSettingsArguments)
+        findNavController().navigate(
+            R.id.action_manageFoldersScreen_to_folderSettingsScreen,
+            folderSettingsArguments,
+            requireActivity().glassNavOptions(),
+        )
     }
 
     private fun configureFolderSearchView(menu: Menu) {

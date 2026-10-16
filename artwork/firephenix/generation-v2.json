@@ -1,0 +1,25 @@
+{
+  "generator": "built-in image_gen",
+  "generated_source_paths": [
+    "exec-a465f3ba-5bd0-4c3d-a3bf-7a1f64685383.png",
+    "exec-7c728e6b-0dfb-4f41-af15-2d73712363c4.png"
+  ],
+  "assets": {
+    "phoenix-carrying-mail.png": {
+      "sha256": "00d2a6b4755c1d53d0e2855cb48e53a97a40d134518b6c19d8b724e9a8c87e73",
+      "pixels": [
+        1254,
+        1254
+      ]
+    },
+    "phoenix-carrying-mail-monochrome.png": {
+      "sha256": "b2a5de88459ec4fc6fabc5fd9bf857e9c5695eadb4743b0301a4413c347af811",
+      "pixels": [
+        1254,
+        1254
+      ]
+    }
+  },
+  "resource_export": "Only mechanical density resizing; generated artwork and alpha preserved. Adaptive foreground inset is 16 percent.",
+  "previous_assets": "previous-v1/"
+}

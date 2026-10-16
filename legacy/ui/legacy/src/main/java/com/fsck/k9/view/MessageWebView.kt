@@ -3,8 +3,21 @@ package com.fsck.k9.view
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.graphics.Color
+import android.view.MotionEvent
+import android.view.View
+import android.widget.ScrollView
+import kotlin.math.abs
+import kotlin.math.min
+import android.util.TypedValue
 import android.util.AttributeSet
 import android.webkit.WebView
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import com.fsck.k9.core.BuildConfig
 import com.fsck.k9.mailstore.AttachmentResolver
 import kotlin.math.roundToInt
@@ -21,12 +34,60 @@ class MessageWebView : WebView, KoinComponent, ThunderbirdWebViewSettings {
     constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle)
 
     private val webViewClientFactory: WebViewClientFactory by inject()
+    internal var bodyViewportEnabled = false
+    private var useDarkMode = false
+    private val htmlRenderer = MessageHtmlRenderer()
+    private val fallbackRenderScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     override var loadWithOverviewMode: Boolean
         get() = settings.loadWithOverviewMode
         set(value) {
             settings.loadWithOverviewMode = value
         }
+
+    private var gestureX = 0f
+    private var gestureY = 0f
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        if (!bodyViewportEnabled) {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+            return
+        }
+        var ancestor = parent
+        var viewport = rootView.height.takeIf { it > 0 } ?: resources.displayMetrics.heightPixels
+        while (ancestor is View) {
+            if (ancestor is ScrollView && ancestor.height > 0) {
+                viewport = min(viewport, ancestor.height)
+                break
+            }
+            ancestor = ancestor.parent
+        }
+        val mode = MeasureSpec.getMode(heightMeasureSpec)
+        val requested = MeasureSpec.getSize(heightMeasureSpec)
+        val height = if (mode == MeasureSpec.UNSPECIFIED) viewport else min(requested, viewport)
+        val boundedMode = if (mode == MeasureSpec.EXACTLY) MeasureSpec.EXACTLY else MeasureSpec.AT_MOST
+        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(height.coerceAtLeast(1), boundedMode))
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (bodyViewportEnabled) {
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    gestureX = event.x
+                    gestureY = event.y
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val dx = gestureX - event.x
+                    val dy = gestureY - event.y
+                    val owns = if (abs(dy) >= abs(dx)) canScrollVertically(dy.toInt())
+                    else canScrollHorizontally(dx.toInt())
+                    parent?.requestDisallowInterceptTouchEvent(owns)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> parent?.requestDisallowInterceptTouchEvent(false)
+            }
+        }
+        return super.onTouchEvent(event)
+    }
 
     override fun blockNetworkData(shouldBlockNetworkData: Boolean) {
         // Images with content: URIs will not be blocked, nor will network images that are already in the WebView cache.
@@ -38,6 +99,7 @@ class MessageWebView : WebView, KoinComponent, ThunderbirdWebViewSettings {
     }
 
     override fun configure(config: WebViewConfig) {
+        useDarkMode = config.useDarkMode
         isVerticalScrollBarEnabled = true
         scrollBarStyle = SCROLLBARS_INSIDE_OVERLAY
         isLongClickable = true
@@ -80,7 +142,7 @@ class MessageWebView : WebView, KoinComponent, ThunderbirdWebViewSettings {
         webView: WebView,
         config: WebViewConfig,
     ) {
-        if (config.useDarkMode) {
+        if (config.useDarkMode && !usesGlass()) {
             webView.showInDarkMode()
         } else {
             webView.showInLightMode()
@@ -100,21 +162,49 @@ class MessageWebView : WebView, KoinComponent, ThunderbirdWebViewSettings {
         attachmentResolver: AttachmentResolver?,
         onPageFinishedListener: OnPageFinishedListener?,
     ) {
-        setWebViewClient(attachmentResolver, onPageFinishedListener)
-        setHtmlContent(htmlText)
+        val glass = usesGlass()
+        val started = android.os.SystemClock.elapsedRealtime()
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: fallbackRenderScope
+        htmlRenderer.render(scope, htmlText, glass, useDarkMode) { prepared ->
+            net.thunderbird.core.ui.theme.manager.GlassMotion.trace(
+                context, "mail-html-ready", android.os.SystemClock.elapsedRealtime() - started,
+            )
+            setWebViewClient(attachmentResolver, onPageFinishedListener)
+            setHtmlContent(prepared, glass)
+        }
     }
 
     private fun setWebViewClient(
         attachmentResolver: AttachmentResolver?,
         onPageFinishedListener: OnPageFinishedListener?,
     ) {
-        val webViewClient = webViewClientFactory.create(attachmentResolver, onPageFinishedListener)
+        val webViewClient = webViewClientFactory.create(attachmentResolver) {
+            net.thunderbird.core.ui.theme.manager.GlassMotion.trace(
+                context, "mail-viewport-${width}x$height-content-$contentHeight-bounded-$bodyViewportEnabled",
+            )
+            onPageFinishedListener?.onPageFinished()
+        }
         setWebViewClient(webViewClient)
     }
 
-    private fun setHtmlContent(htmlText: String) {
+    private fun usesGlass(): Boolean = bodyViewportEnabled || TypedValue().let {
+        val glassAttribute = app.k9mail.core.ui.legacy.designsystem.R.attr.firephenixLiquidGlass
+        context.theme.resolveAttribute(glassAttribute, it, true) && it.data != 0
+    }
+
+    private fun setHtmlContent(htmlText: String, glass: Boolean) {
+        if (glass) {
+            setBackgroundColor(Color.TRANSPARENT)
+            showInLightMode()
+        }
         loadDataWithBaseURL("about:blank", htmlText, "text/html", "utf-8", null)
         resumeTimers()
+    }
+
+    override fun destroy() {
+        htmlRenderer.cancel()
+        fallbackRenderScope.cancel()
+        super.destroy()
     }
 
     fun interface OnPageFinishedListener {

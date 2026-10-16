@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="navigation_drawer_dropdown_action_edit_account_name">修改账户显示昵称</string>
+</resources>

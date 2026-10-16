@@ -1,9 +1,6 @@
 package net.thunderbird.components.ui.bolt.atom.textfield
 
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Icon as Material3Icon
-import androidx.compose.material3.IconButton as Material3IconButton
-import androidx.compose.material3.OutlinedTextField as Material3OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,11 +13,16 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import net.thunderbird.components.ui.bolt.PreviewWithThemes
 import net.thunderbird.components.ui.bolt.atom.icon.Icons
-import net.thunderbird.components.ui.bolt.atom.textfield.applyPasswordSemantics
 import net.thunderbird.components.ui.bolt.resources.Res
 import net.thunderbird.components.ui.bolt.resources.bolt_atom_password_textfield_hide_password
 import net.thunderbird.components.ui.bolt.resources.bolt_atom_password_textfield_show_password
+import net.thunderbird.components.ui.bolt.theme.glassField
+import net.thunderbird.components.ui.bolt.theme.glassFieldColors
+import net.thunderbird.components.ui.bolt.theme.glassFieldShape
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.material3.Icon as Material3Icon
+import androidx.compose.material3.IconButton as Material3IconButton
+import androidx.compose.material3.OutlinedTextField as Material3OutlinedTextField
 
 @Suppress("LongParameterList")
 @Composable
@@ -37,9 +39,11 @@ fun TextFieldOutlinedPassword(
     var passwordVisibilityState by rememberSaveable { mutableStateOf(false) }
 
     Material3OutlinedTextField(
+        shape = glassFieldShape(),
+        colors = glassFieldColors(),
         value = value,
         onValueChange = stripLineBreaks(onValueChange),
-        modifier = modifier.applyPasswordSemantics(),
+        modifier = modifier.glassField().applyPasswordSemantics(),
         enabled = isEnabled,
         label = selectLabel(label, isRequired),
         trailingIcon = selectTrailingIcon(
@@ -72,9 +76,11 @@ fun TextFieldOutlinedPassword(
     hasError: Boolean = false,
 ) {
     Material3OutlinedTextField(
+        shape = glassFieldShape(),
+        colors = glassFieldColors(),
         value = value,
         onValueChange = stripLineBreaks(onValueChange),
-        modifier = modifier.applyPasswordSemantics(),
+        modifier = modifier.glassField().applyPasswordSemantics(),
         enabled = isEnabled,
         label = selectLabel(label, isRequired),
         trailingIcon = selectTrailingIcon(

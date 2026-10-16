@@ -138,6 +138,7 @@
     </string-array>
 
     <string-array name="splitview_mode_entries">
+        <item>@string/global_settings_splitview_automatic</item>
         <item>@string/global_settings_splitview_always</item>
         <item>@string/global_settings_splitview_never</item>
         <item>@string/global_settings_splitview_when_in_landscape</item>

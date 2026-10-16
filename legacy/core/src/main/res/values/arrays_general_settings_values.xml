@@ -195,6 +195,7 @@
     </string-array>
 
     <string-array name="splitview_mode_values" translatable="false">
+        <item>AUTOMATIC</item>
         <item>ALWAYS</item>
         <item>NEVER</item>
         <item>WHEN_IN_LANDSCAPE</item>

@@ -21,6 +21,8 @@ import app.k9mail.feature.account.setup.ui.createaccount.CreateAccountContract.V
 import net.thunderbird.components.ui.bolt.template.Scaffold
 import net.thunderbird.core.common.provider.BrandNameProvider
 import net.thunderbird.core.ui.contract.mvi.observe
+import net.thunderbird.feature.account.settings.alias.AliasService
+import org.koin.core.context.GlobalContext
 
 @Composable
 internal fun CreateAccountScreen(
@@ -30,10 +32,16 @@ internal fun CreateAccountScreen(
     brandNameProvider: BrandNameProvider,
     modifier: Modifier = Modifier,
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val aliases = GlobalContext.getOrNull()?.getOrNull<AliasService>()
     val (state, dispatch) = viewModel.observe { effect ->
         when (effect) {
             Effect.NavigateBack -> onBack()
-            is Effect.NavigateNext -> onNext(effect.accountUuid)
+
+            is Effect.NavigateNext -> {
+                onNext(effect.accountUuid)
+                aliases?.openManagement(context, effect.accountUuid.value)
+            }
         }
     }
 

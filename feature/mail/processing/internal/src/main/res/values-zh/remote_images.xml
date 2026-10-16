@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="remote_images_title">远程图片规则</string>
+    <string name="remote_images_policy">命中已启用的发件人规则，或属于已确认的 Outlook 联系人，才自动加载图片；其他邮件需手动点击。规则按完整地址匹配，适用于全部账户。发件人地址仍可能被伪造。</string>
+    <string name="remote_images_contacts_unavailable">Outlook 联系人尚未接入：当前授权不含 Contacts.Read。目前仅发件人规则可触发自动加载，不使用设备通讯录替代。</string>
+    <string name="remote_images_sender">发件人完整邮箱地址</string>
+    <string name="remote_images_add">添加发件人规则</string>
+    <string name="remote_images_invalid_sender">请输入一个完整邮箱地址，不含显示名称或通配符。</string>
+</resources>

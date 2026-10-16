@@ -18,6 +18,8 @@ import net.thunderbird.components.ui.bolt.atom.tab.TabPrimary
 import net.thunderbird.components.ui.bolt.atom.text.TextBodyLarge
 import net.thunderbird.components.ui.bolt.atom.text.TextTitleMedium
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.LocalGlassAppearance
+import net.thunderbird.components.ui.bolt.theme.liquidGlass
 
 /**
  * A molecule component that displays a scrollable row of primary tabs.
@@ -51,6 +53,11 @@ fun TabRowPrimary(
     PrimaryScrollableTabRow(
         selectedTabIndex = selectedTabIndex,
         edgePadding = edgePadding,
+        containerColor = if (LocalGlassAppearance.current.enabled) {
+            Color.Transparent
+        } else {
+            TabRowDefaults.primaryContainerColor
+        },
         contentColor = BoltTheme.colors.onSurfaceVariant,
         indicator = {
             TabRowDefaults.PrimaryIndicator(
@@ -59,7 +66,7 @@ fun TabRowPrimary(
                 color = indicatorColor,
             )
         },
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().liquidGlass(),
         tabs = tabs,
     )
 }

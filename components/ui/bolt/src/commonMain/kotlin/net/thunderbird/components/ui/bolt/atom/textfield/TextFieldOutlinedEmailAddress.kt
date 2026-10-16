@@ -1,7 +1,6 @@
 package net.thunderbird.components.ui.bolt.atom.textfield
 
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.OutlinedTextField as Material3OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
@@ -10,6 +9,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import net.thunderbird.components.ui.bolt.PreviewWithThemes
+import net.thunderbird.components.ui.bolt.theme.glassField
+import net.thunderbird.components.ui.bolt.theme.glassFieldColors
+import net.thunderbird.components.ui.bolt.theme.glassFieldShape
+import androidx.compose.material3.OutlinedTextField as Material3OutlinedTextField
 
 @Suppress("LongParameterList")
 @Composable
@@ -24,9 +27,11 @@ fun TextFieldOutlinedEmailAddress(
     hasError: Boolean = false,
 ) {
     Material3OutlinedTextField(
+        shape = glassFieldShape(),
+        colors = glassFieldColors(),
         value = value,
         onValueChange = stripLineBreaks(onValueChange),
-        modifier = modifier.semantics { contentType = ContentType.EmailAddress },
+        modifier = modifier.glassField().semantics { contentType = ContentType.EmailAddress },
         enabled = isEnabled,
         label = selectLabel(label, isRequired),
         readOnly = isReadOnly,

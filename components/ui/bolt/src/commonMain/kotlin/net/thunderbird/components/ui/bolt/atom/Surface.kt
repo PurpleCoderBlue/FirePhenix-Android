@@ -2,7 +2,6 @@ package net.thunderbird.components.ui.bolt.atom
 
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.material3.Surface as Material3Surface
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,8 +12,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import net.thunderbird.components.ui.bolt.PreviewWithThemes
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.LocalGlassAppearance
 import net.thunderbird.components.ui.bolt.theme.ThemeColorScheme
 import net.thunderbird.components.ui.bolt.theme.ThemeElevations
+import net.thunderbird.components.ui.bolt.theme.liquidGlass
+import androidx.compose.material3.Surface as Material3Surface
 
 /**
  * UI atom for a surface with customizable shape, color, and elevation. This is a convenience wrapper
@@ -51,12 +53,19 @@ fun Surface(
     tonalElevation: Dp = BoltTheme.elevations.level0,
     content: @Composable () -> Unit,
 ) {
+    val glass = LocalGlassAppearance.current.enabled
+    val page = color == BoltTheme.colors.surface && shape == RectangleShape &&
+        tonalElevation == BoltTheme.elevations.level0
     Material3Surface(
-        modifier = modifier,
+        modifier = if (glass && !page) {
+            modifier.liquidGlass(shape, tint = color, showHighlight = shape != RectangleShape)
+        } else {
+            modifier
+        },
         shape = shape,
         content = content,
         tonalElevation = tonalElevation,
-        color = color,
+        color = if (glass) Color.Transparent else color,
         contentColor = contentColor,
     )
 }

@@ -14,6 +14,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.ui.legacy.designsystem)
     api(projects.feature.funding.api)
 
     implementation(projects.core.common)

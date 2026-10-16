@@ -29,11 +29,19 @@ import net.thunderbird.feature.account.settings.impl.ui.readingMail.ReadingMailS
 import net.thunderbird.feature.account.settings.impl.ui.search.SearchSettingBuilder
 import net.thunderbird.feature.account.settings.impl.ui.search.SearchSettingsContract
 import net.thunderbird.feature.account.settings.impl.ui.search.SearchSettingsViewModel
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val featureAccountSettingsModule = module {
+    single { net.thunderbird.feature.account.settings.impl.alias.SenderAliasResolver() }
+    single<net.thunderbird.feature.account.settings.alias.AliasService> {
+        net.thunderbird.feature.account.settings.impl.alias.DefaultAliasService(androidContext(), get(), get(), get())
+    }
+    viewModel { (accountId: String) ->
+        net.thunderbird.feature.account.settings.impl.alias.AliasManagementViewModel(accountId, get())
+    }
     single<AccountSettingsNavigation> { DefaultAccountSettingsNavigation() }
 
     factory<UseCase.GetAccountName> {
@@ -117,6 +125,7 @@ val featureAccountSettingsModule = module {
     factory<ReadingMailSettingsContract.SettingsBuilder> {
         ReadingMailSettingsBuilder(
             resources = get<StringsResourceManager>(),
+            remoteImages = getOrNull(),
         )
     }
 

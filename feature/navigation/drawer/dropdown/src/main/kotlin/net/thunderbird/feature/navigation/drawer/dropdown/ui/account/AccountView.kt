@@ -31,6 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
+import net.thunderbird.components.ui.bolt.atom.button.ButtonIcon
+import net.thunderbird.components.ui.bolt.atom.icon.Icons
 import net.thunderbird.components.ui.bolt.atom.text.TextBodyLarge
 import net.thunderbird.components.ui.bolt.atom.text.TextBodyLargeAutoResize
 import net.thunderbird.components.ui.bolt.atom.text.TextBodyMedium
@@ -50,6 +52,7 @@ internal fun AccountView(
     showAccountSelection: Boolean,
     isShowAnimations: Boolean,
     modifier: Modifier = Modifier,
+    onEditAccountClick: (() -> Unit)? = null,
 ) {
     AccountLayout(
         onClick = onClick,
@@ -62,6 +65,14 @@ internal fun AccountView(
                 account = account,
                 onAvatarClick = onAvatarClick,
                 isShowAnimations = isShowAnimations,
+            )
+        }
+
+        if (!showAccountSelection && account is MailDisplayAccount && onEditAccountClick != null) {
+            ButtonIcon(
+                onClick = onEditAccountClick,
+                imageVector = Icons.Outlined.Edit,
+                contentDescription = stringResource(R.string.navigation_drawer_dropdown_action_edit_account_name),
             )
         }
 

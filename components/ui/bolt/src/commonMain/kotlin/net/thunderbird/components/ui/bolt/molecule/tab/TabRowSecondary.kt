@@ -18,6 +18,8 @@ import net.thunderbird.components.ui.bolt.atom.tab.TabSecondary
 import net.thunderbird.components.ui.bolt.atom.text.TextBodyLarge
 import net.thunderbird.components.ui.bolt.atom.text.TextTitleMedium
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.LocalGlassAppearance
+import net.thunderbird.components.ui.bolt.theme.liquidGlass
 
 /**
  * A molecule component that displays a scrollable row of secondary tabs.
@@ -49,6 +51,11 @@ fun TabRowSecondary(
     SecondaryScrollableTabRow(
         selectedTabIndex = selectedTabIndex,
         edgePadding = edgePadding,
+        containerColor = if (LocalGlassAppearance.current.enabled) {
+            Color.Transparent
+        } else {
+            TabRowDefaults.secondaryContainerColor
+        },
         contentColor = BoltTheme.colors.onSurfaceVariant,
         indicator = {
             TabRowDefaults.SecondaryIndicator(
@@ -56,7 +63,7 @@ fun TabRowSecondary(
                 color = indicatorColor,
             )
         },
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().liquidGlass(),
         tabs = tabs,
     )
 }

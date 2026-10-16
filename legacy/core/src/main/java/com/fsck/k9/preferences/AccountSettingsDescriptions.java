@@ -140,7 +140,7 @@ class AccountSettingsDescriptions {
         ));
         s.put("maximumAutoDownloadMessageSize", Settings.versions(
                 new V(1, new IntegerResourceSetting(32768, R.array.autodownload_message_size_values)),
-                new V(93, new IntegerResourceSetting(131072, R.array.autodownload_message_size_values))
+                new V(93, new IntegerResourceSetting(AccountDefaultsProvider.DEFAULT_MAXIMUM_AUTO_DOWNLOAD_MESSAGE_SIZE, R.array.autodownload_message_size_values))
         ));
         s.put("maximumPolledMessageAge", Settings.versions(
                 new V(1, new IntegerResourceSetting(-1, R.array.message_age_values))

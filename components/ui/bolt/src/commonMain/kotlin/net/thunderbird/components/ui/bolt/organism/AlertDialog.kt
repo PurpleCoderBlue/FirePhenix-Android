@@ -2,9 +2,10 @@ package net.thunderbird.components.ui.bolt.organism
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.AlertDialog as MaterialAlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -15,6 +16,9 @@ import net.thunderbird.components.ui.bolt.atom.icon.Icons
 import net.thunderbird.components.ui.bolt.atom.text.TextBodyMedium
 import net.thunderbird.components.ui.bolt.atom.text.TextHeadlineSmall
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.LocalGlassAppearance
+import net.thunderbird.components.ui.bolt.theme.liquidGlass
+import androidx.compose.material3.AlertDialog as MaterialAlertDialog
 
 @Composable
 fun AlertDialog(
@@ -86,7 +90,12 @@ fun AlertDialog(
             }
         },
         onDismissRequest = onDismissRequest,
-        modifier = modifier,
+        modifier = modifier.liquidGlass(BoltTheme.shapes.extraLarge),
+        containerColor = if (LocalGlassAppearance.current.enabled) {
+            Color.Transparent
+        } else {
+            AlertDialogDefaults.containerColor
+        },
     )
 }
 

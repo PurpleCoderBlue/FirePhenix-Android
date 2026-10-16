@@ -54,6 +54,15 @@
             tools:text="Message subject"
             />
 
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/mail_processing_actions"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="@id/subject"
+            app:layout_constraintEnd_toStartOf="@id/flagged" />
+
         <ImageView
             android:id="@+id/flagged"
             android:layout_width="44dp"
