@@ -37,6 +37,7 @@ permissions:
 
 jobs:
   get_environment:
+    if: github.repository == 'thunderbird/thunderbird-android'
     name: Determine Release Environment
     runs-on: ubuntu-latest
     outputs:
@@ -61,6 +62,7 @@ jobs:
             }
 
   dump_config:
+    if: github.repository == 'thunderbird/thunderbird-android'
     name: Show Release Environment
     runs-on: ubuntu-latest
     needs: get_environment
@@ -163,7 +165,8 @@ jobs:
     name: Notify Build Start
     runs-on: ubuntu-latest
     needs: [ dump_config ]
-    if: ${{ needs.dump_config.outputs.releaseType == 'beta' || needs.dump_config.outputs.releaseType == 'release' }}
+    if: >-
+      ${{ github.repository == 'thunderbird/thunderbird-android' && (needs.dump_config.outputs.releaseType == 'beta' || needs.dump_config.outputs.releaseType == 'release') }}
     environment: notify_matrix
     outputs:
       actorLink: ${{ steps.actorLink.outputs.actorLink }}
@@ -196,6 +199,7 @@ jobs:
 
 
   release_commit:
+    if: github.repository == 'thunderbird/thunderbird-android'
     name: Release Bumps
     runs-on: ubuntu-latest
     needs: [ dump_config, get_environment ]
@@ -496,7 +500,8 @@ jobs:
     name: Build Unsigned
     runs-on: ubuntu-latest
     timeout-minutes: 90
-    if: ${{ !failure() && !cancelled() }} # Run if release_commit is skipped
+    if: >-
+      ${{ github.repository == 'thunderbird/thunderbird-android' && (!failure() && !cancelled()) }}
     needs: [ dump_config, get_environment, release_commit ]
     strategy:
       matrix:
@@ -617,7 +622,8 @@ jobs:
   sign_mobile:
     name: Sign Packages
     runs-on: ubuntu-latest
-    if: ${{ !failure() && !cancelled() }} # Run if previous step is skipped
+    if: >-
+      ${{ github.repository == 'thunderbird/thunderbird-android' && (!failure() && !cancelled()) }}
     needs: [ build_unsigned, dump_config ]
     strategy:
       matrix:
@@ -666,7 +672,8 @@ jobs:
   notify_pre_publish:
     name: Notify Publish Approval
     needs: [ dump_config, sign_mobile, notify_build_start ]
-    if: "${{ contains(fromJSON('[\"beta\", \"release\"]'), needs.dump_config.outputs.releaseType) }}"
+    if: >-
+      ${{ github.repository == 'thunderbird/thunderbird-android' && (contains(fromJSON('["beta", "release"]'), needs.dump_config.outputs.releaseType)) }}
     runs-on: ubuntu-latest
     environment: notify_matrix
     steps:
@@ -685,7 +692,8 @@ jobs:
     # before proceeding.
     name: Wait for Approval
     needs: [ dump_config, sign_mobile ]
-    if: "${{ contains(fromJSON('[\"beta\", \"release\"]'), needs.dump_config.outputs.releaseType) }}"
+    if: >-
+      ${{ github.repository == 'thunderbird/thunderbird-android' && (contains(fromJSON('["beta", "release"]'), needs.dump_config.outputs.releaseType)) }}
     environment: publish_hold
     runs-on: ubuntu-latest
     steps:
@@ -697,7 +705,8 @@ jobs:
   publish_release:
     name: Publish Release
     needs: [ pre_publish, dump_config, release_commit ]
-    if: ${{ !failure() && !cancelled() }} # Run if previous step is skipped
+    if: >-
+      ${{ github.repository == 'thunderbird/thunderbird-android' && (!failure() && !cancelled()) }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -1078,7 +1087,8 @@ jobs:
 
   notify_build_result:
     name: Notify Build Result
-    if: ${{ always() }}
+    if: >-
+      ${{ github.repository == 'thunderbird/thunderbird-android' && (always()) }}
     needs: [ dump_config, release_commit, build_unsigned, sign_mobile, publish_release, notify_build_start ]
     runs-on: ubuntu-latest
     environment: notify_matrix

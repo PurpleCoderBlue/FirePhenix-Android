@@ -55,3 +55,32 @@ merged-prs-*.csv
 
 # Weblate cache
 cli/weblate-cli/weblate-components-cache.json
+
+# FirePhenix local deliveries and diagnostics (may contain private mail / device data)
+/artifacts/
+*.log
+*.hprof
+*.heapdump
+*.trace
+*.perfetto-trace
+*.eml
+*.mbox
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+
+# Local credentials and agent state; publish only sanitized examples
+.env
+.env.*
+!.env.example
+!.env.template
+*.local.properties
+*.p12
+*.pfx
+*.key
+service-account*.json
+google-services.json
+/.codex/
+/.agents/

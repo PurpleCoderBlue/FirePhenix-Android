@@ -14,7 +14,8 @@ permissions:
 
 jobs:
   pr-merged:
-    if: github.event.pull_request.merged
+    if: >-
+      ${{ github.repository == 'thunderbird/thunderbird-android' && (github.event.pull_request.merged) }}
     runs-on: ubuntu-latest
     environment: botmobile
     steps:

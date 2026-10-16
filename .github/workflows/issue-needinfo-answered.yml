@@ -13,9 +13,8 @@ jobs:
   issue-needinfo-answered:
     name: Remove 'answered' label when both exist
     runs-on: ubuntu-latest
-    if: |
-      contains(github.event.issue.labels.*.name, 'status: needs information') &&
-      contains(github.event.issue.labels.*.name, 'status: answered')
+    if: >-
+      ${{ github.repository == 'thunderbird/thunderbird-android' && (contains(github.event.issue.labels.*.name, 'status: needs information') && contains(github.event.issue.labels.*.name, 'status: answered')) }}
     environment: botmobile
     permissions:
       issues: write

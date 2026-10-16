@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   label-tb-team:
+    if: github.repository == 'thunderbird/thunderbird-android'
     permissions:
       pull-requests: write
     runs-on: ubuntu-latest

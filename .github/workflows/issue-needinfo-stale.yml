@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   issue-needinfo-stale:
+    if: github.repository == 'thunderbird/thunderbird-android'
     name: Close stale needinfo issues
     runs-on: ubuntu-latest
     environment: botmobile
