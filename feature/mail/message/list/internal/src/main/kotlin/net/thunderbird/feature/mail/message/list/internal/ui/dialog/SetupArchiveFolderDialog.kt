@@ -1,8 +1,6 @@
 package net.thunderbird.feature.mail.message.list.internal.ui.dialog
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
@@ -21,6 +19,8 @@ import androidx.compose.ui.window.DialogProperties
 import net.thunderbird.components.ui.bolt.organism.BasicDialog
 import net.thunderbird.components.ui.bolt.organism.BasicDialogDefaults
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.GlassPageMotion
+import net.thunderbird.components.ui.bolt.theme.LocalGlassAppearance
 import net.thunderbird.core.ui.contract.mvi.observe
 import net.thunderbird.feature.account.AccountId
 import net.thunderbird.feature.mail.folder.api.RemoteFolder
@@ -149,12 +149,12 @@ private fun SetupArchiveFolderDialogContent(
     onFolderNameChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val motion = GlassPageMotion(LocalGlassAppearance.current.motionEnabled)
     AnimatedContent(
         targetState = state,
         transitionSpec = {
-            slideInHorizontally(initialOffsetX = { it }) togetherWith slideOutHorizontally(
-                targetOffsetX = { -it },
-            )
+            val back = targetState is State.ChooseArchiveFolder
+            motion.enter(back) togetherWith motion.exit(back)
         },
         contentKey = { it::class },
         modifier = modifier,

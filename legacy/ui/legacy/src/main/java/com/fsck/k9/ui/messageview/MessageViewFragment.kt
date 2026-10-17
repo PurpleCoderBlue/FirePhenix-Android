@@ -623,7 +623,7 @@ class MessageViewFragment :
                 accountId = account.uuid,
                 messageId = messageReference.uid,
                 folder = messageReference.folderId.toString(),
-                sender = messageViewInfo.message.from?.firstOrNull()?.address.orEmpty(),
+                sender = messageViewInfo.message.from?.singleOrNull()?.address.orEmpty(),
                 subject = messageViewInfo.subject.orEmpty(),
                 html = messageViewInfo.text ?: messageViewInfo.textPlainFormatted.orEmpty(),
                 isSpam = account.spamFolderId == messageReference.folderId,
@@ -948,6 +948,8 @@ class MessageViewFragment :
 
     private fun onMessageDetailsResult(requestKey: String, result: Bundle) {
         when (val action = result.getString(MessageDetailsFragment.RESULT_ACTION)) {
+            MessageDetailsFragment.ACTION_IMAGES_CHANGED -> messageTopView.refreshRemoteImagePolicy()
+
             MessageDetailsFragment.ACTION_SEARCH_KEYS -> {
                 messageCryptoPresenter.onClickSearchKey()
             }

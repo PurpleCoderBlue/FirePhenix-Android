@@ -40,7 +40,7 @@
                 android:fadingEdge="none"
                 android:paddingBottom="@dimen/floatingActionButtonSpacing"
                 android:scrollbarStyle="outsideOverlay"
-                android:scrollbars="vertical"
+                android:scrollbars="none"
                 tools:listitem="@layout/message_list_item"
                 />
 

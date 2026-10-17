@@ -32,7 +32,7 @@ internal class TbFeatureThemeProvider(private val settings: GeneralSettingsManag
             AppTheme.DARK -> true
             AppTheme.FOLLOW_SYSTEM -> isSystemInDarkTheme()
         }
-        RenderTheme(dark, controlOnly = true, content = content)
+        RenderTheme(dark, content = content)
     }
 
     @Composable
@@ -65,7 +65,6 @@ internal class TbFeatureThemeProvider(private val settings: GeneralSettingsManag
     @Composable
     private fun RenderTheme(
         darkTheme: Boolean,
-        controlOnly: Boolean = false,
         content: @Composable () -> Unit,
     ) {
         val config by settings.getSettingsFlow().collectAsState(settings.getConfig())
@@ -104,7 +103,8 @@ internal class TbFeatureThemeProvider(private val settings: GeneralSettingsManag
         ThunderbirdBoltTheme(
             darkTheme = darkTheme,
 
-            glassBackgroundVisible = !controlOnly,
+            // GlassActivityCallbacks owns the stationary wallpaper beneath every content host.
+            glassBackgroundVisible = false,
             glassMotionEnabled = net.thunderbird.core.ui.theme.manager.GlassMotion.enabled(
                 LocalContext.current,
                 config.display.visualSettings.animationPreference,

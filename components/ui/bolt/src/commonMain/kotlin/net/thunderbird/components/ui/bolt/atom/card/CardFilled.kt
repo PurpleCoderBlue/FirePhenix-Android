@@ -3,7 +3,6 @@ package net.thunderbird.components.ui.bolt.atom.card
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card as Material3Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
@@ -11,6 +10,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import net.thunderbird.components.ui.bolt.PreviewWithThemes
 import net.thunderbird.components.ui.bolt.atom.text.TextBodyMedium
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.liquidGlass
+import androidx.compose.material3.Card as Material3Card
 
 @Composable
 fun CardFilled(
@@ -24,17 +25,17 @@ fun CardFilled(
     if (onClick != null) {
         Material3Card(
             onClick = onClick,
-            modifier = modifier,
+            modifier = modifier.liquidGlass(shape = shape, interactive = onClick != null),
             shape = shape,
-            colors = colors.toMaterial3CardColors(),
+            colors = colors.forGlass().toMaterial3CardColors(),
             elevation = elevation.toMaterial3CardElevation(),
             content = content,
         )
     } else {
         Material3Card(
-            modifier = modifier,
+            modifier = modifier.liquidGlass(shape = shape, interactive = onClick != null),
             shape = shape,
-            colors = colors.toMaterial3CardColors(),
+            colors = colors.forGlass().toMaterial3CardColors(),
             elevation = elevation.toMaterial3CardElevation(),
             content = content,
         )

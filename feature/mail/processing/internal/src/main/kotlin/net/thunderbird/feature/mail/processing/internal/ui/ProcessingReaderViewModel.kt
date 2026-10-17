@@ -18,6 +18,7 @@ import net.thunderbird.feature.mail.processing.internal.domain.HtmlProcessingPla
 import net.thunderbird.feature.mail.processing.internal.domain.MailProcessingManager
 import net.thunderbird.feature.mail.processing.internal.domain.ProcessingLanguageDetector
 import net.thunderbird.feature.mail.processing.internal.domain.ProcessingSelection
+import net.thunderbird.feature.mail.processing.internal.domain.isChineseLanguage
 import net.thunderbird.feature.mail.processing.internal.domain.matchingRule
 
 internal enum class ReadingMode { ORIGINAL, TRANSLATED, BILINGUAL }
@@ -41,6 +42,7 @@ internal data class ProcessingReaderState(
     val translationLanguage: String = "zh-Hans",
     val summaryLanguage: String = "zh-Hans",
     val detectedLanguage: String? = null,
+    val languageDetectionComplete: Boolean = false,
     val mode: ReadingMode = ReadingMode.ORIGINAL,
     val includeQuotedContext: Boolean = false,
     val summaryExpanded: Boolean = true,
@@ -112,6 +114,7 @@ internal class ProcessingReaderViewModel(
     }
 
     private fun quickAction(action: ProcessingAction) {
+        if (action == ProcessingAction.TRANSLATE && state.value.detectedLanguage.isChineseLanguage()) return
         val current = state.value
         val status = if (action == ProcessingAction.TRANSLATE) current.translation else current.summary
         when {
@@ -185,7 +188,11 @@ internal class ProcessingReaderViewModel(
             val detected = input.copy(sourceLanguage = language)
             message = detected
             updateState {
-                it.copy(detectedLanguage = language, automaticSkipped = plan.characterCount > AUTOMATIC_CHARACTER_LIMIT)
+                it.copy(
+                    detectedLanguage = language,
+                    languageDetectionComplete = true,
+                    automaticSkipped = plan.characterCount > AUTOMATIC_CHARACTER_LIMIT,
+                )
             }
             ProcessingAction.entries.forEach { action ->
                 config.matchingRule(detected, action, plan.characterCount)?.let { rule ->
@@ -196,7 +203,11 @@ internal class ProcessingReaderViewModel(
     }
 
     private fun manual(action: ProcessingAction, force: Boolean) {
-        if (isBusy(action)) return
+        if (isBusy(action) ||
+            (action == ProcessingAction.TRANSLATE && state.value.detectedLanguage.isChineseLanguage())
+        ) {
+            return
+        }
         val input = message ?: return
         val current = state.value
         val selectedId = when (action) {

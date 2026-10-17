@@ -1,7 +1,9 @@
 package net.thunderbird.feature.mail.processing.internal.domain
 
 import java.util.Locale
-import net.thunderbird.feature.mail.processing.api.RemoteImageRule
+import net.thunderbird.feature.mail.processing.api.ProcessingConfiguration
+import net.thunderbird.feature.mail.processing.api.RemoteImageAccess
+import net.thunderbird.feature.mail.processing.api.SenderListKind
 
 /** Only actual From mailboxes qualify; never infer contact trust from display names or Reply-To. */
 internal object RemoteImagePolicy {
@@ -11,8 +13,26 @@ internal object RemoteImagePolicy {
         '*' !in it && mailbox.matches(it)
     }?.lowercase(Locale.ROOT)
 
-    fun allows(rules: List<RemoteImageRule>, senders: List<String>, isOutlookContact: (String) -> Boolean): Boolean {
-        val sender = senders.singleOrNull()?.let(::normalize) ?: return false
-        return rules.any { it.enabled && normalize(it.sender) == sender } || isOutlookContact(sender)
+    fun access(
+        configuration: ProcessingConfiguration,
+        senders: List<String>,
+        officialSenders: List<OfficialSender> = OfficialSenders.entries,
+    ): RemoteImageAccess {
+        val config = configuration.withSenderListsMigration()
+        val manualBlock = senders.any { config.hasSender(it, SenderListKind.BLOCK_IMAGES) }
+        val directoryBlock = senders.mapNotNull(::normalize).any { sender ->
+            if (config.hasSender(sender, SenderListKind.AUTO_IMAGES)) {
+                false
+            } else {
+                officialSenders.any { it.imageAccess == RemoteImageAccess.BLOCKED && it.matches(sender) }
+            }
+        }
+        val sender = senders.singleOrNull()?.let(::normalize)
+        return when {
+            manualBlock || directoryBlock -> RemoteImageAccess.BLOCKED
+            sender == null -> RemoteImageAccess.MANUAL
+            config.hasSender(sender, SenderListKind.AUTO_IMAGES) -> RemoteImageAccess.AUTOMATIC
+            else -> officialSenders.firstOrNull { it.matches(sender) }?.imageAccess ?: RemoteImageAccess.MANUAL
+        }
     }
 }

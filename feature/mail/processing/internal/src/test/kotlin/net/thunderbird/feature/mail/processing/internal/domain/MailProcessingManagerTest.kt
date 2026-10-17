@@ -6,6 +6,7 @@ import assertk.assertions.isNotEqualTo
 import assertk.assertions.isTrue
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -32,6 +33,45 @@ class MailProcessingManagerTest {
         false,
     )
     private val selection = ProcessingSelection("service", ProcessingAction.TRANSLATE)
+
+    @Test
+    fun `summary chunks overlap within the two request limit before ordered reduction`() = runTest {
+        val storage = FakeProcessingStorage()
+        storage.configuration.value = storage.configuration.value.copy(
+            profiles = listOf(ServiceProfile("summary", "Test", ProcessingAction.SUMMARIZE)),
+        )
+        var active = 0
+        var peak = 0
+        val service = object : ProcessingService {
+            override suspend fun execute(
+                profile: ServiceProfile,
+                secret: String,
+                texts: List<String>,
+                language: String,
+            ): List<String> {
+                active++
+                peak = maxOf(peak, active)
+                try {
+                    delay(100)
+                    return listOf(if (texts.single().length > 100) texts.single().take(1) else texts.single())
+                } finally {
+                    active--
+                }
+            }
+        }
+        val testSubject =
+            MailProcessingManager(storage, service, backgroundScope, StandardTestDispatcher(testScheduler))
+
+        val output = testSubject.process(
+            message.copy(html = "<p>" + "a".repeat(4_000) + "b".repeat(4_000) + "c".repeat(1_000) + "</p>"),
+            ProcessingSelection("summary", ProcessingAction.SUMMARIZE),
+            false,
+        ) { _, _ -> }
+
+        assertThat(peak).isEqualTo(2)
+        assertThat(testScheduler.currentTime).isEqualTo(300L)
+        assertThat(output).isEqualTo("a\n\nb\n\nc")
+    }
 
     @Test
     fun `long processing holds one credential snapshot across every chunk`() = runTest {

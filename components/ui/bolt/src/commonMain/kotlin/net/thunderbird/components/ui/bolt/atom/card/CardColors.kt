@@ -1,6 +1,9 @@
 package net.thunderbird.components.ui.bolt.atom.card
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.LocalGlassAppearance
 import androidx.compose.material3.CardColors as Material3CardColors
 
 /**
@@ -41,3 +44,16 @@ internal fun CardColors.toMaterial3CardColors(): Material3CardColors =
         disabledContainerColor = disabledContainerColor,
         disabledContentColor = disabledContentColor,
     )
+
+/** The optical material owns the backing; Material must not paint an opaque card over it. */
+@Composable
+internal fun CardColors.forGlass(): CardColors = if (LocalGlassAppearance.current.enabled) {
+    copy(
+        containerColor = Color.Transparent,
+        disabledContainerColor = Color.Transparent,
+        contentColor = BoltTheme.colors.onSurface,
+        disabledContentColor = BoltTheme.colors.onSurface.copy(alpha = CardDefaults.DISABLED_ALPHA),
+    )
+} else {
+    this
+}

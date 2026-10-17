@@ -105,23 +105,6 @@ class ProcessingSettingsViewModelTest {
     }
 
     @Test
-    fun `automatic processing remains off when its service is not configured`() = runTest {
-        // Arrange
-        storage.configuration.value = storage.configuration.value.copy(profiles = emptyList())
-        // Act
-        testSubject.event(
-            ProcessingSettingsEvent.Automatic(
-                net.thunderbird.feature.mail.processing.api.ProcessingAction.TRANSLATE,
-                true,
-            ),
-        )
-        val result = testSubject.state.first { !it.saving }
-        // Assert
-        assertThat(result.error).isEqualTo(ProcessingFailure.NOT_CONFIGURED)
-        assertThat(result.configuration.automaticTranslation).isEqualTo(false)
-    }
-
-    @Test
     fun `copying a model service saves independent credentials without exposing the key in UI state`() = runTest {
         val source = storage.configuration.value.profiles.single()
         testSubject.event(

@@ -28,6 +28,8 @@ class K9WebViewClient(
     private val attachmentResolver: AttachmentResolver?,
     private val onPageFinishedListener: OnPageFinishedListener?,
 ) : WebViewClient() {
+    internal var onPageVisible: (() -> Unit)? = null
+
 
     @Deprecated("Deprecated in parent class")
     override fun shouldOverrideUrlLoading(webView: WebView, url: String): Boolean {
@@ -114,6 +116,12 @@ class K9WebViewClient(
 
     private fun WebResourceResponse.addCacheControlHeader() {
         responseHeaders = mapOf("Cache-Control" to "no-store")
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onPageCommitVisible(view: WebView, url: String) {
+        super.onPageCommitVisible(view, url)
+        onPageVisible?.invoke()
     }
 
     override fun onPageFinished(view: WebView, url: String) {

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="sender_lists_group" />
+    <item type="id" name="sender_lists_heading" />
+    <item type="id" name="sender_auto_translate" />
+    <item type="id" name="sender_auto_summary" />
+    <item type="id" name="sender_auto_images" />
+    <item type="id" name="sender_block_images" />
+    <string name="sender_auto_translate">Auto-translate this sender</string>
+    <string name="sender_auto_summary">Auto-summarize this sender</string>
+    <string name="sender_auto_images">Auto-load images from this sender</string>
+    <string name="sender_block_images">Block images from this sender</string>
+    <string name="sender_lists_ambiguous">A single From address is required</string>
+    <string name="sender_lists_saved">Sender list updated</string>
+    <string name="sender_lists_save_failed">Could not save the sender list</string>
+</resources>

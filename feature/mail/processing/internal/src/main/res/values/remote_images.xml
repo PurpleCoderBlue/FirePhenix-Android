@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="remote_images_title">Remote image rules</string>
-    <string name="remote_images_policy">Automatically load images only for an enabled exact sender rule OR a verified Outlook contact. Other messages require a manual tap. Rules apply to all accounts. Sender addresses can be spoofed.</string>
-    <string name="remote_images_contacts_unavailable">Outlook contacts are not connected: current authorization has no Contacts.Read permission. Only sender rules currently enable automatic loading. Device contacts are not used.</string>
     <string name="remote_images_sender">Exact sender email address</string>
-    <string name="remote_images_add">Add sender rule</string>
     <string name="remote_images_invalid_sender">Enter one complete email address without a display name or wildcard.</string>
 </resources>

@@ -47,7 +47,7 @@ import net.thunderbird.components.ui.bolt.template.Scaffold
 import net.thunderbird.feature.mail.processing.api.ProcessingAction
 import net.thunderbird.feature.mail.processing.api.ProcessingConfiguration
 import net.thunderbird.feature.mail.processing.api.ProcessingProvider
-import net.thunderbird.feature.mail.processing.api.ProcessingRule
+import net.thunderbird.feature.mail.processing.api.SenderListKind
 import net.thunderbird.feature.mail.processing.api.ServiceProfile
 import net.thunderbird.feature.mail.processing.internal.R
 
@@ -60,9 +60,7 @@ internal fun ProcessingSettingsContent(viewModel: ProcessingSettingsViewModel, o
             TopAppBarWithBackButton(
                 stringResource(R.string.processing_title),
                 onBackClick = {
-                    if (state.profile != null ||
-                        state.rule != null
-                    ) {
+                    if (state.profile != null) {
                         dispatch(ProcessingSettingsEvent.CloseEditor)
                     } else {
                         onBack()
@@ -77,21 +75,14 @@ internal fun ProcessingSettingsContent(viewModel: ProcessingSettingsViewModel, o
                 modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                if (state.profile == null &&
-                    state.rule == null
-                ) {
+                if (state.profile == null) {
                     state.error?.let { TextBodyMedium(processingErrorText(it)) }
                 }
                 if (state.loadFailed) TextBodyMedium(stringResource(R.string.processing_storage_warning))
                 val profile = state.profile
-                val rule = state.rule
                 when {
                     profile != null -> Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
                         ProfileEditor(state, profile, dispatch, Modifier.widthIn(max = 720.dp))
-                    }
-
-                    rule != null -> Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
-                        RuleEditor(state, rule, dispatch, Modifier.widthIn(max = 720.dp))
                     }
 
                     else -> {
@@ -136,49 +127,6 @@ private fun SettingsOverview(
             dispatch(ProcessingSettingsEvent.ClearCache)
         })
         if (state.cacheCleared) TextBodyMedium(stringResource(R.string.processing_cache_cleared))
-    }
-}
-
-@Composable
-private fun RulesSection(
-    action: ProcessingAction,
-    config: ProcessingConfiguration,
-    dispatch: (ProcessingSettingsEvent) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        val rules = config.rules.filter { it.action == action }
-        TextBodyMedium(stringResource(R.string.processing_rules_notice))
-        rules.forEachIndexed { index, rule ->
-            val service = config.profiles.firstOrNull { it.id == rule.profileId }?.name
-                ?: stringResource(R.string.processing_missing_profile)
-            TextBodyMedium(rule.name + " · " + service + " · " + rule.targetLanguage)
-            FlowRow {
-                ButtonText(
-                    stringResource(R.string.processing_edit),
-                    { dispatch(ProcessingSettingsEvent.EditRule(rule)) },
-                )
-                ButtonText(
-                    stringResource(R.string.processing_move_up),
-                    {
-                        dispatch(ProcessingSettingsEvent.MoveRule(rule.id, -1))
-                    },
-                    enabled = index > 0,
-                )
-                ButtonText(
-                    stringResource(R.string.processing_move_down),
-                    {
-                        dispatch(ProcessingSettingsEvent.MoveRule(rule.id, 1))
-                    },
-                    enabled = index < rules.lastIndex,
-                )
-                ButtonText(
-                    stringResource(R.string.processing_delete),
-                    { dispatch(ProcessingSettingsEvent.DeleteRule(rule.id)) },
-                )
-            }
-        }
-        ButtonText(stringResource(R.string.processing_add_rule), { dispatch(ProcessingSettingsEvent.AddRule(action)) })
     }
 }
 
@@ -327,55 +275,6 @@ private fun SaveFeedback(state: ProcessingSettingsState, onSave: () -> Unit, ena
 }
 
 @Composable
-private fun RuleEditor(
-    state: ProcessingSettingsState,
-    rule: ProcessingRule,
-    dispatch: (ProcessingSettingsEvent) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    fun change(next: ProcessingRule) = dispatch(ProcessingSettingsEvent.DraftRule(next))
-    val translation = stringResource(R.string.processing_translate)
-    val summary = stringResource(R.string.processing_summary)
-    val profiles = state.configuration.profiles.filter { it.action == rule.action }
-    val noService = stringResource(R.string.processing_not_configured)
-    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        TextInput({ change(rule.copy(name = it)) }, text = rule.name, label = stringResource(R.string.processing_name))
-        SelectInput(
-            options = ProcessingAction.entries.toImmutableList(),
-            selectedOption = rule.action,
-            onOptionChange = { change(rule.copy(action = it, profileId = "")) },
-            optionToStringTransformation = { if (it == ProcessingAction.TRANSLATE) translation else summary },
-        )
-        SwitchInput(stringResource(R.string.processing_enabled), rule.enabled, { change(rule.copy(enabled = it)) })
-        SwitchInput(stringResource(R.string.processing_match_all), rule.matchAll, { change(rule.copy(matchAll = it)) })
-        if (profiles.isNotEmpty()) {
-            SelectInput(
-                options = profiles.toImmutableList(),
-                selectedOption = profiles.firstOrNull { it.id == rule.profileId },
-                onOptionChange = { it?.let { service -> change(rule.copy(profileId = service.id)) } },
-                optionToStringTransformation = { it?.name ?: noService },
-                label = stringResource(R.string.processing_profile),
-            )
-        }
-        if (profiles.isEmpty()) TextBodyMedium(stringResource(R.string.processing_not_configured))
-        RuleFilters(rule, ::change)
-        TextInput(
-            { change(rule.copy(model = it)) },
-            text = rule.model,
-            label = stringResource(R.string.processing_rule_model),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii, autoCorrectEnabled = false),
-        )
-        TextInput(
-            { change(rule.copy(targetLanguage = it)) },
-            text = rule.targetLanguage,
-            label = stringResource(R.string.processing_language),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii, autoCorrectEnabled = false),
-        )
-        SaveFeedback(state, { dispatch(ProcessingSettingsEvent.SaveRule) }, enabled = profiles.isNotEmpty())
-    }
-}
-
-@Composable
 private fun ServiceSection(
     action: ProcessingAction,
     configuration: ProcessingConfiguration,
@@ -407,14 +306,7 @@ private fun ServiceSection(
             ),
         )
         TextBodyMedium(stringResource(R.string.processing_service_long_press))
-        SwitchInput(
-            stringResource(
-                if (translation) R.string.processing_automatic_translation else R.string.processing_automatic_summary,
-            ),
-            if (translation) configuration.automaticTranslation else configuration.automaticSummary,
-            { dispatch(ProcessingSettingsEvent.Automatic(action, it)) },
-        )
-        RulesSection(action, configuration, dispatch)
+        SenderListSettingsButton(translation)
     }
     managedProfile?.let { profile ->
         AlertDialog(
@@ -433,6 +325,26 @@ private fun ServiceSection(
             onDismissRequest = { managedProfile = null },
         )
     }
+}
+
+@Composable
+private fun SenderListSettingsButton(translation: Boolean) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    ButtonText(
+        stringResource(if (translation) R.string.sender_list_translate else R.string.sender_list_summary),
+        {
+            context.startActivity(
+                android.content.Intent(context, RemoteImageSettingsActivity::class.java).putExtra(
+                    "senderListKind",
+                    if (translation) {
+                        SenderListKind.AUTO_TRANSLATE.name
+                    } else {
+                        SenderListKind.AUTO_SUMMARIZE.name
+                    },
+                ),
+            )
+        },
+    )
 }
 
 @Composable
@@ -462,37 +374,5 @@ private fun ProfileProvider(profile: ServiceProfile, change: (ServiceProfile) ->
         onOptionChange = { change(profile.copy(provider = it, endpoint = it.endpoint, parameters = emptyMap())) },
         optionToStringTransformation = { it.label },
         label = stringResource(R.string.processing_provider),
-    )
-}
-
-@Composable
-private fun RuleFilters(rule: ProcessingRule, change: (ProcessingRule) -> Unit) {
-    TextInput(
-        { change(rule.copy(accountId = it)) },
-        text = rule.accountId,
-        label = stringResource(R.string.processing_account),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii, autoCorrectEnabled = false),
-    )
-    TextInput(
-        { change(rule.copy(folder = it)) },
-        text = rule.folder,
-        label = stringResource(R.string.processing_folder),
-    )
-    TextInput(
-        { change(rule.copy(sender = it)) },
-        text = rule.sender,
-        label = stringResource(R.string.processing_sender),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, autoCorrectEnabled = false),
-    )
-    TextInput(
-        { change(rule.copy(subject = it)) },
-        text = rule.subject,
-        label = stringResource(R.string.processing_subject),
-    )
-    TextInput(
-        { change(rule.copy(sourceLanguage = it)) },
-        text = rule.sourceLanguage,
-        label = stringResource(R.string.processing_source_language),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii, autoCorrectEnabled = false),
     )
 }

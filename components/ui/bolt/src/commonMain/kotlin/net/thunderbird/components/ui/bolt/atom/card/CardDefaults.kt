@@ -120,7 +120,7 @@ object CardDefaults {
      * [Card].
      */
     @Composable
-    fun cardColors(): CardColors = Material3CardDefaults.cardColors().toCardColors()
+    fun cardColors(): CardColors = Material3CardDefaults.cardColors().toCardColors().forGlass()
 
     /**
      * Creates a [CardColors] that represents the default container and content colors used in a
@@ -142,14 +142,14 @@ object CardDefaults {
         contentColor = contentColor,
         disabledContainerColor = disabledContainerColor,
         disabledContentColor = disabledContentColor,
-    ).toCardColors()
+    ).toCardColors().forGlass()
 
     /**
      * Creates a [CardColors] that represents the default container and content colors used in an
      * [ElevatedCard].
      */
     @Composable
-    fun elevatedCardColors(): CardColors = Material3CardDefaults.elevatedCardColors().toCardColors()
+    fun elevatedCardColors(): CardColors = Material3CardDefaults.elevatedCardColors().toCardColors().forGlass()
 
     /**
      * Creates a [CardColors] that represents the default container and content colors used in an
@@ -171,14 +171,14 @@ object CardDefaults {
         contentColor = contentColor,
         disabledContainerColor = disabledContainerColor,
         disabledContentColor = disabledContentColor,
-    ).toCardColors()
+    ).toCardColors().forGlass()
 
     /**
      * Creates a [CardColors] that represents the default container and content colors used in an
      * [OutlinedCard].
      */
     @Composable
-    fun outlinedCardColors(): CardColors = Material3CardDefaults.outlinedCardColors().toCardColors()
+    fun outlinedCardColors(): CardColors = Material3CardDefaults.outlinedCardColors().toCardColors().forGlass()
 
     /**
      * Creates a [CardColors] that represents the default container and content colors used in an
@@ -200,7 +200,7 @@ object CardDefaults {
         contentColor = contentColor,
         disabledContainerColor = disabledContainerColor,
         disabledContentColor = disabledContentColor,
-    ).toCardColors()
+    ).toCardColors().forGlass()
 
     /**
      * Creates a [BorderStroke] that represents the default border used in [OutlinedCard].

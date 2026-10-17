@@ -37,7 +37,7 @@ class GlassReaderHeaderTest {
         }
         val participants = ConstraintLayout(context).apply {
             id = R.id.participants_container
-            listOf(R.id.date, R.id.recipients, R.id.menu_primary_action).forEach { target ->
+            listOf(R.id.date, R.id.from_address, R.id.recipients, R.id.menu_primary_action).forEach { target ->
                 addView(View(context).apply { id = target }, ConstraintLayout.LayoutParams(48, 48))
             }
         }

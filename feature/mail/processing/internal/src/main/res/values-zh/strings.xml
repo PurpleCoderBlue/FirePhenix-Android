@@ -89,4 +89,16 @@
     <string name="processing_test_model">测试模型（固定短文本）</string>
     <string name="processing_model_test_notice">翻译测试使用约 1000 字符的公开示例，总结测试使用一句公开示例。不发送邮件，可能消耗 API 额度。</string>
     <string name="processing_model_test_output">模型测试结果：%1$s</string>
+    <string name="processing_translating">翻译中</string>
+    <string name="processing_summarizing">总结中</string>
+    <string name="processing_hide_summary">隐藏总结</string>
+    <string name="processing_show_summary">显示总结</string>
+    <string name="sender_lists_title">发件人名单</string>
+    <string name="sender_list_translate">自动翻译名单</string>
+    <string name="sender_list_summary">自动总结名单</string>
+    <string name="sender_list_images">自动下载图片名单</string>
+    <string name="sender_list_block_images">禁止下载图片名单</string>
+    <string name="sender_list_add">添加发件人</string>
+    <string name="sender_lists_builtin">内置发件人默认项</string>
+    <string name="sender_lists_policy">按完整发件人地址匹配；禁止图片时隐藏加载按钮。手动选择优先于内置图片默认项。只有手动加入名单的发件人才会自动使用默认服务翻译或总结。</string>
 </resources>

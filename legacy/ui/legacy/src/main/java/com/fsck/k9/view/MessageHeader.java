@@ -61,6 +61,7 @@ public class MessageHeader extends LinearLayout implements OnClickListener, OnLo
     private ImageView starView;
     private ImageView contactPictureView;
     private MaterialTextView fromView;
+    private MaterialTextView fromAddressView;
     private ImageView cryptoStatusIcon;
     private RecipientNamesView recipientNamesView;
     private MaterialTextView dateView;
@@ -92,6 +93,7 @@ public class MessageHeader extends LinearLayout implements OnClickListener, OnLo
         starView = findViewById(R.id.flagged);
         contactPictureView = findViewById(R.id.contact_picture);
         fromView = findViewById(R.id.from);
+        fromAddressView = findViewById(R.id.from_address);
         cryptoStatusIcon = findViewById(R.id.crypto_status_icon);
         recipientNamesView = findViewById(R.id.recipients);
         dateView = findViewById(R.id.date);
@@ -239,6 +241,13 @@ public class MessageHeader extends LinearLayout implements OnClickListener, OnLo
 
         CharSequence from = messageHelper.getSenderDisplayName(fromAddress);
         fromView.setText(from);
+        StringBuilder senderAddresses = new StringBuilder();
+        for (Address address : fromAddresses) {
+            if (senderAddresses.length() > 0) senderAddresses.append(", ");
+            senderAddresses.append(address.getAddress());
+        }
+        fromAddressView.setText(senderAddresses.toString());
+        fromAddressView.setVisibility(senderAddresses.length() == 0 ? View.GONE : View.VISIBLE);
 
         if (showStar) {
             starView.setVisibility(View.VISIBLE);

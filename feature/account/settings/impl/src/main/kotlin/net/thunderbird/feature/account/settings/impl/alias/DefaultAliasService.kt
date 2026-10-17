@@ -119,9 +119,8 @@ internal class DefaultAliasService(
         }
     }
 
-    override suspend fun searchSent(accountId: String, recipient: String): Set<String> = withContext(Dispatchers.IO) {
-        require(android.util.Patterns.EMAIL_ADDRESS.matcher(recipient).matches())
-        history.searchRemote(accountId, recipient)
-        history.candidates(accountId, setOf(recipient.lowercase()))
+    override suspend fun localCandidates(accountId: String): Set<String> = withContext(Dispatchers.IO) {
+        history.localCandidates(accountId).map { it.trim().lowercase(java.util.Locale.ROOT) }
+            .filter { android.util.Patterns.EMAIL_ADDRESS.matcher(it).matches() }.toSet()
     }
 }

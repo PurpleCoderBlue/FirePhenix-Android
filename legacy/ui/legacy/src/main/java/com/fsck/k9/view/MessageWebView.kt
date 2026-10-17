@@ -100,7 +100,8 @@ class MessageWebView : WebView, KoinComponent, ThunderbirdWebViewSettings {
 
     override fun configure(config: WebViewConfig) {
         useDarkMode = config.useDarkMode
-        isVerticalScrollBarEnabled = true
+        isVerticalScrollBarEnabled = false
+        isHorizontalScrollBarEnabled = false
         scrollBarStyle = SCROLLBARS_INSIDE_OVERLAY
         isLongClickable = true
 
@@ -178,11 +179,23 @@ class MessageWebView : WebView, KoinComponent, ThunderbirdWebViewSettings {
         attachmentResolver: AttachmentResolver?,
         onPageFinishedListener: OnPageFinishedListener?,
     ) {
+        var delivered = false
+        val notifyReady: () -> Unit = {
+            if (!delivered) {
+                delivered = true
+                onPageFinishedListener?.onPageFinished()
+            }
+        }
         val webViewClient = webViewClientFactory.create(attachmentResolver) {
             net.thunderbird.core.ui.theme.manager.GlassMotion.trace(
                 context, "mail-viewport-${width}x$height-content-$contentHeight-bounded-$bodyViewportEnabled",
             )
-            onPageFinishedListener?.onPageFinished()
+            notifyReady()
+        }
+        if (bodyViewportEnabled) {
+            // Reading can reveal committed text while remote images continue loading.
+            // Printing/signatures leave this unset and still wait for onPageFinished.
+            webViewClient.onPageVisible = notifyReady
         }
         setWebViewClient(webViewClient)
     }

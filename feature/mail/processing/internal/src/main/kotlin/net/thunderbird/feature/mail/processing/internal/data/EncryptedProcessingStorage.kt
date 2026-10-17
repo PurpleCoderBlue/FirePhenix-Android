@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 import net.thunderbird.feature.mail.processing.api.ProcessingAction
 import net.thunderbird.feature.mail.processing.api.ProcessingConfiguration
 import net.thunderbird.feature.mail.processing.api.ServiceProfile
+import net.thunderbird.feature.mail.processing.internal.domain.withSenderListsMigration
 
 internal fun contentHash(value: String): String = MessageDigest.getInstance("SHA-256")
     .digest(value.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
@@ -124,7 +125,7 @@ internal class EncryptedProcessingStorage(context: Context) : ProcessingStorage 
         return try {
             json.decodeFromString<StoredProcessingConfiguration>(
                 cipher.read(configurationFile).toString(Charsets.UTF_8),
-            )
+            ).let { it.copy(configuration = it.configuration.withSenderListsMigration()) }
         } catch (_: Exception) {
             loadFailed = true
             StoredProcessingConfiguration()

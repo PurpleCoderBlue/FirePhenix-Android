@@ -76,14 +76,11 @@ internal fun GlassBackgroundControls(
             onClick = { picker.launch(arrayOf("image/*")) },
             enabled = !importing,
         )
-        TextBodyMedium(stringResource(R.string.appearance_background_notice))
         GlassValueControl(
             value = blur,
-            label = R.string.appearance_background_blur,
-            numberLabel = R.string.appearance_background_blur_value,
+            label = R.string.appearance_background_blur_label,
             onChange = onBlurChange,
         )
-        TextBodyMedium(stringResource(R.string.appearance_background_contrast_notice))
         ImportStatus(importing, failed)
         if (style == GlassBackground.CUSTOM && !GlassBackgroundStore.hasImage(context, imageName)) {
             TextBodyMedium(stringResource(R.string.appearance_background_missing))

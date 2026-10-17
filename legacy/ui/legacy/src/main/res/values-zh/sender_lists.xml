@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sender_auto_translate">加入／移出自动翻译名单</string>
+    <string name="sender_auto_summary">加入／移出自动总结名单</string>
+    <string name="sender_auto_images">加入／移出自动下载图片名单</string>
+    <string name="sender_block_images">加入／移出禁止下载图片名单</string>
+    <string name="sender_lists_ambiguous">需要唯一发件人地址</string>
+    <string name="sender_lists_saved">已更新发件人名单</string>
+    <string name="sender_lists_save_failed">发件人名单保存失败</string>
+</resources>

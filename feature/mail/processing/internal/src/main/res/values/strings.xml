@@ -89,4 +89,16 @@
     <string name="processing_test_model">Test model (fixed short text)</string>
     <string name="processing_model_test_notice">Translation tests use about 1,000 public sample characters; summary tests use one public sentence. No mail is sent. May consume API credits.</string>
     <string name="processing_model_test_output">Model test result: %1$s</string>
+    <string name="processing_translating">Translating…</string>
+    <string name="processing_summarizing">Summarizing…</string>
+    <string name="processing_hide_summary">Hide summary</string>
+    <string name="processing_show_summary">Show summary</string>
+    <string name="sender_lists_title">Sender lists</string>
+    <string name="sender_list_translate">Auto-translation senders</string>
+    <string name="sender_list_summary">Auto-summary senders</string>
+    <string name="sender_list_images">Auto-load images from</string>
+    <string name="sender_list_block_images">Block images from</string>
+    <string name="sender_list_add">Add sender</string>
+    <string name="sender_lists_builtin">Built-in sender defaults</string>
+    <string name="sender_lists_policy">Lists use the complete From address. Blocked images stay hidden. User choices override built-in image defaults. AI runs only for senders you add, using the default service.</string>
 </resources>

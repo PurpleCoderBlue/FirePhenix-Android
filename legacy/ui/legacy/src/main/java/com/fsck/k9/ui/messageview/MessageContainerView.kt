@@ -82,6 +82,7 @@ class MessageContainerView(context: Context, attrs: AttributeSet?) :
 
     private var isShowingPictures = false
     private var currentHtmlText: String? = null
+    private var onContentReady: OnPageFinishedListener? = null
     private val attachmentViewMap = mutableMapOf<AttachmentViewInfo, AttachmentView>()
     private val attachments = mutableMapOf<Uri, AttachmentViewInfo>()
     private var attachmentCallback: AttachmentViewCallback? = null
@@ -468,10 +469,12 @@ class MessageContainerView(context: Context, attrs: AttributeSet?) :
         val textToDisplay = messageText
             ?: displayHtml.wrapStatusMessage(context.getString(R.string.webview_empty_message))
 
+        val ready = OnPageFinishedListener { onRenderingFinishedListener.onLoadFinished() }
+        onContentReady = ready
         displayHtmlContentWithInlineAttachments(
             htmlText = textToDisplay,
             attachmentResolver = messageViewInfo.attachmentResolver,
-            onPageFinishedListener = onRenderingFinishedListener::onLoadFinished,
+            onPageFinishedListener = ready,
         )
 
         if (!messageViewInfo.extraText.isNullOrEmpty()) {
@@ -497,7 +500,7 @@ class MessageContainerView(context: Context, attrs: AttributeSet?) :
         messageContentView.displayHtmlContentWithInlineAttachments(
             htmlText = htmlText,
             attachmentResolver = currentAttachmentResolver,
-            onPageFinishedListener = null,
+            onPageFinishedListener = onContentReady,
         )
     }
 

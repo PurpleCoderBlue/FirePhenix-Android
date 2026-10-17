@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -42,6 +43,7 @@ import com.fsck.k9.ui.R
 import kotlinx.collections.immutable.ImmutableList
 import net.thunderbird.components.ui.bolt.atom.icon.Icons
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.LocalGlassAppearance
 
 private const val DIMMED_ROW_ALPHA = 0.6f
 private const val DRAGGED_ROW_SCALE = 1.02f
@@ -346,7 +348,7 @@ private fun NotificationReorderRow(
                 shadowElevation = dragElevationPx
             }
             .zIndex(if (dragState.isDragged) 1f else 0f)
-            .background(BoltTheme.colors.surface)
+            .background(if (LocalGlassAppearance.current.enabled) Color.Transparent else BoltTheme.colors.surface)
             .padding(start = startPadding, end = BoltTheme.spacings.zero),
         verticalAlignment = Alignment.CenterVertically,
         content = content,

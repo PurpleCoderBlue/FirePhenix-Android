@@ -28,11 +28,13 @@ class GlassActivityCallbacks(
     private val settings: GeneralSettingsManager,
     private val theme: FeatureThemeProvider,
 ) : Application.ActivityLifecycleCallbacks {
+    private val entered = WeakHashMap<Activity, Boolean>()
     private val popupThemes = GlassPopupThemes()
-    private val views = WeakHashMap<Activity, GlassViewStyler>()
+    private val views = WeakHashMap<Activity, GlassWindowStyler>()
     private val renderers = WeakHashMap<Activity, GlassSurfaceRenderer>()
     private val systemBarThemes = WeakHashMap<Activity, Boolean>()
     private val observers = WeakHashMap<Activity, ViewTreeObserver.OnPreDrawListener>()
+    private val layouts = WeakHashMap<Activity, ViewTreeObserver.OnGlobalLayoutListener>()
     private val backgrounds = WeakHashMap<Activity, Pair<String, Job>>()
     private val motions = WeakHashMap<Activity, Pair<AnimationPreference, Boolean>>()
     private val contentImages = WeakHashMap<Activity, Bitmap>()
@@ -42,6 +44,13 @@ class GlassActivityCallbacks(
         systemBarThemes.remove(activity)
         motions.remove(activity)
         val root = activity.window.decorView
+        val styler = views.getOrPut(activity) { GlassWindowStyler(GlassViewStyler(theme)) }
+        styler.invalidateWindow()
+        val layout = layouts.getOrPut(activity) {
+            ViewTreeObserver.OnGlobalLayoutListener { styler.invalidateWindow() }
+        }
+        root.viewTreeObserver.removeOnGlobalLayoutListener(layout)
+        root.viewTreeObserver.addOnGlobalLayoutListener(layout)
         val observer = observers.getOrPut(activity) {
             ViewTreeObserver.OnPreDrawListener {
                 if (!activity.isDestroyed) apply(activity)
@@ -50,7 +59,26 @@ class GlassActivityCallbacks(
         }
         root.viewTreeObserver.removeOnPreDrawListener(observer)
         root.viewTreeObserver.addOnPreDrawListener(observer)
-        root.post { if (!activity.isDestroyed) apply(activity) }
+        val returning = entered.put(activity, true) == true
+        root.post {
+            if (!activity.isDestroyed && observers[activity] === observer) {
+                apply(activity)
+                val content = activity.findViewById<ViewGroup>(android.R.id.content)
+                if (content !=
+                    null
+                ) {
+                    GlassContentMotion.start(
+                        content,
+                        GlassMotion.transitions(
+                            activity,
+                            settings.getConfig().display.visualSettings.animationPreference,
+                        ),
+                        true,
+                        returning,
+                    )
+                }
+            }
+        }
     }
 
     private fun apply(activity: Activity) {
@@ -78,8 +106,8 @@ class GlassActivityCallbacks(
         applyBackground(activity, root, backdrop, config, dark)
         val renderer = renderers.getOrPut(activity) { GlassSurfaceRenderer(root) }
         renderer.configure(dark, config.glassBlur)
-        views.getOrPut(activity) { GlassViewStyler(theme) }
-            .visitWindow(activity.window.decorView, root, renderer, contentImages[activity], palettes[activity])
+        views.getOrPut(activity) { GlassWindowStyler(GlassViewStyler(theme)) }
+            .refreshWindow(activity.window.decorView, root, renderer, contentImages[activity], palettes[activity])
     }
 
     private fun applyBackground(
@@ -149,15 +177,24 @@ class GlassActivityCallbacks(
     }
 
     override fun onActivityPaused(activity: Activity) {
+        val content = activity.findViewById<ViewGroup>(android.R.id.content)
+        if (content != null && !activity.isDestroyed) {
+            GlassContentMotion.start(
+                content,
+                GlassMotion.transitions(activity, settings.getConfig().display.visualSettings.animationPreference),
+                false,
+                activity.isFinishing,
+            )
+        }
         if (activity.isFinishing) {
             GlassMotion.configureActivity(
                 activity,
                 settings.getConfig().display.visualSettings.animationPreference,
-                closing = true,
             )
         }
         systemBarThemes.remove(activity)
         observers.remove(activity)?.let { activity.window.decorView.viewTreeObserver.removeOnPreDrawListener(it) }
+        layouts.remove(activity)?.let { activity.window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(it) }
     }
 
     override fun onActivityStarted(activity: Activity) = Unit
@@ -166,6 +203,7 @@ class GlassActivityCallbacks(
 
     override fun onActivityDestroyed(activity: Activity) {
         onActivityPaused(activity)
+        entered.remove(activity)
         backgrounds.remove(activity)?.second?.cancel()
         contentImages.remove(activity)
         palettes.remove(activity)

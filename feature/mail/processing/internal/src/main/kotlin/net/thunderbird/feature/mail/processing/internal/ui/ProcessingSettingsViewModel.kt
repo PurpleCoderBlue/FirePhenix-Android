@@ -15,7 +15,6 @@ import net.thunderbird.core.ui.contract.mvi.BaseViewModel
 import net.thunderbird.feature.mail.processing.api.ProcessingAction
 import net.thunderbird.feature.mail.processing.api.ProcessingConfiguration
 import net.thunderbird.feature.mail.processing.api.ProcessingProvider
-import net.thunderbird.feature.mail.processing.api.ProcessingRule
 import net.thunderbird.feature.mail.processing.api.ServiceProfile
 import net.thunderbird.feature.mail.processing.internal.data.ProcessingConnectionTester
 import net.thunderbird.feature.mail.processing.internal.data.ProcessingException
@@ -34,7 +33,6 @@ internal data class ProcessingSettingsState(
     val profile: ServiceProfile? = null,
     val secret: String = "",
     val parameters: String = "{}",
-    val rule: ProcessingRule? = null,
     val error: ProcessingFailure? = null,
     val cacheCleared: Boolean = false,
     val loadFailed: Boolean = false,
@@ -49,7 +47,6 @@ internal data class ProcessingSettingsState(
 
 internal sealed interface ProcessingSettingsEvent {
     sealed interface ProfileEvent : ProcessingSettingsEvent
-    sealed interface RuleEvent : ProcessingSettingsEvent
     data class EditProfile(val profile: ServiceProfile) : ProfileEvent
     data class AddProfile(val action: ProcessingAction) : ProfileEvent
     data class DraftProfile(val profile: ServiceProfile) : ProfileEvent
@@ -61,18 +58,11 @@ internal sealed interface ProcessingSettingsEvent {
     data object SaveProfile : ProfileEvent
     data class DeleteProfile(val id: String) : ProfileEvent
     data class DefaultProfile(val action: ProcessingAction, val id: String) : ProfileEvent
-    data class Automatic(val action: ProcessingAction, val enabled: Boolean) : ProcessingSettingsEvent
-    data class EditRule(val rule: ProcessingRule) : RuleEvent
-    data class AddRule(val action: ProcessingAction) : RuleEvent
-    data class DraftRule(val rule: ProcessingRule) : RuleEvent
-    data object SaveRule : RuleEvent
-    data class DeleteRule(val id: String) : RuleEvent
-    data class MoveRule(val id: String, val offset: Int) : RuleEvent
     data object ClearCache : ProcessingSettingsEvent
     data object CloseEditor : ProcessingSettingsEvent
 }
 
-// One settings state owner handles explicit profile, rule and diagnostic events.
+// One settings state owner handles explicit profile and diagnostic events.
 @Suppress("TooManyFunctions")
 internal class ProcessingSettingsViewModel(
     private val storage: ProcessingStorage,
@@ -84,14 +74,6 @@ internal class ProcessingSettingsViewModel(
 ) {
     private var connectionJob: Job? = null
     private val mutationMutex = Mutex()
-    private var currentAccount = ""
-    private var currentFolder = ""
-
-    fun setMessageScope(accountId: String, folderId: String) {
-        currentAccount = accountId
-        currentFolder = folderId
-    }
-
     init {
         viewModelScope.launch {
             storage.configuration.collect { config -> updateState { it.copy(configuration = config) } }
@@ -113,22 +95,6 @@ internal class ProcessingSettingsViewModel(
         when (event) {
             is ProcessingSettingsEvent.ProfileEvent -> profileEvent(event)
 
-            is ProcessingSettingsEvent.RuleEvent -> ruleEvent(event)
-
-            is ProcessingSettingsEvent.Automatic -> mutate {
-                val config = storage.configuration.value
-                if (event.enabled && config.profiles.none { it.action == event.action }) {
-                    throw ProcessingException(ProcessingFailure.NOT_CONFIGURED)
-                }
-                storage.saveConfiguration(
-                    if (event.action == ProcessingAction.TRANSLATE) {
-                        config.copy(automaticTranslation = event.enabled)
-                    } else {
-                        config.copy(automaticSummary = event.enabled)
-                    },
-                )
-            }
-
             ProcessingSettingsEvent.ClearCache -> mutate {
                 storage.clearCache()
                 updateState { it.copy(cacheCleared = true) }
@@ -137,7 +103,6 @@ internal class ProcessingSettingsViewModel(
             ProcessingSettingsEvent.CloseEditor -> updateState {
                 it.copy(
                     profile = null,
-                    rule = null,
                     secret = "",
                     parameters = "{}",
                     error = null,
@@ -208,59 +173,6 @@ internal class ProcessingSettingsViewModel(
         }
     }
 
-    private fun ruleEvent(event: ProcessingSettingsEvent.RuleEvent) {
-        when (event) {
-            is ProcessingSettingsEvent.EditRule -> updateState {
-                it.copy(
-                    rule = event.rule,
-                    profile = null,
-                    error = null,
-                )
-            }
-
-            is ProcessingSettingsEvent.AddRule -> updateState {
-                it.copy(
-                    rule = ProcessingRule(
-                        UUID.randomUUID().toString(),
-                        "",
-                        event.action,
-                        storage.configuration.value.profiles.firstOrNull { profile ->
-                            profile.action == event.action &&
-                                profile.id == if (event.action == ProcessingAction.TRANSLATE) {
-                                    storage.configuration.value.defaultTranslationProfile
-                                } else {
-                                    storage.configuration.value.defaultSummaryProfile
-                                }
-                        }?.id ?: storage.configuration.value.profiles.firstOrNull { profile ->
-                            profile.action == event.action
-                        }?.id.orEmpty(),
-                        accountId = currentAccount,
-                        folder = currentFolder,
-                    ),
-                    profile = null,
-                    error = null,
-                )
-            }
-
-            is ProcessingSettingsEvent.DraftRule -> updateState { it.copy(rule = event.rule, error = null) }
-
-            ProcessingSettingsEvent.SaveRule -> saveRule()
-
-            is ProcessingSettingsEvent.DeleteRule -> changeRules { rules -> rules.filterNot { it.id == event.id } }
-
-            is ProcessingSettingsEvent.MoveRule -> changeRules { rules ->
-                val index = rules.indexOfFirst { it.id == event.id }
-                if (index < 0) return@changeRules rules
-                val group = rules.indices.filter { rules[it].action == rules[index].action }
-                val target = group.getOrNull(group.indexOf(index) + event.offset) ?: return@changeRules rules
-                rules.toMutableList().apply {
-                    this[index] = rules[target]
-                    this[target] = rules[index]
-                }
-            }
-        }
-    }
-
     private fun edit(profile: ServiceProfile) {
         val params = kotlinx.serialization.json.buildJsonObject {
             profile.parameters.forEach { (key, value) -> put(key, Json.parseToJsonElement(value)) }
@@ -268,7 +180,6 @@ internal class ProcessingSettingsViewModel(
         updateState {
             it.copy(
                 profile = profile,
-                rule = null,
                 secret = "",
                 parameters = params,
                 error = null,
@@ -393,33 +304,6 @@ internal class ProcessingSettingsViewModel(
         val secret = current.secret.trim().ifBlank { reusable?.secret.orEmpty() }
         if (secret.isBlank()) throw ProfileValidationException(ProfileField.KEY, ProcessingFailure.NOT_CONFIGURED)
         return secret
-    }
-
-    private fun saveRule() {
-        val rule = state.value.rule ?: return
-        mutate {
-            val profile = storage.configuration.value.profiles.firstOrNull {
-                it.id == rule.profileId && it.action == rule.action
-            } ?: throw ProcessingException(ProcessingFailure.NOT_CONFIGURED)
-            val invalidLanguage = !rule.targetLanguage.matches(Regex("[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*"))
-            val machineModel = rule.model.isNotBlank() && profile.provider in setOf(
-                ProcessingProvider.GOOGLE,
-                ProcessingProvider.MICROSOFT,
-            )
-            if (rule.name.isBlank() || invalidLanguage || machineModel) {
-                throw ProcessingException(ProcessingFailure.INVALID_CONFIGURATION)
-            }
-            val rules = storage.configuration.value.rules.toMutableList()
-            val index = rules.indexOfFirst { it.id == rule.id }
-            if (index < 0) rules.add(rule) else rules[index] = rule
-            storage.saveConfiguration(storage.configuration.value.copy(rules = rules))
-            updateState { it.copy(rule = null) }
-        }
-    }
-
-    private fun changeRules(change: (List<ProcessingRule>) -> List<ProcessingRule>) = mutate {
-        val config = storage.configuration.value
-        storage.saveConfiguration(config.copy(rules = change(config.rules)))
     }
 
     private fun mutate(block: () -> Unit) {

@@ -22,3 +22,8 @@ internal interface ProcessingStorage {
 
 internal fun ProcessingConfiguration.withoutAccount(accountId: String): ProcessingConfiguration =
     copy(rules = rules.filterNot { it.accountId == accountId && it.accountId.isNotBlank() })
+
+/** Share the storage monitor with profile writes; menu and settings edits cannot lose each other. */
+internal fun ProcessingStorage.updateConfiguration(change: (ProcessingConfiguration) -> ProcessingConfiguration) {
+    synchronized(this) { saveConfiguration(change(configuration.value)) }
+}

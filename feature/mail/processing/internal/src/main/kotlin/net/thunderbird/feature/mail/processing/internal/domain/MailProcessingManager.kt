@@ -204,9 +204,18 @@ internal class MailProcessingManager(
         var chunks = splitText(text)
         var round = 0
         while (true) {
-            val summaries = chunks.mapIndexed { index, chunk ->
-                onProgress(index, chunks.size)
-                execute(credentials, listOf(chunk), selection.language).single()
+            val progress = Mutex()
+            var completed = 0
+            onProgress(0, chunks.size)
+            val summaries = coroutineScope {
+                chunks.map { chunk ->
+                    async {
+                        // execute() shares the same two-request limit as translation.
+                        execute(credentials, listOf(chunk), selection.language).single().also {
+                            progress.withLock { onProgress(++completed, chunks.size) }
+                        }
+                    }
+                }.awaitAll()
             }
             if (summaries.size == 1) {
                 onProgress(chunks.size, chunks.size)

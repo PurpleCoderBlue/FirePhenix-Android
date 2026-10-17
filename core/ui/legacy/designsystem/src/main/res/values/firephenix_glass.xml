@@ -38,10 +38,10 @@
         <item name="android:textColorSecondary">#FFCAC4D0</item>
     </style>
     <style name="FirePhenixGlassWindowAnimations">
-        <item name="android:activityOpenEnterAnimation">@anim/firephenix_forward_enter</item>
-        <item name="android:activityOpenExitAnimation">@anim/firephenix_forward_exit</item>
-        <item name="android:activityCloseEnterAnimation">@anim/firephenix_back_enter</item>
-        <item name="android:activityCloseExitAnimation">@anim/firephenix_back_exit</item>
+        <item name="android:activityOpenEnterAnimation">@null</item>
+        <item name="android:activityOpenExitAnimation">@null</item>
+        <item name="android:activityCloseEnterAnimation">@null</item>
+        <item name="android:activityCloseExitAnimation">@null</item>
         <item name="android:windowEnterAnimation">@anim/firephenix_popup_enter</item>
         <item name="android:windowExitAnimation">@anim/firephenix_popup_exit</item>
     </style>

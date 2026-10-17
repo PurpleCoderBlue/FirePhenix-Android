@@ -26,6 +26,6 @@ data class GlassPageMotion(val enabled: Boolean = true) {
     }
 
     companion object {
-        const val DURATION = 220
+        const val DURATION = 360
     }
 }

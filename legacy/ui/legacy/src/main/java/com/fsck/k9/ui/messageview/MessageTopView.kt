@@ -1,9 +1,8 @@
 package com.fsck.k9.ui.messageview
 
 import android.animation.Animator
-import app.k9mail.core.android.common.contact.ContactRepository
-import net.thunderbird.core.android.account.ShowPictures
-import net.thunderbird.core.common.mail.toEmailAddressOrNull
+import net.thunderbird.feature.mail.processing.api.MailProcessingExtension
+import net.thunderbird.feature.mail.processing.api.RemoteImageAccess
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
@@ -43,7 +42,6 @@ class MessageTopView(
     attrs: AttributeSet?,
 ) : LinearLayout(context, attrs), KoinComponent {
 
-    private val contactRepository: ContactRepository by inject()
     private val visualSettingsPrefManager: DisplayVisualSettingsPreferenceManager by inject()
     private val animationManager: AnimationManager by inject()
 
@@ -65,6 +63,10 @@ class MessageTopView(
     private var isShowingProgress = false
     private var showPicturesButtonClicked = false
     private var displayedMessageKey: String? = null
+    private var imageSenders: List<String> = emptyList()
+    private var imageAccountId: String = ""
+    private var lastImageAccount: LegacyAccountDto? = null
+    private var lastImageMessage: MessageViewInfo? = null
     var renderPlainFormat = false
 
     private var showAccountIndicator = false
@@ -105,6 +107,11 @@ class MessageTopView(
 
     private fun setShowPicturesButtonListener() {
         showPicturesButton.setOnClickListener {
+            val access = getKoin().getOrNull<MailProcessingExtension>()?.remoteImageAccess(imageAccountId, imageSenders)
+            if (access == RemoteImageAccess.BLOCKED) {
+                hideShowPicturesButton()
+                return@setOnClickListener
+            }
             showPicturesInAllContainerViews()
             showPicturesButtonClicked = true
         }
@@ -133,10 +140,16 @@ class MessageTopView(
         val key = "${account.uuid}/$identity"
         if (displayedMessageKey != key) showPicturesButtonClicked = false
         displayedMessageKey = key
-        val extension = getKoin().getOrNull<net.thunderbird.feature.mail.processing.api.MailProcessingExtension>()
-        val automatic = extension?.shouldLoadRemoteImages(account.uuid, message.from.orEmpty().map { it.address })
-            ?: legacyPicturesPolicy(account.showPictures, message)
-        val loadPictures = automatic || showPicturesButtonClicked
+        imageSenders = message.from.orEmpty().map { it.address }
+        imageAccountId = account.uuid
+        lastImageAccount = account
+        lastImageMessage = messageViewInfo
+        val extension = getKoin().getOrNull<MailProcessingExtension>()
+        val access = extension?.remoteImageAccess(account.uuid, imageSenders)
+            ?: RemoteImageAccess.MANUAL
+        if (access == RemoteImageAccess.BLOCKED) showPicturesButtonClicked = false
+        val loadPictures = access != RemoteImageAccess.BLOCKED &&
+            (access == RemoteImageAccess.AUTOMATIC || showPicturesButtonClicked)
 
         val view = layoutInflater.inflate(
             R.layout.message_container,
@@ -151,7 +164,7 @@ class MessageTopView(
             renderPlainFormat,
             object : OnRenderingFinishedListener {
                 override fun onLoadFinished() {
-                    displayViewOnLoadFinished(true)
+                    if (containerView.getChildAt(0) === view) displayViewOnLoadFinished(true)
                 }
             },
             loadPictures,
@@ -160,13 +173,19 @@ class MessageTopView(
             messageReaderViewModel,
         )
 
-        if (view.hasHiddenExternalImages && !showPicturesButtonClicked) {
+        if (access != RemoteImageAccess.BLOCKED && view.hasHiddenExternalImages && !loadPictures) {
             showShowPicturesButton()
         } else {
             hideShowPicturesButton()
         }
 
         updateAttachmentSummary(messageViewInfo)
+    }
+
+    fun refreshRemoteImagePolicy() {
+        val account = lastImageAccount ?: return
+        val message = lastImageMessage ?: return
+        showMessage(account, message)
     }
 
     private fun updateAttachmentSummary(messageViewInfo: MessageViewInfo) {
@@ -326,12 +345,6 @@ class MessageTopView(
 
     private fun hideShowPicturesButton() {
         extraHeaderContainer.visibility = GONE
-    }
-
-    private fun legacyPicturesPolicy(setting: ShowPictures, message: Message): Boolean {
-        val sender = message.from?.firstOrNull()?.address?.toEmailAddressOrNull()
-        return setting == ShowPictures.ALWAYS ||
-            (setting == ShowPictures.ONLY_FROM_CONTACTS && sender != null && contactRepository.hasContactFor(sender))
     }
 
     @SuppressLint("ObjectAnimatorBinding")

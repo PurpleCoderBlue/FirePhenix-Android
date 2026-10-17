@@ -8,7 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -19,14 +19,22 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.toImmutableList
 import net.thunderbird.components.ui.bolt.atom.button.ButtonFilled
+import net.thunderbird.components.ui.bolt.atom.button.ButtonIcon
 import net.thunderbird.components.ui.bolt.atom.button.ButtonText
+import net.thunderbird.components.ui.bolt.atom.icon.Icons
 import net.thunderbird.components.ui.bolt.atom.text.TextBodyMedium
-import net.thunderbird.components.ui.bolt.molecule.input.TextInput
+import net.thunderbird.components.ui.bolt.atom.text.TextLabelSmall
+import net.thunderbird.components.ui.bolt.atom.textfield.TextFieldOutlinedSuggestions
+import net.thunderbird.components.ui.bolt.organism.BasicDialog
 import net.thunderbird.components.ui.bolt.organism.TopAppBarWithBackButton
 import net.thunderbird.components.ui.bolt.template.Scaffold
 import net.thunderbird.core.ui.theme.api.FeatureThemeProvider
@@ -71,6 +79,17 @@ private fun AliasManagementContent(
 ) {
     val state by viewModel.state.collectAsState()
     val dispatch = viewModel::event
+    AliasManagementScreen(state, dispatch, onBack, chooseAccount, onAccount)
+}
+
+@Composable
+internal fun AliasManagementScreen(
+    state: AliasManagementState,
+    dispatch: (AliasManagementEvent) -> Unit,
+    onBack: () -> Unit,
+    chooseAccount: Boolean = false,
+    onAccount: (String) -> Unit = {},
+) {
     Scaffold(
         topBar = {
             TopAppBarWithBackButton(stringResource(AliasR.string.account_settings_api_alias_title), onBack)
@@ -88,27 +107,18 @@ private fun AliasManagementContent(
                     return@Column
                 }
                 state.aliases.forEach { alias -> AliasItem(alias, state.busy, dispatch) }
-                TextInput(
-                    { dispatch(AliasManagementEvent.Address(it)) },
-                    text = state.address,
+                TextFieldOutlinedSuggestions(
+                    value = state.address,
+                    onValueChange = { dispatch(AliasManagementEvent.Address(it)) },
+                    options = state.candidates.toImmutableList(),
                     label = stringResource(AliasR.string.account_settings_api_alias_existing_address),
+                    enabled = !state.busy,
                 )
                 ButtonFilled(
                     stringResource(AliasR.string.account_settings_api_alias_add),
                     { dispatch(AliasManagementEvent.Add) },
                     enabled = !state.busy && state.address.isNotBlank(),
                 )
-                TextInput(
-                    { dispatch(AliasManagementEvent.Recipient(it)) },
-                    text = state.recipient,
-                    label = stringResource(AliasR.string.account_settings_api_alias_history_recipient),
-                )
-                ButtonText(
-                    stringResource(AliasR.string.account_settings_api_alias_search_sent),
-                    { dispatch(AliasManagementEvent.Search) },
-                    enabled = !state.busy && state.recipient.isNotBlank(),
-                )
-                state.history.forEach { TextBodyMedium(it) }
             }
         }
     }
@@ -121,8 +131,43 @@ private fun AliasItem(
     dispatch: (AliasManagementEvent) -> Unit,
 ) {
     val address = alias.identity.email.orEmpty()
-    TextBodyMedium(address)
-    FlowRow {
+    var managing by remember { mutableStateOf(false) }
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        TextBodyMedium(address, modifier = Modifier.weight(1f))
+        if (alias.isDefault) TextLabelSmall(stringResource(AliasR.string.account_settings_api_alias_default))
+        if (alias.isFavorite) TextLabelSmall("★")
+        ButtonIcon(
+            onClick = { managing = true },
+            imageVector = Icons.Outlined.MoreVert,
+            contentDescription = stringResource(AliasR.string.account_settings_api_alias_manage),
+            enabled = !busy,
+        )
+    }
+    if (managing) {
+        BasicDialog(
+            headlineText = address,
+            onDismissRequest = { managing = false },
+            buttons = {},
+            content = {
+                Column(Modifier.padding(16.dp)) {
+                    AliasActions(alias, busy) { event ->
+                        managing = false
+                        dispatch(event)
+                    }
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun AliasActions(
+    alias: net.thunderbird.feature.account.settings.alias.SenderAlias,
+    busy: Boolean,
+    dispatch: (AliasManagementEvent) -> Unit,
+) {
+    val address = alias.identity.email.orEmpty()
+    Column {
         ButtonText(
             stringResource(
                 if (alias.isDefault) {

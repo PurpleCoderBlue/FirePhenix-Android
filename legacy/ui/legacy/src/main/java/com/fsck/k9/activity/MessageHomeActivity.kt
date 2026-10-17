@@ -39,6 +39,7 @@ import com.fsck.k9.activity.compose.MessageActions
 import com.fsck.k9.controller.MessagingController
 import com.fsck.k9.search.isUnifiedFolders
 import com.fsck.k9.ui.BuildConfig
+import com.fsck.k9.ui.base.extensions.fragmentTransaction
 import com.fsck.k9.ui.R
 import com.fsck.k9.ui.base.BaseActivity
 import com.fsck.k9.ui.managefolders.ManageFoldersActivity
@@ -1206,7 +1207,7 @@ open class MessageHomeActivity :
     private fun addMessageListFragment(fragment: MessageListFragmentBridgeContract) {
         messageListFragment?.isActive = false
 
-        supportFragmentManager.commit {
+        fragmentTransaction {
             replace(R.id.message_list_container, fragment as Fragment)
 
             setReorderingAllowed(true)

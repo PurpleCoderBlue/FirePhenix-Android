@@ -28,4 +28,13 @@
     <string name="appearance_background_contrast_notice">只模糊底层背景，不模糊正文。明暗遮罩随主题调整，改善文字对比度。</string>
     <string name="appearance_background_blur_value">自定义背景模糊值（0–512）</string>
     <string name="appearance_value_range">请输入 0 到 %1$d 之间的数值。</string>
+    <string name="appearance_glass_blur_label">玻璃模糊</string>
+    <string name="appearance_background_blur_label">背景模糊</string>
+    <string name="appearance_customize_color">自定义</string>
+    <string name="appearance_color_wheel">颜色轮盘</string>
+    <string name="appearance_color_hue">色相</string>
+    <string name="appearance_color_saturation">饱和度</string>
+    <string name="appearance_color_brightness">明度</string>
+    <string name="appearance_apply">应用</string>
+    <string name="appearance_cancel">取消</string>
 </resources>

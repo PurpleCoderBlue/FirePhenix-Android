@@ -198,7 +198,7 @@ class ProcessingLayoutTest : ComposeTest() {
         assertThat(summary.fetchSemanticsNode().boundsInRoot.left)
             .isGreaterThan(translation.fetchSemanticsNode().boundsInRoot.right)
         assertThat(
-            composeTestRule.onNodeWithText(getString(R.string.processing_automatic_translation))
+            composeTestRule.onNodeWithText(getString(R.string.sender_list_translate))
                 .fetchSemanticsNode().boundsInRoot.top,
         )
             .isGreaterThan(translation.fetchSemanticsNode().boundsInRoot.bottom)

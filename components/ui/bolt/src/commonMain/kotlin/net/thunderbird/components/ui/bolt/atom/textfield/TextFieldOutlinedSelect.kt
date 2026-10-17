@@ -41,6 +41,7 @@ import net.thunderbird.components.ui.bolt.theme.liquidGlass
 import androidx.compose.material3.DropdownMenu as Material3DropdownMenu
 import androidx.compose.material3.DropdownMenuItem as Material3DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox as Material3ExposedDropdownMenuBox
+import androidx.compose.material3.MenuDefaults as Material3MenuDefaults
 import androidx.compose.material3.OutlinedTextField as Material3OutlinedTextField
 import androidx.compose.material3.Text as Material3Text
 
@@ -107,7 +108,7 @@ fun <T> TextFieldOutlinedSelect(
                 containerColor = if (LocalGlassAppearance.current.enabled) {
                     Color.Transparent
                 } else {
-                    BoltTheme.colors.surfaceContainer.copy(alpha = 1f)
+                    Material3MenuDefaults.containerColor
                 },
             ) {
                 options.forEach { option ->

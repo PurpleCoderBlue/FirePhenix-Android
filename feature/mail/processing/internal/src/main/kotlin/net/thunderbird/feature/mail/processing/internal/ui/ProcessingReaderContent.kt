@@ -20,6 +20,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
@@ -43,6 +45,7 @@ import net.thunderbird.feature.mail.processing.api.ServiceProfile
 import net.thunderbird.feature.mail.processing.internal.R
 import net.thunderbird.feature.mail.processing.internal.data.sourceKey
 import net.thunderbird.feature.mail.processing.internal.domain.HtmlProcessingPlan
+import net.thunderbird.feature.mail.processing.internal.domain.isChineseLanguage
 
 @Composable
 internal fun ProcessingReaderContent(
@@ -95,10 +98,10 @@ private fun ReaderResults(
     modifier: Modifier = Modifier,
     slot: ReaderContentSlot = ReaderContentSlot.INLINE,
 ) {
-    val busy = state.translation.busy || state.summary.busy
     val failed = state.translation.error != null || state.summary.error != null
-    val hasStatus = busy || failed || state.automaticSkipped
-    val visible = slot == ReaderContentSlot.INLINE || state.summary.result != null || hasStatus
+    val hasStatus = failed || state.automaticSkipped
+    val visible = slot == ReaderContentSlot.INLINE ||
+        (state.summary.result != null && state.summaryExpanded) || hasStatus
     if (visible) {
         Surface(modifier) {
             Column(
@@ -117,7 +120,7 @@ private fun ReaderResults(
                     ActionProgress(state)
                 }
                 if (state.automaticSkipped) TextBodyMedium(stringResource(R.string.processing_auto_skipped))
-                SummaryResult(state, dispatch)
+                SummaryResult(state)
             }
         }
     }
@@ -137,13 +140,11 @@ private fun ReaderResults(
 @Composable
 private fun ActionProgress(state: ProcessingReaderState) {
     Column {
-        ProcessingAction.entries.forEach { action ->
+        ProcessingAction.entries.filter {
+            it != ProcessingAction.TRANSLATE ||
+                (state.languageDetectionComplete && !state.detectedLanguage.isChineseLanguage())
+        }.forEach { action ->
             val status = if (action == ProcessingAction.TRANSLATE) state.translation else state.summary
-            if (status.busy) {
-                TextBodyMedium(
-                    stringResource(R.string.processing_progress, status.completed, status.total),
-                )
-            }
             status.error?.let { TextBodyMedium(processingErrorText(it)) }
         }
     }
@@ -157,24 +158,27 @@ private fun ReaderActions(
     onSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val cancelDescription = stringResource(R.string.processing_cancel)
     var expanded by rememberSaveable { mutableStateOf(false) }
     Column(modifier) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            if (state.languageDetectionComplete && !state.detectedLanguage.isChineseLanguage()) {
+                ButtonText(
+                    stringResource(translationActionLabel(state)),
+                    { dispatch(ProcessingReaderEvent.ToggleTranslation) },
+                    modifier = Modifier.weight(1f).semantics {
+                        if (state.translation.busy) contentDescription = cancelDescription
+                    },
+                )
+            }
             ButtonText(
                 stringResource(
-                    when {
-                        state.translation.busy -> R.string.processing_cancel
-                        state.mode != ReadingMode.ORIGINAL -> R.string.processing_original
-                        else -> R.string.processing_translate
-                    },
+                    summaryActionLabel(state),
                 ),
-                { dispatch(ProcessingReaderEvent.ToggleTranslation) },
-                modifier = Modifier.weight(1f),
-            )
-            ButtonText(
-                stringResource(if (state.summary.busy) R.string.processing_cancel else R.string.processing_summary),
                 { dispatch(ProcessingReaderEvent.QuickSummary) },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).semantics {
+                    if (state.summary.busy) contentDescription = cancelDescription
+                },
             )
             ButtonIcon(
                 onClick = { expanded = true },
@@ -216,24 +220,28 @@ private fun ReadingToolbar(
     onSettings: () -> Unit,
 ) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        ReadingMode.entries.forEach { mode ->
-            val label = stringResource(
-                when (mode) {
-                    ReadingMode.ORIGINAL -> R.string.processing_original
-                    ReadingMode.TRANSLATED -> R.string.processing_translated
-                    ReadingMode.BILINGUAL -> R.string.processing_bilingual
-                },
-            )
-            if (state.mode == mode) {
-                ButtonFilled(label, { dispatch(ProcessingReaderEvent.Mode(mode)) })
-            } else {
-                ButtonText(
-                    label,
-                    { dispatch(ProcessingReaderEvent.Mode(mode)) },
-                    enabled = mode == ReadingMode.ORIGINAL || state.translation.result != null,
-                )
-            }
+        ReadingMode.entries.filter {
+            (state.languageDetectionComplete && !state.detectedLanguage.isChineseLanguage()) ||
+                it == ReadingMode.ORIGINAL
         }
+            .forEach { mode ->
+                val label = stringResource(
+                    when (mode) {
+                        ReadingMode.ORIGINAL -> R.string.processing_original
+                        ReadingMode.TRANSLATED -> R.string.processing_translated
+                        ReadingMode.BILINGUAL -> R.string.processing_bilingual
+                    },
+                )
+                if (state.mode == mode) {
+                    ButtonFilled(label, { dispatch(ProcessingReaderEvent.Mode(mode)) })
+                } else {
+                    ButtonText(
+                        label,
+                        { dispatch(ProcessingReaderEvent.Mode(mode)) },
+                        enabled = mode == ReadingMode.ORIGINAL || state.translation.result != null,
+                    )
+                }
+            }
         ButtonText(stringResource(R.string.processing_title), onSettings)
     }
 }
@@ -250,7 +258,10 @@ private fun ConfiguredProcessing(
             state.detectedLanguage ?: stringResource(R.string.processing_unknown),
         ),
     )
-    ProcessingAction.entries.forEach { action ->
+    ProcessingAction.entries.filter {
+        it != ProcessingAction.TRANSLATE ||
+            (state.languageDetectionComplete && !state.detectedLanguage.isChineseLanguage())
+    }.forEach { action ->
         val status = if (action == ProcessingAction.TRANSLATE) state.translation else state.summary
         val selected = if (action == ProcessingAction.TRANSLATE) state.translationProfile else state.summaryProfile
         ActionControls(
@@ -356,12 +367,6 @@ private fun ProcessingButtons(
 }
 
 @Composable
-private fun SummaryResult(state: ProcessingReaderState, dispatch: (ProcessingReaderEvent) -> Unit) {
-    state.summary.result?.let { summary ->
-        ButtonText(
-            stringResource(if (state.summaryExpanded) R.string.processing_collapse else R.string.processing_expand),
-            { dispatch(ProcessingReaderEvent.ToggleSummary) },
-        )
-        if (state.summaryExpanded) TextBodyMedium(summary)
-    }
+private fun SummaryResult(state: ProcessingReaderState) {
+    if (state.summaryExpanded) state.summary.result?.let { TextBodyMedium(it) }
 }

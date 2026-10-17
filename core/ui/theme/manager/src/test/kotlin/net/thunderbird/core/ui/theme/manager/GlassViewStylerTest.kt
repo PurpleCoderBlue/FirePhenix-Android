@@ -36,6 +36,71 @@ import org.robolectric.annotation.GraphicsMode
 @Config(sdk = [28], application = Application::class, manifest = Config.NONE)
 class GlassViewStylerTest {
     @Test
+    fun `unchanged animation frames do not traverse the native child hierarchy again`() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val root = CountingFrame(activity).apply { addView(TextView(activity)) }
+        val renderer = GlassSurfaceRenderer(root)
+        val testSubject = GlassWindowStyler(GlassViewStyler())
+        testSubject.refreshWindow(root, root, renderer)
+        root.childReads = 0
+
+        repeat(20) { testSubject.refreshWindow(root, root, renderer) }
+
+        assertThat(root.childReads).isEqualTo(0)
+        testSubject.invalidateWindow()
+        testSubject.refreshWindow(root, root, renderer)
+        assertThat(root.childReads > 0).isEqualTo(true)
+        testSubject.close()
+        renderer.close()
+    }
+
+    @Test
+    fun `cached window frames still restore a replaced black header`() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val toolbar = android.widget.Toolbar(activity).apply { background = ColorDrawable(Color.BLACK) }
+        val root = FrameLayout(activity).apply { addView(toolbar) }
+        val renderer = GlassSurfaceRenderer(root)
+        val testSubject = GlassWindowStyler(GlassViewStyler())
+        testSubject.refreshWindow(root, root, renderer)
+        val glass = toolbar.background
+
+        toolbar.background = ColorDrawable(Color.BLACK)
+        testSubject.refreshWindow(root, root, renderer)
+
+        assertThat(toolbar.background).isSameInstanceAs(glass)
+        testSubject.close()
+        renderer.close()
+    }
+
+    @Test
+    fun `controls added by a new layout receive their glass decoration`() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val root = FrameLayout(activity)
+        val renderer = GlassSurfaceRenderer(root)
+        val testSubject = GlassWindowStyler(GlassViewStyler())
+        testSubject.refreshWindow(root, root, renderer)
+        val original = ColorDrawable(Color.BLUE)
+        val button = Button(activity).apply { background = original }
+
+        root.addView(button)
+        testSubject.invalidateWindow()
+        testSubject.refreshWindow(root, root, renderer)
+
+        assertThat(button.background === original).isFalse()
+        testSubject.close()
+        assertThat(button.background).isSameInstanceAs(original)
+        renderer.close()
+    }
+
+    private class CountingFrame(context: Context) : FrameLayout(context) {
+        var childReads = 0
+        override fun getChildAt(index: Int): View {
+            childReads++
+            return super.getChildAt(index)
+        }
+    }
+
+    @Test
     fun `repeated frame visits skip missing ids and resolve unchanged resource ids once`() {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
         val resources = CountingResources(activity.resources)
@@ -236,5 +301,38 @@ class GlassViewStylerTest {
             lookups[id] = (lookups[id] ?: 0) + 1
             return super.getResourceEntryName(id)
         }
+    }
+
+    @Test
+    fun `native lists and webviews hide both scrollbars without disabling scrolling`() {
+        val context = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val root = android.widget.FrameLayout(context)
+        val scroll = android.widget.ScrollView(context)
+        val web = android.webkit.WebView(context)
+        root.addView(scroll)
+        scroll.addView(web)
+        listOf(scroll, web).forEach {
+            it.isVerticalScrollBarEnabled = true
+            it.isHorizontalScrollBarEnabled = true
+        }
+        GlassViewStyler().visit(root, GlassSurfaceRenderer(root))
+        listOf(scroll, web).forEach {
+            assertThat(it.isVerticalScrollBarEnabled).isEqualTo(false)
+            assertThat(it.isHorizontalScrollBarEnabled).isEqualTo(false)
+        }
+    }
+
+    @Test
+    @Config(sdk = [35])
+    fun `independent dialog window also hides its native scrollbars`() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val content = activity.findViewById<android.view.ViewGroup>(android.R.id.content)
+        val scroll = android.widget.ScrollView(activity).apply { isVerticalScrollBarEnabled = true }
+        val dialog = android.app.Dialog(activity)
+        dialog.setContentView(scroll)
+        dialog.show()
+        GlassViewStyler().visitWindow(activity.window.decorView, content, GlassSurfaceRenderer(content))
+        assertThat(scroll.isVerticalScrollBarEnabled).isEqualTo(false)
+        dialog.dismiss()
     }
 }

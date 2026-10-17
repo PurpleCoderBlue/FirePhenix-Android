@@ -13,6 +13,7 @@ import net.thunderbird.components.ui.bolt.PreviewWithThemesLightDark
 import net.thunderbird.components.ui.bolt.atom.Surface
 import net.thunderbird.components.ui.bolt.atom.text.TextBodyMedium
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.liquidGlass
 
 @Composable
 fun CardOutlined(
@@ -27,18 +28,18 @@ fun CardOutlined(
     if (onClick != null) {
         OutlinedCard(
             onClick = onClick,
-            modifier = modifier,
+            modifier = modifier.liquidGlass(shape = shape, interactive = onClick != null),
             shape = shape,
-            colors = colors.toMaterial3CardColors(),
+            colors = colors.forGlass().toMaterial3CardColors(),
             elevation = elevation.toMaterial3CardElevation(),
             border = border,
             content = content,
         )
     } else {
         OutlinedCard(
-            modifier = modifier,
+            modifier = modifier.liquidGlass(shape = shape, interactive = onClick != null),
             shape = shape,
-            colors = colors.toMaterial3CardColors(),
+            colors = colors.forGlass().toMaterial3CardColors(),
             elevation = elevation.toMaterial3CardElevation(),
             border = border,
             content = content,

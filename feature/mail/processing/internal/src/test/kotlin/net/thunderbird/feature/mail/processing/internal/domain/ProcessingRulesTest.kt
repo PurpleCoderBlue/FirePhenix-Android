@@ -48,7 +48,7 @@ class ProcessingRulesTest {
     }
 
     @Test
-    fun `first match keeps its own service model and language independently for each action`() {
+    fun `legacy rules cannot trigger either action even when their switches are enabled`() {
         // Arrange
         val summaryProfile = profile.copy(id = "summary", action = ProcessingAction.SUMMARIZE)
         val first = rule.copy(model = "model-one", targetLanguage = "ja")
@@ -66,8 +66,8 @@ class ProcessingRulesTest {
             automaticSummary = true,
         )
         // Act / Assert
-        assertThat(testSubject.matchingRule(message, ProcessingAction.TRANSLATE, 10)).isEqualTo(first)
-        assertThat(testSubject.matchingRule(message, ProcessingAction.SUMMARIZE, 10)).isEqualTo(summary)
+        assertThat(testSubject.matchingRule(message, ProcessingAction.TRANSLATE, 10)).isNull()
+        assertThat(testSubject.matchingRule(message, ProcessingAction.SUMMARIZE, 10)).isNull()
     }
 
     @Test
@@ -101,5 +101,34 @@ class ProcessingRulesTest {
         assertThat(result.joinToString("")).isEqualTo(source)
         assertThat(result.all { it.codePointCount(0, it.length) <= 63 }).isTrue()
         assertThat(result.none { it.lastOrNull()?.isHighSurrogate() == true }).isTrue()
+    }
+
+    @Test
+    fun `Chinese originals skip automatic translation even for an explicitly listed sender`() {
+        val testSubject = ProcessingConfiguration(
+            profiles = listOf(profile),
+            defaultTranslationProfile = profile.id,
+            senderListsVersion = 1,
+            senderLists = listOf(
+                net.thunderbird.feature.mail.processing.api.SenderListEntry(
+                    message.sender,
+                    net.thunderbird.feature.mail.processing.api.SenderListKind.AUTO_TRANSLATE,
+                ),
+            ),
+        )
+        assertThat(
+            testSubject.matchingRule(
+                message.copy(sourceLanguage = "zh-Hans"),
+                ProcessingAction.TRANSLATE,
+                10,
+            ),
+        ).isNull()
+        assertThat(
+            testSubject.matchingRule(
+                message.copy(sourceLanguage = "en"),
+                ProcessingAction.TRANSLATE,
+                10,
+            )?.profileId,
+        ).isEqualTo(profile.id)
     }
 }

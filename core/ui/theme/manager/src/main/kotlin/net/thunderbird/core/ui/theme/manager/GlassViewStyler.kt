@@ -15,9 +15,9 @@ import android.widget.EditText
 import androidx.core.view.children
 import app.k9mail.core.ui.legacy.designsystem.GlassBackdropView
 import app.k9mail.core.ui.legacy.designsystem.GlassControlColors
+import app.k9mail.core.ui.legacy.designsystem.GlassScrollbars
 import app.k9mail.core.ui.legacy.designsystem.GlassSurfaceRenderer
 import app.k9mail.core.ui.legacy.designsystem.GlassThemePalette
-import app.k9mail.core.ui.legacy.designsystem.GlassWallpaperDrawable
 import java.util.WeakHashMap
 import net.thunderbird.core.ui.theme.api.FeatureThemeProvider
 
@@ -28,10 +28,20 @@ internal class GlassViewStyler(private val theme: FeatureThemeProvider? = null) 
     private val decorations = WeakHashMap<View, Drawable?>()
     private val paddings = WeakHashMap<View, IntArray>()
     private val elevations = WeakHashMap<View, Float>()
-    private val contentImages = WeakHashMap<View, Bitmap>()
     private val accents = GlassControlColors()
     private val resourceNames = WeakHashMap<Resources, MutableMap<Int, String>>()
     private val materialColors = WeakHashMap<View, GlassThemePalette>()
+
+    private val windowBars = WeakHashMap<View, Unit>()
+
+    fun restoreWindowBars() {
+        // Lift animators may replace a bar backing without laying out the page.
+        windowBars.keys.forEach { bar ->
+            if (decorations.containsKey(bar) && bar.background !== decorations[bar]) {
+                bar.background = decorations[bar]
+            }
+        }
+    }
 
     fun visit(
         view: View,
@@ -39,15 +49,17 @@ internal class GlassViewStyler(private val theme: FeatureThemeProvider? = null) 
         content: Bitmap? = null,
         palette: GlassThemePalette? = null,
     ) {
+        view.isVerticalScrollBarEnabled = false
+        view.isHorizontalScrollBarEnabled = false
         if (view is GlassBackdropView || view is WebView || view.javaClass.name.startsWith("androidx.compose.")) return
         if (renderer == null) {
             restore(view)
         } else {
             style(view, renderer)
-            if (content != null && resourceName(view) in CONTENT_HOSTS && contentImages[view] !== content) {
+            if (content != null && resourceName(view) in CONTENT_HOSTS && view.background != null) {
                 if (!originals.containsKey(view)) saveOriginal(view)
-                view.background = GlassWallpaperDrawable(view, content)
-                contentImages[view] = content
+                view.background = null
+                decorations[view] = null
             }
             if (palette != null) applyPalette(view, renderer, palette)
         }
@@ -69,6 +81,9 @@ internal class GlassViewStyler(private val theme: FeatureThemeProvider? = null) 
 
     private fun style(view: View, renderer: GlassSurfaceRenderer) {
         val name = view.javaClass.simpleName
+        if (WINDOW_BAR_SUFFIXES.any { name.endsWith(it) }) {
+            windowBars[view] = Unit
+        }
         if (originals.containsKey(view)) {
             // AppBar lift-on-scroll may replace its backing after initial layout.
             val toolbar = name.endsWith("Toolbar") || name.endsWith("ActionBarContextView")
@@ -142,7 +157,6 @@ internal class GlassViewStyler(private val theme: FeatureThemeProvider? = null) 
 
     private fun restore(view: View) {
         accents.restore(view)
-        contentImages.remove(view)
         materialColors.remove(view)
         if (view is CompoundButton) toggles.remove(view)?.close()
         if (!originals.containsKey(view)) return
@@ -158,12 +172,7 @@ internal class GlassViewStyler(private val theme: FeatureThemeProvider? = null) 
         toggles.clear()
         originals.keys.toList().forEach { restore(it) }
         resourceNames.clear()
-    }
-
-    private fun resolveSurface(view: View): Int {
-        val typed = TypedValue()
-        view.context.theme.resolveAttribute(android.R.attr.colorBackground, typed, true)
-        return typed.data
+        windowBars.clear()
     }
 
     private companion object {
@@ -212,6 +221,7 @@ internal fun GlassViewStyler.visitWindow(
     content: Bitmap? = null,
     palette: GlassThemePalette? = null,
 ) {
+    GlassScrollbars.observeWindows()
     visit(contentRoot, renderer, content, palette)
     visitWindowBars(decor, contentRoot) { visit(it, renderer, palette = palette) }
 }
@@ -224,4 +234,12 @@ private fun visitWindowBars(view: View, contentRoot: ViewGroup, decorate: (View)
     } else if (view is ViewGroup) {
         view.children.forEach { visitWindowBars(it, contentRoot, decorate) }
     }
+}
+
+private val WINDOW_BAR_SUFFIXES = listOf("Toolbar", "ActionBarContextView", "AppBarLayout", "ActionBarContainer")
+
+private fun resolveSurface(view: View): Int {
+    val typed = TypedValue()
+    view.context.theme.resolveAttribute(android.R.attr.colorBackground, typed, true)
+    return typed.data
 }

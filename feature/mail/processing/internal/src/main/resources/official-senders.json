@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "revision": 2,
+  "entries": [
+    {
+      "name": "Steam",
+      "addresses": [
+        "support@steampowered.com",
+        "noreply@steampowered.com"
+      ],
+      "domains": [],
+      "source": "https://help.steampowered.com/en/wizard/HelpWithSteamGuardCode",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "Epic Games",
+      "addresses": [],
+      "domains": [
+        "support.epicgames.com",
+        "email.epicgames.com",
+        "developers.epicgames.com",
+        "mail.epicgames.com",
+        "acct.epicgames.com",
+        "accts.epicgames.com",
+        "acct-auth.epicgames.com"
+      ],
+      "source": "https://www.epicgames.com/help/c-Category_EpicAccounts/c-38978022/a17080747",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "Microsoft",
+      "addresses": [],
+      "domains": [
+        "accountprotection.microsoft.com"
+      ],
+      "source": "https://support.microsoft.com/en-au/accounts-billing/security/can-i-trust-email-from-the-microsoft-account-team",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "Google",
+      "addresses": [
+        "noreply@google.com"
+      ],
+      "domains": [],
+      "source": "https://support.google.com/accounts/answer/27445?hl=en",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "OpenAI",
+      "addresses": [],
+      "domains": [
+        "ads.openai.com",
+        "c-openai.com",
+        "email.openai.com",
+        "mail.openai.com",
+        "openai.com",
+        "sales.openai.com",
+        "tm.openai.com"
+      ],
+      "source": "https://help.openai.com/en/articles/11725090-verifying-communications-from-openai",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "Anthropic / Claude",
+      "addresses": [],
+      "domains": [
+        "anthropic.com",
+        "claude.com"
+      ],
+      "source": "https://support.claude.com/en/articles/10416553-official-anthropic-marketing-email-addresses",
+      "imageAccess": "BLOCKED"
+    },
+    {
+      "name": "GitHub",
+      "addresses": [
+        "notifications@github.com",
+        "noreply@github.com"
+      ],
+      "domains": [],
+      "source": "https://docs.github.com/en/subscriptions-and-notifications/reference/email-notification-headers",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "Spotify",
+      "addresses": [],
+      "domains": [
+        "spotify.com"
+      ],
+      "source": "https://support.spotify.com/us/article/spotify-email-legit/",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "Dropbox",
+      "addresses": [],
+      "domains": [
+        "docsend.com",
+        "dropbox.com",
+        "dropboxmail.com",
+        "em-s.dropbox.com",
+        "em.dropbox.com",
+        "txn.dropbox.com",
+        "dropbox.zendesk.com",
+        "dropboxpartners.com",
+        "dropboxteam.com"
+      ],
+      "source": "https://help.dropbox.com/security/official-domains",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "Evernote",
+      "addresses": [],
+      "domains": [
+        "evernote.com",
+        "account.evernote.com",
+        "accounts.evernote.com",
+        "comms.evernote.com",
+        "updates.evernote.com",
+        "communications.evernote.com",
+        "mail.evernote.com",
+        "mail-svc.evernote.com",
+        "messages.evernote.com",
+        "notifications.evernote.com",
+        "nsvc.evernote.com",
+        "mg.evernote.com"
+      ],
+      "source": "https://help.evernote.com/hc/en-us/articles/115004380587-How-to-identify-if-an-email-received-from-Evernote-is-authentic",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "Zoom",
+      "addresses": [
+        "no-reply@zoom.us",
+        "customercare@zoom.us"
+      ],
+      "domains": [],
+      "source": "https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0060106",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "Atlassian / Bitbucket",
+      "addresses": [
+        "no-reply@atlassian.com",
+        "noreply@mailer.atlassian.com",
+        "notifications-noreply@bitbucket.org"
+      ],
+      "domains": [
+        "am.atlassian.com",
+        "id.atlassian.net"
+      ],
+      "source": "https://support.atlassian.com/bitbucket-cloud/kb/email-notifications-not-working/",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "PayPal",
+      "addresses": [
+        "service@paypal.com"
+      ],
+      "domains": [],
+      "source": "https://www.paypal.com/sb/cshelp/article/how-do-i-spot-a-fake-fraudulent-or-phishing-paypal-email-or-website---help164",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "Adobe",
+      "addresses": [],
+      "domains": [
+        "adobe.com",
+        "adobe.net",
+        "acrobat.com",
+        "adobecslive.com",
+        "adobestandout.com",
+        "creativecloud.com",
+        "photoshop.com"
+      ],
+      "source": "https://helpx.adobe.com/account/individual/communications-and-preferences/didnt-receive-subscription-related-emails-from-adobe.html",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "JetBrains",
+      "addresses": [
+        "sales@jetbrains.com",
+        "sales.us@jetbrains.com",
+        "sales.cn@jetbrains.com",
+        "marketing@jetbrains.com"
+      ],
+      "domains": [],
+      "source": "https://www.jetbrains.com/company/contacts/",
+      "imageAccess": "AUTOMATIC"
+    },
+    {
+      "name": "Figma",
+      "addresses": [
+        "admin-support@figma.com"
+      ],
+      "domains": [],
+      "source": "https://help.figma.com/hc/en-us/articles/13843533972119-Guide-to-merging-organizations",
+      "imageAccess": "AUTOMATIC"
+    }
+  ]
+}

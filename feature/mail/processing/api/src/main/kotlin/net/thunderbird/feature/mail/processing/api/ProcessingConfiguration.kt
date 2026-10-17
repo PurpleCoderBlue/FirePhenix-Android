@@ -50,6 +50,14 @@ data class ProcessingRule(
 data class RemoteImageRule(val id: String, val sender: String, val enabled: Boolean = true)
 
 @Serializable
+enum class SenderListKind { AUTO_TRANSLATE, AUTO_SUMMARIZE, AUTO_IMAGES, BLOCK_IMAGES }
+
+@Serializable
+data class SenderListEntry(val sender: String, val kind: SenderListKind, val enabled: Boolean = true)
+
+enum class RemoteImageAccess { MANUAL, AUTOMATIC, BLOCKED }
+
+@Serializable
 data class ProcessingConfiguration(
     val profiles: List<ServiceProfile> = emptyList(),
     val rules: List<ProcessingRule> = emptyList(),
@@ -58,6 +66,9 @@ data class ProcessingConfiguration(
     val defaultTranslationProfile: String = "",
     val defaultSummaryProfile: String = "",
     val remoteImageRules: List<RemoteImageRule> = emptyList(),
+    val senderLists: List<SenderListEntry> = emptyList(),
+    val senderListsVersion: Int = 0,
+
 )
 
 data class ProcessingMessage(

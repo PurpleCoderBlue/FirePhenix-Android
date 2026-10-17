@@ -45,11 +45,11 @@ interface AliasService {
     fun favorite(accountId: String, address: String, favorite: Boolean)
     fun clearAccount(accountId: String)
     fun resolve(owner: LifecycleOwner, request: AliasRequest, listener: AliasResolutionListener)
-    suspend fun searchSent(accountId: String, recipient: String): Set<String>
+    suspend fun localCandidates(accountId: String): Set<String>
 }
 
 /** Legacy sent-mail access is adapted in the application wiring layer. */
 interface SentAliasHistory {
     fun candidates(accountId: String, recipients: Set<String>): Set<String>
-    suspend fun searchRemote(accountId: String, recipient: String)
+    fun localCandidates(accountId: String): Set<String>
 }

@@ -81,6 +81,7 @@ private class OpticalRenderer(private val root: ViewGroup) : ViewTreeObserver.On
     private val targets = WeakHashMap<View, WeakReference<OpticalDrawable>>()
     private val backdrop = GlassBackdropCapture(root)
     private var capturing = false
+    val isCapturing: Boolean get() = capturing
     var dark = false
         private set
     var blur = NativeGlassSpec.DEFAULT_BLUR
@@ -106,7 +107,8 @@ private class OpticalRenderer(private val root: ViewGroup) : ViewTreeObserver.On
 
     override fun onPreDraw(): Boolean {
         val ready = root.width > 0 && root.height > 0
-        if (capturing || targets.isEmpty() || !ready) return true
+        val sampling = capturing || GlassBackdropCapture.isCapturing
+        if (sampling || targets.isEmpty() || !ready) return true
         // RecyclerView reattaches controls with the same background; retain their weak registration.
         capturing = true
         try {
@@ -154,7 +156,11 @@ private class OpticalDrawable(
     private var configured = ""
 
     override fun draw(canvas: Canvas) {
-        if (!canvas.isHardwareAccelerated || !renderer.source.hasDisplayList()) return
+        // Final guard for custom wrappers: the source must never reference one of its own regions.
+        val sampling = GlassBackdropCapture.isCapturing || renderer.isCapturing
+        if (sampling || !canvas.isHardwareAccelerated || !renderer.source.hasDisplayList()) {
+            return
+        }
         val density = target.resources.displayMetrics.density
         val inset = if (pill && target is ViewGroup) NativeGlassSpec.TOOLBAR_INSET * density else density
         val width = bounds.width() - inset * 2f

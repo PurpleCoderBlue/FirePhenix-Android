@@ -15,10 +15,6 @@ internal class ProcessingSettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        viewModel.setMessageScope(
-            intent.getStringExtra("accountId").orEmpty(),
-            intent.getStringExtra("folderId").orEmpty(),
-        )
         setContent {
             themeProvider.WithTheme {
                 ProcessingSettingsContent(viewModel, onBack = ::finish)

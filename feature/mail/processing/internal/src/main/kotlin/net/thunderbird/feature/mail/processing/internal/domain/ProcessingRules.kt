@@ -13,15 +13,26 @@ internal fun ProcessingConfiguration.matchingRule(
     action: ProcessingAction,
     characterCount: Int,
 ): ProcessingRule? {
-    val enabled = when (action) {
-        ProcessingAction.TRANSLATE -> automaticTranslation
-        ProcessingAction.SUMMARIZE -> automaticSummary
+    val excluded = message.isSpam || !message.isComplete || characterCount > AUTOMATIC_CHARACTER_LIMIT
+    val chineseOriginal = action == ProcessingAction.TRANSLATE && message.sourceLanguage.isChineseLanguage()
+    if (excluded || chineseOriginal) return null
+    val kind = when (action) {
+        ProcessingAction.TRANSLATE -> net.thunderbird.feature.mail.processing.api.SenderListKind.AUTO_TRANSLATE
+        ProcessingAction.SUMMARIZE -> net.thunderbird.feature.mail.processing.api.SenderListKind.AUTO_SUMMARIZE
     }
-    val unsafeForAutomaticProcessing = message.isSpam || !message.isComplete
-    if (!enabled || unsafeForAutomaticProcessing || characterCount > AUTOMATIC_CHARACTER_LIMIT) return null
-    return rules.firstOrNull { rule ->
-        rule.enabled && rule.action == action &&
-            profiles.any { it.id == rule.profileId && it.action == action } && rule.matches(message)
+    val defaultId = when (action) {
+        ProcessingAction.TRANSLATE -> defaultTranslationProfile
+        ProcessingAction.SUMMARIZE -> defaultSummaryProfile
+    }
+    val profile = if (defaultId.isBlank()) {
+        profiles.firstOrNull { it.action == action }
+    } else {
+        profiles.firstOrNull { it.id == defaultId && it.action == action }
+    }
+    return if (withSenderListsMigration().hasSender(message.sender, kind)) {
+        profile?.let { ProcessingRule("sender-list", "", action, it.id) }
+    } else {
+        null
     }
 }
 

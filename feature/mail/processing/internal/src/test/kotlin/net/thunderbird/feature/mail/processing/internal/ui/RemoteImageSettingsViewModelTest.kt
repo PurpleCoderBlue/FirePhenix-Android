@@ -46,7 +46,7 @@ class RemoteImageSettingsViewModelTest {
         assertThat(saved.sender).isEqualTo("allowed@example.org")
         testSubject.event(RemoteImageSettingsEvent.Enabled(saved, false))
         testSubject.state.first { it.rules.singleOrNull()?.enabled == false }
-        testSubject.event(RemoteImageSettingsEvent.Delete(saved.id))
+        testSubject.event(RemoteImageSettingsEvent.Delete(saved))
         testSubject.state.first { it.rules.isEmpty() }
         assertThat(storage.configuration.value.profiles).isEqualTo(services)
     }

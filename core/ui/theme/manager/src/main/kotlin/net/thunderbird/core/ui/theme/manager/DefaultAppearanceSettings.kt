@@ -2,7 +2,6 @@ package net.thunderbird.core.ui.theme.manager
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -26,9 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.toImmutableList
-import net.thunderbird.components.ui.bolt.atom.GlassPreview
 import net.thunderbird.components.ui.bolt.atom.button.ButtonText
-import net.thunderbird.components.ui.bolt.atom.text.TextBodyMedium
 import net.thunderbird.components.ui.bolt.molecule.input.SelectInput
 import net.thunderbird.components.ui.bolt.organism.TopAppBarWithBackButton
 import net.thunderbird.components.ui.bolt.template.Scaffold
@@ -41,7 +37,6 @@ import net.thunderbird.core.ui.theme.api.AppearanceSettings
 import net.thunderbird.core.ui.theme.api.FeatureThemeProvider
 import org.koin.android.ext.android.inject
 
-private const val DEFAULT_BLUR = 16
 private const val MAX_BLUR = 32
 
 class DefaultAppearanceSettings(
@@ -118,25 +113,11 @@ class DefaultAppearanceSettings(
         Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             GlassValueControl(
                 value = blur,
-                label = R.string.appearance_blur,
-                numberLabel = R.string.appearance_blur,
+                label = R.string.appearance_glass_blur_label,
                 onChange = { value -> updateDisplay { it.copy(glassBlur = value) } },
                 maximum = MAX_BLUR,
                 sliderLimit = MAX_BLUR,
             )
-            ButtonText(stringResource(R.string.appearance_reset), {
-                updateDisplay { it.copy(glassBlur = DEFAULT_BLUR) }
-            })
-            GlassPreview(
-                label = stringResource(R.string.appearance_preview),
-                sourceLabel = stringResource(R.string.appearance_preview_background),
-                modifier = Modifier.fillMaxWidth().height(160.dp),
-            )
-            TextBodyMedium(stringResource(R.string.appearance_blur_preview_notice))
-            TextBodyMedium(stringResource(R.string.appearance_blur_notice))
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                TextBodyMedium(stringResource(R.string.appearance_refraction_fallback))
-            }
         }
     }
 

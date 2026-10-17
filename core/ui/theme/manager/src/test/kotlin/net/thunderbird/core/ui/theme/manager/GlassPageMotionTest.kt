@@ -36,7 +36,7 @@ class GlassPageMotionTest {
                 it.initialize(width, 800, width, 800)
                 it.startTime = 0L
             }
-            listOf(0L, 55L, 110L, 165L, 219L).forEach { time ->
+            listOf(0L, 90L, 180L, 270L, 359L).forEach { time ->
                 val incoming = Transformation()
                 val outgoing = Transformation()
                 enter.getTransformation(time, incoming)
@@ -62,7 +62,7 @@ class GlassPageMotionTest {
         )
         resources.forEach { resource ->
             val animation = AnimationUtils.loadAnimation(activity, resource) as AnimationSet
-            assertThat(animation.duration).isEqualTo(220L)
+            assertThat(animation.duration).isEqualTo(360L)
             assertThat(animation.animations.any { it is AlphaAnimation }).isFalse()
         }
     }

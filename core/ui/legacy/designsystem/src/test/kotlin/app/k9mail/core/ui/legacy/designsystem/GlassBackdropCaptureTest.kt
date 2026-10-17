@@ -24,6 +24,58 @@ import org.robolectric.annotation.GraphicsMode
 @Config(sdk = [28], application = Application::class, manifest = Config.NONE)
 class GlassBackdropCaptureTest {
     @Test
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun `fully clipped offscreen containers do not redraw their descendants for glass`() {
+        val context = RuntimeEnvironment.getApplication()
+        val leaf = CountingView(context)
+        val offscreen = FrameLayout(context).apply { addView(leaf, FrameLayout.LayoutParams(100, 100)) }
+        val root = FrameLayout(context).apply {
+            addView(offscreen, FrameLayout.LayoutParams(100, 100).apply { topMargin = 200 })
+            measure(
+                View.MeasureSpec.makeMeasureSpec(100, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(100, View.MeasureSpec.EXACTLY),
+            )
+            layout(0, 0, 100, 100)
+        }
+        val canvas = Canvas(Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888))
+
+        GlassBackdropCapture(root).draw(canvas, emptySet())
+
+        assertThat(leaf.draws).isEqualTo(0)
+    }
+
+    @Test
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun `an offscreen parent without child clipping still captures its visible overflow`() {
+        val context = RuntimeEnvironment.getApplication()
+        var draws = 0
+        val leaf = object : View(context) {
+            override fun draw(canvas: Canvas) {
+                draws++
+                canvas.drawColor(Color.BLUE)
+            }
+        }.apply { translationY = -200f }
+        val overflow = FrameLayout(context).apply {
+            clipChildren = false
+            addView(leaf, FrameLayout.LayoutParams(100, 100))
+        }
+        val root = FrameLayout(context).apply {
+            addView(overflow, FrameLayout.LayoutParams(100, 100).apply { topMargin = 200 })
+            measure(
+                View.MeasureSpec.makeMeasureSpec(100, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(100, View.MeasureSpec.EXACTLY),
+            )
+            layout(0, 0, 100, 100)
+        }
+        val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+
+        GlassBackdropCapture(root).draw(Canvas(bitmap), emptySet())
+
+        assertThat(draws).isEqualTo(1)
+        assertThat(bitmap.getPixel(50, 50)).isEqualTo(Color.BLUE)
+    }
+
+    @Test
     fun `sampling does not dispatch fragment animations or Compose hosts for a second draw pass`() {
         val context = RuntimeEnvironment.getApplication()
         val leaf = CountingView(context)
@@ -114,6 +166,47 @@ class GlassBackdropCaptureTest {
         assertThat(background.draws).isEqualTo(0)
         assertThat(recycled.draws).isEqualTo(0)
         assertThat(ordinary.draws).isEqualTo(1)
+    }
+
+    @Test
+    fun `wrapped and foreground optical materials never enter their own backdrop after recycling`() {
+        val context = RuntimeEnvironment.getApplication()
+        val background = CountingGlassBackground()
+        val wrapped = android.graphics.drawable.InsetDrawable(
+            android.graphics.drawable.LayerDrawable(arrayOf(background)),
+            2,
+        )
+        val recycled = CountingView(context).apply { this.background = wrapped }
+        val foreground = CountingGlassBackground()
+        val reusedForeground = CountingView(context).apply {
+            this.foreground = android.graphics.drawable.InsetDrawable(foreground, 1)
+        }
+        val root = layout(context, recycled, reusedForeground)
+        val canvas = Canvas(Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888))
+
+        GlassBackdropCapture(root).draw(canvas, emptySet())
+
+        assertThat(background.draws).isEqualTo(0)
+        assertThat(recycled.draws).isEqualTo(0)
+        assertThat(reusedForeground.draws).isEqualTo(0)
+    }
+
+    @Test
+    fun `AppCompat wrappers and popup materials are excluded from a recycled backdrop`() {
+        val context = RuntimeEnvironment.getApplication()
+        val background = CountingGlassBackground()
+        val wrapped = CountingView(context).apply {
+            this.background = androidx.appcompat.graphics.drawable.DrawableWrapperCompat(background)
+        }
+        val popup = CountingView(context).apply { this.background = GlassPopupDrawable() }
+        val root = layout(context, wrapped, popup)
+        val canvas = Canvas(Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888))
+
+        GlassBackdropCapture(root).draw(canvas, emptySet())
+
+        assertThat(background.draws).isEqualTo(0)
+        assertThat(wrapped.draws).isEqualTo(0)
+        assertThat(popup.draws).isEqualTo(0)
     }
 
     private class CountingGlassBackground : Drawable(), GlassOpticalMaterial {

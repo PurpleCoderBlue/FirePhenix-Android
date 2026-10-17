@@ -16,7 +16,8 @@ object TransparentMessageBackground {
         val foreground = if (dark) "#F3F3F3" else "#1B1B1F"
         val link = if (dark) "#A6D1FF" else "#004B85"
         val style = "html,body,body *{background-color:transparent!important;color:$foreground!important;}" +
-            "body a,body a *{color:$link!important;}"
+            "body a,body a *{color:$link!important;}" +
+            "*{scrollbar-width:none!important;}*::-webkit-scrollbar{display:none!important;width:0;height:0;}"
         document.head().appendElement("style").appendText(style)
         // Inline !important declarations outrank any stylesheet. Append after the original declaration.
         document.select("html,body,body *").forEach { element ->

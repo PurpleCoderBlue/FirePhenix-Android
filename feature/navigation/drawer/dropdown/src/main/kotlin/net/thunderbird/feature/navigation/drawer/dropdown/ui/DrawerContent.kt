@@ -38,7 +38,7 @@ import net.thunderbird.feature.navigation.drawer.dropdown.ui.folder.FolderList
 import net.thunderbird.feature.navigation.drawer.dropdown.ui.setting.AccountSettingList
 import net.thunderbird.feature.navigation.drawer.dropdown.ui.setting.FolderSettingList
 
-private const val ANIMATION_DURATION_MS = 300
+private const val ANIMATION_DURATION_MS = net.thunderbird.components.ui.bolt.theme.GlassPageMotion.DURATION
 
 @Composable
 private fun areSystemAnimationsEnabled(): Boolean {

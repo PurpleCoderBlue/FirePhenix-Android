@@ -1,19 +1,13 @@
 package net.thunderbird.app.common.account
 
 import app.k9mail.legacy.mailstore.MessageStoreManager
-import com.fsck.k9.controller.MessagingController
-import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import net.thunderbird.core.android.account.LegacyAccountDtoManager
-import net.thunderbird.core.common.mail.Flag
 import net.thunderbird.feature.account.settings.alias.SentAliasHistory
 
 /** Adapts the existing sent folder; no new mail backend or OAuth scopes. */
 internal class LegacySentAliasHistory(
     private val accounts: LegacyAccountDtoManager,
     private val stores: MessageStoreManager,
-    private val controller: MessagingController,
 ) : SentAliasHistory {
     override fun candidates(accountId: String, recipients: Set<String>): Set<String> {
         val account = requireNotNull(accounts.getAccount(accountId))
@@ -28,26 +22,22 @@ internal class LegacySentAliasHistory(
         }.flatten().toSet()
     }
 
-    override suspend fun searchRemote(accountId: String, recipient: String) = withContext(Dispatchers.IO) {
+    override fun localCandidates(accountId: String): Set<String> {
         val account = requireNotNull(accounts.getAccount(accountId))
-        val folder = requireNotNull(account.sentFolderId)
-        val search = controller.searchRemoteMessages(
-            accountId,
-            folder,
-            recipient,
-            emptySet<Flag>(),
-            emptySet<Flag>(),
-            null,
-        )
-        try {
-            search.get(REMOTE_SEARCH_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            Unit
-        } finally {
-            if (!search.isDone) search.cancel(true)
+        val result = mutableSetOf<String>()
+        stores.getMessageStore(account).getMessages<Nothing>(
+            selection = "deleted = 0 AND empty = 0",
+            selectionArgs = emptyArray(),
+            sortOrder = "date DESC",
+        ) { message ->
+            val addresses = if (message.folderId == account.sentFolderId) {
+                message.fromAddresses
+            } else {
+                message.toAddresses + message.ccAddresses
+            }
+            addresses.forEach { result.add(it.address) }
+            null
         }
-    }
-
-    private companion object {
-        const val REMOTE_SEARCH_TIMEOUT_SECONDS = 60L
+        return result
     }
 }

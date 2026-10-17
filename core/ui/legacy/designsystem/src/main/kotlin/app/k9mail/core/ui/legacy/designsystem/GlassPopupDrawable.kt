@@ -15,7 +15,7 @@ import org.xmlpull.v1.XmlPullParser
 
 /** Optical popup background; foreground menus/dialog content retain their native input handling. */
 @Keep
-class GlassPopupDrawable : Drawable() {
+class GlassPopupDrawable : Drawable(), GlassOpticalMaterial {
     private var density = 1f
     private var delegate: Drawable? = null
     private val fallback = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -28,6 +28,7 @@ class GlassPopupDrawable : Drawable() {
 
     override fun draw(canvas: Canvas) {
         val view = callbackView()
+        if (view != null) GlassScrollbars.observe(view.rootView)
         if (view != null) GlassThemePalette.forContext(view.context)?.let { accents.visit(view.rootView, it) }
         if (delegate == null && view != null) {
             delegate = GlassSurfaceRenderer.popupMaterial(view)

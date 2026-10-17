@@ -1,5 +1,9 @@
 package com.fsck.k9.ui.messagedetails
 
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import net.thunderbird.feature.mail.processing.api.MailProcessingExtension
+import net.thunderbird.feature.mail.processing.api.SenderListKind
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.IntentSender.SendIntentException
@@ -48,6 +52,9 @@ class MessageDetailsFragment : ToolbarBottomSheetDialogFragment() {
     private val contactPictureLoader: ContactPictureLoader by inject()
     private val folderIconProvider: FolderIconProvider by inject { parametersOf(requireContext().theme) }
 
+    private val processingExtension: MailProcessingExtension by inject()
+    private var actualSender: String? = null
+    private var updatingSenderList = false
     private lateinit var messageReference: MessageReference
     private val itemAdapter = ItemAdapter<GenericItem>()
 
@@ -155,6 +162,7 @@ class MessageDetailsFragment : ToolbarBottomSheetDialogFragment() {
     }
 
     private fun setMessageDetails(details: MessageDetailsUi, appearance: MessageDetailsAppearance) {
+        actualSender = details.from.singleOrNull()?.emailAddress
         val items = buildList {
             add(MessageDateItem(details.date ?: getString(R.string.message_details_missing_date)))
 
@@ -309,12 +317,56 @@ class MessageDetailsFragment : ToolbarBottomSheetDialogFragment() {
             menu.findItem(R.id.copy_name_and_email_address).isVisible = false
         }
 
+        val sender = actualSender
+        val memberships = sender?.let(processingExtension::senderMembership).orEmpty()
+        menu.add(
+            R.id.sender_lists_group, R.id.sender_lists_heading, 0,
+            sender ?: getString(R.string.sender_lists_ambiguous),
+        ).isEnabled = false
+        val listItems = mapOf(
+            R.id.sender_auto_translate to (SenderListKind.AUTO_TRANSLATE to R.string.sender_auto_translate),
+            R.id.sender_auto_summary to (SenderListKind.AUTO_SUMMARIZE to R.string.sender_auto_summary),
+            R.id.sender_auto_images to (SenderListKind.AUTO_IMAGES to R.string.sender_auto_images),
+            R.id.sender_block_images to (SenderListKind.BLOCK_IMAGES to R.string.sender_block_images),
+        )
+        listItems.forEach { (id, entry) ->
+            menu.add(R.id.sender_lists_group, id, 0, entry.second).apply {
+                isCheckable = true
+                isChecked = entry.first in memberships
+                isEnabled = sender != null && !updatingSenderList
+            }
+        }
+
         popupMenu.setOnMenuItemClickListener { item: MenuItem ->
-            onOverflowMenuItemClick(item.itemId, participant)
+            val kind = listItems[item.itemId]?.first
+            if (kind != null && sender != null) {
+                updateSenderList(sender, kind, !item.isChecked)
+            } else {
+                onOverflowMenuItemClick(item.itemId, participant)
+            }
             true
         }
 
         popupMenu.show()
+    }
+
+    private fun updateSenderList(sender: String, kind: SenderListKind, enabled: Boolean) {
+        if (updatingSenderList) return
+        updatingSenderList = true
+        lifecycleScope.launch {
+            val saved = processingExtension.setSenderMembership(sender, kind, enabled)
+            updatingSenderList = false
+            context?.let { context ->
+                android.widget.Toast.makeText(
+                    context,
+                    if (saved) R.string.sender_lists_saved else R.string.sender_lists_save_failed,
+                    android.widget.Toast.LENGTH_SHORT,
+                ).show()
+            }
+            if (saved && (kind == SenderListKind.AUTO_IMAGES || kind == SenderListKind.BLOCK_IMAGES)) {
+                setFragmentResult(FRAGMENT_RESULT_KEY, bundleOf(RESULT_ACTION to ACTION_IMAGES_CHANGED))
+            }
+        }
     }
 
     private fun onOverflowMenuItemClick(itemId: Int, participant: Participant) {
@@ -361,6 +413,7 @@ class MessageDetailsFragment : ToolbarBottomSheetDialogFragment() {
 
         const val FRAGMENT_RESULT_KEY = "messageDetailsResult"
         const val RESULT_ACTION = "action"
+        const val ACTION_IMAGES_CHANGED = "images_changed"
         const val ACTION_SEARCH_KEYS = "search_keys"
         const val ACTION_SHOW_WARNING = "show_warning"
 

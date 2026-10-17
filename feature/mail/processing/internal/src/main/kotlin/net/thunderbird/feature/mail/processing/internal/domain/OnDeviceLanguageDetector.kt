@@ -11,11 +11,16 @@ internal fun interface ProcessingLanguageDetector {
 
 internal class OnDeviceLanguageDetector(private val context: Context) : ProcessingLanguageDetector {
     override fun detect(text: String): String? {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || text.isBlank()) return null
+        val sample = text.take(DETECTION_CHARACTER_LIMIT)
+        return chineseSampleLanguage(sample) ?: detectSystemLanguage(sample)
+    }
+
+    private fun detectSystemLanguage(sample: String): String? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || sample.isBlank()) return null
         return try {
             val classifier = context.getSystemService(TextClassificationManager::class.java).textClassifier
             val result = classifier.detectLanguage(
-                TextLanguage.Request.Builder(text.take(DETECTION_CHARACTER_LIMIT)).build(),
+                TextLanguage.Request.Builder(sample).build(),
             )
             if (result.localeHypothesisCount == 0) {
                 null
@@ -27,7 +32,7 @@ internal class OnDeviceLanguageDetector(private val context: Context) : Processi
         }
     }
     private companion object {
-        const val DETECTION_CHARACTER_LIMIT = 20_000
+        const val DETECTION_CHARACTER_LIMIT = 3_000
         const val MINIMUM_CONFIDENCE = 0.65f
     }
 }

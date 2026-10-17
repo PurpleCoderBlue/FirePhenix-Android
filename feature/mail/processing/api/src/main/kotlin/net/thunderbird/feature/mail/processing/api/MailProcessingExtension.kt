@@ -14,7 +14,16 @@ interface MailProcessingExtension {
 
     fun openRemoteImageSettings(context: Context) = Unit
 
-    /** Fail closed when no rules implementation or verified Outlook contacts are available. */
+    fun openSenderListSettings(context: Context, kind: SenderListKind) = openRemoteImageSettings(context)
+
+    fun senderMembership(sender: String): Set<SenderListKind> = emptySet()
+
+    suspend fun setSenderMembership(sender: String, kind: SenderListKind, enabled: Boolean): Boolean = false
+
+    fun remoteImageAccess(accountId: String, senders: List<String>): RemoteImageAccess =
+        if (shouldLoadRemoteImages(accountId, senders)) RemoteImageAccess.AUTOMATIC else RemoteImageAccess.MANUAL
+
+    /** Unknown senders require a manual image-loading action. */
     fun shouldLoadRemoteImages(accountId: String, senders: List<String>): Boolean = false
 
     fun clearAccount(accountId: String)

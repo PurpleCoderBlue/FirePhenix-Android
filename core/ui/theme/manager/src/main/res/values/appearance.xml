@@ -28,4 +28,13 @@
     <string name="appearance_background_contrast_notice">Blurs only the background. A light or dark overlay follows the theme to keep text readable.</string>
     <string name="appearance_background_blur_value">Custom background blur (0–512)</string>
     <string name="appearance_value_range">Enter a number from 0 to %1$d.</string>
+    <string name="appearance_glass_blur_label">Glass blur</string>
+    <string name="appearance_background_blur_label">Background blur</string>
+    <string name="appearance_customize_color">Customize</string>
+    <string name="appearance_color_wheel">Color wheel</string>
+    <string name="appearance_color_hue">Hue</string>
+    <string name="appearance_color_saturation">Saturation</string>
+    <string name="appearance_color_brightness">Brightness</string>
+    <string name="appearance_apply">Apply</string>
+    <string name="appearance_cancel">Cancel</string>
 </resources>

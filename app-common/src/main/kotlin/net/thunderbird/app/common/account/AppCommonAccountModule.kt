@@ -29,7 +29,7 @@ import app.k9mail.core.ui.legacy.theme2.common.R as ThemeCommonR
 
 internal val appCommonAccountModule = module {
     single<net.thunderbird.feature.account.settings.alias.SentAliasHistory> {
-        LegacySentAliasHistory(get(), get(), get())
+        LegacySentAliasHistory(get(), get())
     }
     includes(
         featureAccountCoreModule,

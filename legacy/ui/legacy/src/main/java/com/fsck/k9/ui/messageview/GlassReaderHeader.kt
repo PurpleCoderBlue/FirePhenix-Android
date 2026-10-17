@@ -9,7 +9,7 @@ import com.google.android.material.button.MaterialButton
 /** Reparents existing actions only in glass mode; their listeners and visibility state stay intact. */
 internal object GlassReaderHeader {
     private const val ACTION_SIZE_DP = 48
-    private const val PROCESSING_WIDTH_DP = 176
+    private const val PROCESSING_WIDTH_DP = 240
     private const val COMPACT_WIDTH_DP = 600
     private const val LARGE_FONT_SCALE = 1.3f
     private const val CONTENT_MARGIN_DP = 16
@@ -44,7 +44,7 @@ internal object GlassReaderHeader {
                 endToStart = download.id
             },
         )
-        listOf(R.id.date, R.id.recipients).forEach { id ->
+        listOf(R.id.date, R.id.from_address, R.id.recipients).forEach { id ->
             (root.findViewById<View>(id).layoutParams as ConstraintLayout.LayoutParams).endToStart = remote.id
         }
     }

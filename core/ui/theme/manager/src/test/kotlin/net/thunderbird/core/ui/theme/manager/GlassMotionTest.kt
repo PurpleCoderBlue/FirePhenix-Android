@@ -34,4 +34,12 @@ class GlassMotionTest {
         Settings.Global.putFloat(context.contentResolver, Settings.Global.TRANSITION_ANIMATION_SCALE, 1f)
         assertThat(GlassMotion.enabled(context, AnimationPreference.OFF)).isFalse()
     }
+
+    @Test
+    fun `activity window stays stationary so its wallpaper cannot slide`() {
+        val activity = org.robolectric.Robolectric.buildActivity(android.app.Activity::class.java).setup().get()
+        GlassMotion.configureActivity(activity, AnimationPreference.FOLLOW_SYSTEM)
+        val resource = org.robolectric.Shadows.shadowOf(activity).pendingTransitionEnterAnimationResourceId
+        assertThat(resource).isEqualTo(0)
+    }
 }

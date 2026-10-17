@@ -1,11 +1,6 @@
 package net.thunderbird.feature.navigation.drawer.dropdown.ui.account
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +33,7 @@ import net.thunderbird.components.ui.bolt.atom.text.TextBodyLargeAutoResize
 import net.thunderbird.components.ui.bolt.atom.text.TextBodyMedium
 import net.thunderbird.components.ui.bolt.atom.text.TextDisplayMediumAutoResize
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.GlassPageMotion
 import net.thunderbird.feature.navigation.drawer.dropdown.R
 import net.thunderbird.feature.navigation.drawer.dropdown.domain.entity.DisplayAccount
 import net.thunderbird.feature.navigation.drawer.dropdown.domain.entity.MailDisplayAccount
@@ -94,13 +90,8 @@ private fun RowScope.AccountSelectedView(
     AnimatedContent(
         targetState = account,
         transitionSpec = {
-            if (isShowAnimations) {
-                (slideInHorizontally { it } + fadeIn()) togetherWith
-                    (slideOutHorizontally { -it } + fadeOut())
-            } else {
-                (slideInHorizontally(animationSpec = snap()) { 0 } + fadeIn(animationSpec = snap())) togetherWith
-                    (slideOutHorizontally(animationSpec = snap()) { 0 } + fadeOut(animationSpec = snap()))
-            }
+            val motion = GlassPageMotion(isShowAnimations)
+            motion.enter() togetherWith motion.exit()
         },
         label = "AccountSelectedContent",
         contentKey = { it.id },

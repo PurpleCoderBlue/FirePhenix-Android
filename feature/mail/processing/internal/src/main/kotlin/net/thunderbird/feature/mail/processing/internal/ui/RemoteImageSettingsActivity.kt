@@ -15,6 +15,11 @@ internal class RemoteImageSettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        intent.getStringExtra("senderListKind")?.let { value ->
+            net.thunderbird.feature.mail.processing.api.SenderListKind.entries.firstOrNull { it.name == value }?.let {
+                viewModel.initializeKind(it)
+            }
+        }
         setContent { theme.WithTheme { RemoteImageSettingsContent(viewModel, ::finish) } }
     }
 }

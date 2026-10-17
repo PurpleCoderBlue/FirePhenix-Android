@@ -13,26 +13,25 @@ internal data class AliasManagementState(
     val aliases: List<SenderAlias> = emptyList(),
     val accounts: List<net.thunderbird.feature.account.settings.alias.AliasAccount> = emptyList(),
     val address: String = "",
-    val recipient: String = "",
-    val history: Set<String> = emptySet(),
+    val candidates: List<String> = emptyList(),
     val busy: Boolean = false,
     val failed: Boolean = false,
 )
 
 internal sealed interface AliasManagementEvent {
     data class Address(val value: String) : AliasManagementEvent
-    data class Recipient(val value: String) : AliasManagementEvent
     data object Add : AliasManagementEvent
     data class Remove(val address: String) : AliasManagementEvent
     data class Default(val address: String) : AliasManagementEvent
     data class Favorite(val address: String, val favorite: Boolean) : AliasManagementEvent
-    data object Search : AliasManagementEvent
 }
 
 internal class AliasManagementViewModel(
     private val accountId: String,
     private val service: AliasService,
 ) : BaseViewModel<AliasManagementState, AliasManagementEvent, Nothing>(AliasManagementState()) {
+    private var loadedCandidates: Set<String>? = null
+
     init {
         mutate {}
     }
@@ -40,8 +39,6 @@ internal class AliasManagementViewModel(
     override fun event(event: AliasManagementEvent) {
         when (event) {
             is AliasManagementEvent.Address -> updateState { it.copy(address = event.value, failed = false) }
-
-            is AliasManagementEvent.Recipient -> updateState { it.copy(recipient = event.value, failed = false) }
 
             AliasManagementEvent.Add -> mutate {
                 service.add(accountId, state.value.address)
@@ -53,11 +50,6 @@ internal class AliasManagementViewModel(
             is AliasManagementEvent.Default -> mutate { service.setDefault(accountId, event.address) }
 
             is AliasManagementEvent.Favorite -> mutate { service.favorite(accountId, event.address, event.favorite) }
-
-            AliasManagementEvent.Search -> mutate {
-                val result = service.searchSent(accountId, state.value.recipient.trim())
-                updateState { it.copy(history = result) }
-            }
         }
     }
 
@@ -71,7 +63,15 @@ internal class AliasManagementViewModel(
                     if (accountId.isBlank()) emptyList() else service.aliases(accountId)
                 }
                 val accounts = withContext(Dispatchers.IO) { service.accounts() }
-                updateState { it.copy(aliases = aliases, accounts = accounts) }
+                val candidates = withContext(Dispatchers.IO) {
+                    if (accountId.isBlank()) {
+                        emptySet()
+                    } else {
+                        loadedCandidates ?: service.localCandidates(accountId).also { loadedCandidates = it }
+                    }
+                }.filter { candidate -> aliases.none { it.identity.email.equals(candidate, ignoreCase = true) } }
+                    .distinctBy { it.lowercase(java.util.Locale.ROOT) }.sorted()
+                updateState { it.copy(aliases = aliases, accounts = accounts, candidates = candidates) }
             } catch (exception: CancellationException) {
                 throw exception
             } catch (_: Exception) {
