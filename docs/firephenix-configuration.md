@@ -7,12 +7,12 @@
 - 外观：设置 → 常规设置 → 显示 → 外观。应用现仅保留液态玻璃，不再提供原版切换。
 - 液态玻璃底层背景：外观页向下滚动，可选择墨蓝（默认）、暖灰、凤凰拼色或自选图片。图片居中裁切，用于统一液态玻璃背景。导入图片需不超过 32MiB／一亿像素，保存副本的长边限制为 2560 像素；取消或失败保留原选择。图片保存在 App 私有 noBackup 目录，不进入普通设置导出，换设备后需重新选择。
 - 语言：设置 → 常规设置 → 显示 → 语言。玻璃外观下为限宽、可上下滚动的居中弹窗，沿用原来的语言选择和保存逻辑。
-- 翻译、总结与规则：设置 → 常规设置 → 互动 → 翻译与总结；玻璃阅读页的翻译按钮直接执行翻译，再点恢复原文；总结与翻译相邻，更多菜单保留双语、服务、语言、重新生成等选项。下载完整邮件与显示远程图片同在发件人栏右侧。
+- 翻译、总结与发件人名单：设置 → 常规设置 → 互动 → 翻译与总结；玻璃阅读页的翻译按钮直接执行翻译，再点恢复原文；总结与翻译相邻，更多菜单保留双语、服务、语言、重新生成等选项。下载完整邮件与显示远程图片同在发件人栏右侧。
 - 别名：设置 → 对应账户 → 发送邮件 → 管理身份，进入“发件别名”页。首次创建和导入账户后的入口也已接入。
 
 ## 配置在线服务
 
-翻译和总结分别保存配置。默认服务列表内点选服务，长按已有项编辑或删除，列表末项添加服务；自动开关和规则位于各自分组下方。另一动作已有大模型配置时，编辑器可以选择从中复制地址、提供方、模型、可选参数和密钥；复制后分别保存，后续修改不会联动。复制的密钥不会回填到可见输入框。更换复制后的地址或提供方时，必须重新填写对应密钥。保存只做本地校验，不向服务发送邮件，也不证明密钥、模型或服务可用。
+翻译和总结分别保存配置。默认服务列表内点选服务，长按已有项编辑或删除，列表末项添加服务；对应的发件人名单入口位于各自分组下方。另一动作已有大模型配置时，编辑器可以选择从中复制地址、提供方、模型、可选参数和密钥；复制后分别保存，后续修改不会联动。复制的密钥不会回填到可见输入框。更换复制后的地址或提供方时，必须重新填写对应密钥。保存只做本地校验，不向服务发送邮件，也不证明密钥、模型或服务可用。
 
 |            类型            |                         基础地址／地址                          |               协议与填写要求                |
 |--------------------------|----------------------------------------------------------|--------------------------------------|
@@ -44,35 +44,35 @@ AI 类型按千问、OpenAI、DeepSeek、自定义、Anthropic 排列。机器�
 
 - 翻译支持原文、译文、双语对照、重新处理和取消。译文修改 HTML 副本中的文本节点，复用原有邮件渲染与附件解析。
 - 翻译处理完整正文；总结默认提取最新内容，排除可识别的引用历史。需要时可开启最近引用层作为总结参考。
-- 翻译和总结的手动语言、服务、执行状态和结果分别保存；手动语言默认均为 `zh-Hans`。规则的输出语言可各自覆盖，结果区域会显示本次使用的语言。
+- 翻译和总结的手动语言、服务、执行状态和结果分别保存；手动语言默认均为 `zh-Hans`。自动处理使用该动作的默认服务和默认输出语言。
 - 识别使用 Android 系统语言识别接口；设备不支持或置信度不足时显示未知。在线翻译协议也使用自动源语言识别。
 - 不上传附件或图片。总结中的引用识别覆盖常见 blockquote、Gmail 和 Outlook 分隔结构；非标准邮件排版仍需结合原文核对。
 - 原邮件始终可读，翻译／总结不会写回服务器原文。
-- 翻译按钮直接执行翻译，再点恢复原文；总结与翻译相邻，更多菜单保留双语、服务、语言、重新生成和取消。总结结果在正文前，可收起。下载完整邮件与显示远程图片同在发件人栏右侧，仅在邮件不完整或存在被阻止的图片时显示。
+- 翻译按钮直接执行翻译，再点恢复原文；总结与翻译相邻，更多菜单保留双语、服务、语言、重新生成和取消。总结完成后，同一个顶部按钮切换“显示总结／隐藏总结”；处理中分别显示“翻译中／总结中”，点击可取消，不另占状态行。下载完整邮件与显示远程图片同在发件人栏右侧，仅在邮件不完整或存在被阻止的图片时显示。
 
 未配置、认证失败、余额／计费要求、限流、超时、网络错误、输出异常和不完整输出都有对应状态。服务生成内容的准确性需要结合原文核对；已完成的千问固定文本调用和仍未验收的整封邮件／其他服务见文末诊断记录。
 
-## 自动规则
+## 发件人名单
 
-两个全局自动开关初始均关闭；没有对应服务配置时不能打开。先保存配置，再设置规则，检查规则范围与启停状态后按需开启自动功能。
+旧规则全部停用，四个手动名单从空白开始，不迁移发件人、主题、文件夹或域名条件；已保存的服务和加密密钥保留。
 
-每个动作按列表顺序执行首条匹配规则。规则支持账户、文件夹、发件地址／`@域名`、主题关键词、源语言，以及全部／任一条件。条件为空代表匹配全部。垃圾目录、不完整正文、超长正文的排除先于条件组合。
+- 自动翻译名单、自动总结名单：完整 From 地址精确匹配，使用对应默认服务。仅在打开完整邮件时触发；垃圾邮件和超过自动长度上限的邮件仍不自动处理。
+- 自动下载图片名单：允许该发件人的远程图片。
+- 禁止下载图片名单：不加载远程图片，并隐藏加载图片按钮；优先于允许项。
 
-从阅读页进入设置时，新增规则会带入当前账户和文件夹 ID。留空表示不限制；从通用设置进入时也可按发件人、主题等字段筛选。垃圾目录判断复用账户原有的垃圾邮件文件夹映射，请确认该映射正确。
+设置 → 常规设置 → 互动 → 发件人名单，可切换和管理四个名单。邮件详情中任何参与者的菜单也提供四个复选项，菜单显示的是当前邮件的实际 From 地址；不是被点击的收件人或 Reply-To。多个 From 时禁用加入操作。
 
-每条规则独立指定服务、模型覆盖及输出语言。机器翻译规则的模型覆盖留空。未知源语言不满足语言条件；基础语言如 `en` 可匹配 `en-US`。保存规则不立即上传当前邮件，触发时机是打开完整邮件。
-
-新增规则编辑器的“启用”初始为开；保存规则不会自行打开全局自动开关。删除服务后，引用它的规则保留为服务缺失状态，不换成另一服务；若对应动作已无服务，其自动开关关闭。
+内置 15 个品牌的地址／域名目录默认允许图片，Anthropic／Claude 默认禁止。精确的手动选择覆盖内置默认项；自动翻译和总结绝不由内置目录触发。未知发件人需手动加载；没有读取 Outlook 联系人权限。来源和匹配项见 [内置发件人目录](firephenix-official-senders.md)。目录匹配不代表邮件身份认证。
 
 ## 长邮件、取消与缓存
 
 自动上限为 30,000 个 Unicode 码点，按正文文本计算。手动动作超过上限时确认一次，然后连续处理选定范围，内部最多每段 4,000 个码点、每批 100 个文本项；不会逐段再问，也不会把前半部分标成成功。
 
-总结分段后继续合并，限制最大合并轮数并检测无法收敛的输出。进度按当前处理轮次显示。中途失败、取消或输出不完整时，不保存半成品。
+总结分段后继续合并，限制最大合并轮数并检测无法收敛的输出。处理中状态由对应按钮显示。中途失败、取消或输出不完整时，不保存半成品。
 
 缓存按账户、文件夹／邮件、正文、服务配置版本、模型、语言和相关选项隔离。切换阅读模式不重新请求；重复进入或并发处理共享请求和进度。保存服务配置会更新版本，使旧结果失效。服务更改后，旧任务不能把新密钥用于旧地址。
 
-可在服务设置清理加密结果缓存。删除账户时取消相关处理，清理该账户缓存、专属规则及别名偏好；全局服务、全局规则及其他账户的数据保留。真实服务的请求限额、分段效果及计费尚未验证。
+可在服务设置清理加密结果缓存。删除账户时取消相关处理，清理该账户缓存、专属规则及别名偏好；全局服务、四个发件人名单及其他账户的数据保留。真实服务的请求限额、分段效果及计费尚未验证。
 
 ## 账户显示昵称与文件夹名称
 
@@ -86,6 +86,10 @@ AI 类型按千问、OpenAI、DeepSeek、自定义、Anthropic 排列。机器�
 
 每个账户的默认发件地址与收藏相互独立，收藏项优先展示。默认值只影响 App，不改变微软主别名。主登录身份不能在此页删除。
 
+发件别名页只有一个地址输入下拉框。候选仅从当前账户本机已加载邮件提取：已发送文件夹取发件地址，其他文件夹取收件人与抄送地址。
+候选不证明地址属于你，也不会自动注册成发件身份；只有明确选择并点击添加后才保存。不会额外搜索服务器或增加邮件权限。
+默认、收藏和移除操作位于每个已配置别名的管理菜单。
+
 选择顺序：
 
 1. 本次手动选择；
@@ -94,7 +98,7 @@ AI 类型按千问、OpenAI、DeepSeek、自定义、Anthropic 排列。机器�
 4. 与收件人通信的唯一已发送历史；
 5. 账户默认值。
 
-存在歧义时必须选择后继续编辑；失效的显式选择或原 From 不会默默改成另一个地址。历史只采用仍在身份列表中的地址。默认先查本机已发送文件夹，需要时可在别名管理页按收件地址搜索服务器已发送记录。撰写页显示实际 From，仍沿用原有 MIME、签名和发送路径。
+存在歧义时必须选择后继续编辑；失效的显式选择或原 From 不会默默改成另一个地址。历史只采用仍在身份列表中的地址。只查询本机已加载的已发送历史，不再提供服务器查询按钮。撰写页显示实际 From，仍沿用原有 MIME、签名和发送路径。
 
 本轮没有代发邮件。请用至少两个真实已有别名，自行检查收件端 From、Sender、Reply-To 和回复路由。服务器拒绝仍由原发送错误流程展示，不会自动改发件地址重发。
 
@@ -104,11 +108,11 @@ AI 类型按千问、OpenAI、DeepSeek、自定义、Anthropic 排列。机器�
 
 背景模糊默认 12，滑块初始显示 0–128，可输入 0–512 的整数扩展范围。拖动时数值与滑块直接跟手，释放后只保存最终值；不按历史数值排队重放。玻璃模糊与背景模糊独立保存；背景、主题色及明暗选择保留。
 
-玻璃主题色默认从原始背景图的主色提取，再生成浅色／深色的前景和容器配色；不从已经模糊、加遮罩的图像取色。关闭自动取色后可输入 `#RRGGBB` 或选预设。手动颜色会保留，可随时重新开启自动取色。
+玻璃主题色默认从原始背景图的主色提取，再生成浅色／深色的前景和容器配色；不从已经模糊、加遮罩的图像取色。关闭自动取色后点击“自定义”，在颜色轮盘弹窗中选择；点击“应用”保存，取消保留原值。手动颜色会保留，可随时重新开启自动取色。
 
 玻璃原生页面及弹窗增加轻微位移和淡入淡出；App 关闭动画或系统任一相关动画缩放为零时停用。没有修改系统动画设置。
 
-Compose 复用 Backdrop 2.0.0 的背景采样、折射、色散、高光及控件示例；旧 View 页面复用同源着色器，通过 GPU 显示列表桥接。邮件 WebView 和独立渲染表面不参与二次绘制，采样时只保留其背景填充，邮件正文继续由原有安全渲染链路显示。Android 13/API 33 起启用运行时光学效果；较旧系统使用可读替代呈现，设置页会提示限制。模糊关闭时仍保留支持设备上的折射和边缘高光。
+Compose 复用 Backdrop 2.0.0 的背景采样、折射、色散、高光及控件示例；旧 View 页面复用同源着色器，通过 GPU 显示列表桥接。邮件 WebView 和独立渲染表面不参与二次绘制，采样时只保留其背景填充，邮件正文继续由原有安全渲染链路显示。Android 13/API 33 起启用运行时光学效果；较旧系统使用可读替代呈现。模糊关闭时仍保留支持设备上的折射和边缘高光。
 
 邮件自动分栏以实际窗口宽度至少 840dp、可用配置高度至少 480dp 为条件；紧凑窗口单栏。已有用户明确保存的分栏偏好会保留，需在常规设置的显示／布局中选择自动分栏。新服务编辑页限制宽度并支持滚动、键盘避让；服务设置在可用宽度至少 720dp 且高度至少 600dp 时按翻译／总结两栏排列，手机和窄窗口上下排列。
 
@@ -122,16 +126,15 @@ Compose 复用 Backdrop 2.0.0 的背景采样、折射、色散、高光及控�
 - 已连接真机是荣耀 CHG-W60 平板；荣耀 500 Pro 的机型专项验证仍需连接该设备。
 - FCM／荣耀 Push 仅提供未来信号处理 API 边界，未装配 SDK、注册令牌或部署网关；现有邮件同步与通知继续复用上游能力。
 
-## Remote image rules and request scheduling (2026-10-15)
+## Remote image lists and request scheduling (updated 2026-10-16)
 
-- Settings > General settings > Interaction > Remote image rules; account reading settings link to the same screen.
-- Allow when an enabled exact From sender rule OR a verified Outlook contact matches. Unknown, missing and multiple From senders remain blocked. Matching uses the full mailbox, case-insensitively, never display name, Reply-To or a substring. Sender rules currently apply across accounts.
-- Outlook contact reading is NOT connected. The configured Microsoft scopes lack Contacts.Read; Microsoft Graph requires it. No new OAuth scope or device-contact permission was added. Current builds therefore automatically load only matched sender rules. Other images require a manual tap; that grant is confined to the current local message, including rotation, and resets on message change.
-- Sender rules live in the existing AES-GCM encrypted configuration, outside ordinary settings export and backup. Saving rules makes no network requests.
+- Settings > General settings > Interaction > Sender lists manages four exact From-address lists. All previous rules are disabled during upgrade; manual lists start empty. Sender lists use the existing AES-GCM encrypted configuration and are excluded from ordinary export/backup.
+- Manual block beats manual allow. Exact manual choices override the built-in image defaults; Anthropic/Claude defaults to blocked, other documented brands default to automatic images. Unknown addresses require a manual tap. Multiple From addresses never automatically allow images.
+- Outlook contacts are not read. No OAuth scope or contact permission was added. Saving a list makes no network requests; only explicitly added AI senders qualify for automatic processing when a complete, non-spam message is opened.
 - New accounts default to automatic complete body download up to 5 MiB, increased from 128 KiB. Existing explicitly stored account values remain unchanged; adjust the account fetching setting for an existing account. This limit does not authorize remote image or attachment downloads and does not change automatic AI processing limits.
 - Translation uses two bounded workers and one shared two-request semaphore across messages and actions. Original batch order is retained, repeated items within a batch share a result, cancellation propagates to child workers, and failed partial output is never cached. Existing full-result cache and in-flight request deduplication remain in effect. No service/model fallback or automatic paid retry was added.
 - Source paragraphs already in each batch provide batch context. Additional subject/cross-batch context was not integrated: automatic approval rejected that added sensitive-data transfer. No extra context-summary request is made. Actual short Qwen fixture requests completed in about 4.1 seconds for translation and 2.8 seconds for summarization; email-length latency remains a separate check. The deterministic local queue regression models 2,000 ms serial work completing in 1,000 ms at concurrency two.
-- Glass Activity, Fragment and popup enter/exit resources share 220 ms and the same easing, with app/system disabled-animation settings respected. Only the unified Glass appearance remains; page motion no longer uses full-page alpha compositing.
+- Glass Activity, Fragment and popup enter/exit resources share 360 ms and the same easing, with app/system disabled-animation settings respected. Only the unified Glass appearance remains; page motion no longer uses full-page alpha compositing.
 
 Sources: [Microsoft contact permissions](https://learn.microsoft.com/en-us/graph/api/user-list-contacts?view=graph-rest-1.0); [Read Frog request queue](https://github.com/mengxi-ream/read-frog/blob/f2e72180008812358b501e105b6a5ca66ff53b4e/src/utils/request/request-queue.ts), [batch queue](https://github.com/mengxi-ream/read-frog/blob/f2e72180008812358b501e105b6a5ca66ff53b4e/src/utils/request/batch-queue.ts), [translation cache](https://github.com/mengxi-ream/read-frog/blob/f2e72180008812358b501e105b6a5ca66ff53b4e/src/utils/host/translate/in-memory-translation-cache.ts). Architectural methods were reimplemented in Kotlin; GPL source was not copied into this fork.
 
@@ -153,3 +156,20 @@ Debug 版的 `FP-Motion` 仅记录固定页面名、阶段、耗时和慢帧指�
 依据：[千问思考模式](https://platform.qianwenai.com/docs/developer-guides/text-generation/thinking)、本项目协议回归及 `artifacts/firephenix-liquid-glass/checks/ai-fixed-text-device.log`。
 
 2026-10-16 诊断补充：设备已保存的千问配置对 1116 字符公开固定文本真实翻译为 HTTP 200，首内容约 0.464 秒、完整约 3.072 秒；不代表整封邮件验收。三次代理模型测试授权均已消耗。动画和回复弹层修正、验证边界见 [诊断记录](engineering/technical-designs/0007-firephenix-diagnosis.md)。
+
+### 官方发件人目录
+
+官方目录仅随应用版本更新，不提供联网刷新、下载或独立更新缓存。
+目录只控制远程图片默认策略，不触发自动翻译、总结，也不显示官方身份标志。
+完整名单、来源与维护方法见 [内置发件人目录](firephenix-official-senders.md)。
+
+## 2026-10-16 阅读与界面补充
+
+- 邮件切换使用上下方向，阅读正文优先。只有从顶部开始下拉或从底部开始上拉的新手势才交给邮件分页；左右滑动不再切换邮件。
+- 原生与 Compose 页面复用 360ms 的方向与时长策略；Activity 关闭整窗过渡，固定壁纸单独绘制，内容层执行动画。
+- 隐藏原生页面、正文和独立弹窗的滚动条；不禁用正文或列表滚动。Android 10 起通过公开窗口检查 API 覆盖独立窗口，玻璃弹窗绘制也会注册布局观察。
+- 中文原文在本地识别完成前不闪现翻译入口，识别后隐藏翻译及跳过自动翻译，总结入口保留。使用现有 Android 本地分类器，并为较短中文、夹杂产品名的中文增加文字脚本判断；不发起语言识别 API 请求。识别不确定时保留翻译，不把少量汉字或日语一概当作中文。
+- 方法参考 Read Frog 的[本地检测与可选模型检测](https://github.com/mengxi-ream/read-frog/blob/main/src/utils/content/language.ts)、[有限文本取样](https://github.com/mengxi-ream/read-frog/blob/main/src/utils/content/page-language.ts)和[目标语言跳过](https://github.com/mengxi-ream/read-frog/blob/main/src/utils/host/translate/target-language-skip.ts)，未引入浏览器扩展运行时或新的依赖。
+- 图片仅按四个名单及随应用发布的品牌目录判断，不再使用 Outlook 联系人放行。GitHub 同时收录 notifications@github.com 与官方文档披露的 noreply@github.com；手动禁止仍优先，不允许仿冒后缀或未知子域。
+
+真机检查记录与未完成的验收必须分别说明。逐帧录制用于检查过渡是否存在和背景是否位移，录屏不能替代实际帧截止时间统计，也不能证明所有页面满帧。

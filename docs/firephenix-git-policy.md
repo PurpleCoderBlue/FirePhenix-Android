@@ -11,6 +11,7 @@
 ## 应用版本
 
 - 首个测试版本为 `0.1.0-alpha.1`，内部 `versionCode` 为 `34`；调试构建按既有规则追加 `-SNAPSHOT`。
+- 本轮明确采用 `0.1.0-alpha.2`，内部 `versionCode` 为 `35`，计划按预发布处理；签名、OAuth 和附件核验完成前不公开为可用发行版。
 - FirePhenix 产品版本与 Thunderbird 上游版本分别记录，不能以升级上游为理由自动覆盖产品版本。
 - 后续安装包的 `versionCode` 必须递增；APK Release 与 Git 标签的创建另行进行，不由源码上传自动触发。
 

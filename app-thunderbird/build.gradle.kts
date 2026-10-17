@@ -17,8 +17,8 @@ android {
         applicationId = "app.firephenix.android"
         testApplicationId = "app.firephenix.android.tests"
 
-        versionCode = 34
-        versionName = "0.1.0-alpha.1"
+        versionCode = 35
+        versionName = "0.1.0-alpha.2"
 
         buildConfigField("String", "CLIENT_INFO_APP_NAME", "\"FirePhenix for Android\"")
     }
