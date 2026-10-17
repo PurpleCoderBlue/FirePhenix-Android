@@ -6,14 +6,14 @@
 
 基于 [Thunderbird for Android](https://github.com/thunderbird/thunderbird-android) 的个人邮件客户端，围绕 Outlook 多别名、邮件翻译与总结和液态玻璃界面进行开发。当前基线为 Thunderbird 24.0（`73a7b7fffcaed6db51c5b0aaa90e4ee012549563`）。
 
-这是独立衍生项目，与 Mozilla、Thunderbird 官方没有隶属或背书关系。目前为开发版本，尚未完成正式发行准备。
+这是独立衍生项目，与 Mozilla、Thunderbird 官方没有隶属或背书关系。目前为 alpha 预发布版本。
 
 FirePhenix 应用版本为 `0.1.0-alpha.2`，内部 `versionCode` 为 `35`；调试构建追加 `-SNAPSHOT`。产品版本独立于上游 Thunderbird 24.0 基线。
 
 ## 获取应用
 
-- [本仓库 Releases](https://github.com/PurpleCoderBlue/FirePhenix-Android/releases)：截至 2026-10-17 尚未公开 APK Release，可先按下文构建调试版。
-- [Komi Store](https://github.com/komi-store/komi-store)（原 GitHub Store）：开源的 GitHub Release 应用获取与更新工具。本仓库发布带 APK 的 Release 后，可在其中添加本仓库；目前不表示已上架或可以下载。
+- [下载 0.1.0-alpha.2](https://github.com/PurpleCoderBlue/FirePhenix-Android/releases/tag/v0.1.0-alpha.2)：2026-10-17 发布的长期签名预发布 APK，内部版本号 35；附件提供 SHA-256 校验文件。
+- [Komi Store](https://github.com/komi-store/komi-store)（原 GitHub Store）：开源的 GitHub Release 应用获取与更新工具。可在其中添加本仓库读取 GitHub Release；商店兼容性仍待验证，不表示已上架。
 
 Thunderbird 官方的 Google Play、F-Droid 下载入口对应上游应用，不是 FirePhenix 的发行渠道。
 
@@ -59,7 +59,7 @@ cd FirePhenix-Android
 
 输出：`app-thunderbird/build/outputs/apk/foss/debug/app-thunderbird-foss-debug.apk`。调试包名为 `app.firephenix.android.debug`，正式应用 ID 为 `app.firephenix.android`。
 
-自行构建时必须使用自己的 OAuth 注册和签名，核对包名、证书哈希及 redirect URI。仓库中的 OAuth Client ID 是公开标识，不是 Client Secret；现有调试回调只匹配开发时登记的签名。Beta、Daily、Release 及其他邮件提供商的自有 OAuth 尚未配置完整，不能直接作为正式发行版本使用。详见 [上游派生要求](README.thunderbird.md#forking)。
+自行构建时必须使用自己的 OAuth 注册和签名，核对包名、证书哈希及 redirect URI。仓库中的 OAuth Client ID 是公开标识，不是 Client Secret；现有调试回调只匹配开发时登记的签名。本项目已在自有 Microsoft 注册中分别登记 Debug 和长期签名 Release 的 Android 回调；Beta、Daily 及其他邮件提供商的自有 OAuth 尚未配置完整。详见 [上游派生要求](README.thunderbird.md#forking)。
 
 ## 验证与已知限制
 
@@ -73,7 +73,7 @@ cd FirePhenix-Android
 - Outlook 别名的真实收件端 `From` / `Sender` / `Reply-To` 和回复路由尚未验收。
 - 远程图片只按四个发件人名单及随应用发布的内置目录判断，手动禁止优先；不读取 Outlook 或设备联系人，也不以联系人身份放行图片。
 - FCM／荣耀 Push 仅预留 API 边界，没有接入 SDK、注册令牌或部署推送网关；现有同步继续复用上游。
-- 长期签名已在本地建立；发行版 OAuth 登记及登录验证、公开 APK Release 和商店发行尚未完成。
+- 长期签名 APK 已公开为 alpha.2 预发布；正式包已在真机通过 Microsoft OAuth 返回应用并成功发现邮箱文件夹，Debug 回调保留。未发送邮件；商店发行尚未完成。
 
 诊断详情见 [问题与验证记录](docs/engineering/technical-designs/0007-firephenix-diagnosis.md)。原始真机截图、邮件、日志、密钥、本机配置与构建产物不纳入源码仓库。
 

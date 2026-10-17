@@ -10,8 +10,8 @@ FirePhenix version: `0.1.0-alpha.2`, Android `versionCode`: `35`. Debug builds a
 
 ## Downloads
 
-- [GitHub Releases](https://github.com/PurpleCoderBlue/FirePhenix-Android/releases): no APK release has been published yet; debug builds can be built locally.
-- [Komi Store](https://github.com/komi-store/komi-store), formerly GitHub Store, can retrieve applications from GitHub Releases. Add this repository after an APK release is available. This does not imply an existing store listing.
+- [Download 0.1.0-alpha.2](https://github.com/PurpleCoderBlue/FirePhenix-Android/releases/tag/v0.1.0-alpha.2): a prerelease APK signed with the long-term FirePhenix certificate, published on October 17, 2026; Android version code 35. A SHA-256 checksum file is attached.
+- [Komi Store](https://github.com/komi-store/komi-store), formerly GitHub Store, can retrieve applications from GitHub Releases. Add this repository to retrieve its GitHub Releases. Store compatibility still needs verification; this does not imply an existing store listing.
 
 Thunderbird's official Google Play and F-Droid listings distribute the upstream application, not FirePhenix.
 
@@ -58,7 +58,7 @@ Configure `JAVA_HOME`, `ANDROID_HOME`, or an ignored `local.properties` locally.
 
 Output: `app-thunderbird/build/outputs/apk/foss/debug/app-thunderbird-foss-debug.apk`. Debug package: `app.firephenix.android.debug`. Release application ID: `app.firephenix.android`.
 
-Forks must use their own OAuth registrations and signing keys. Check the package, certificate hash, and redirect URI together. OAuth client IDs are public identifiers, not client secrets. The existing debug callback only matches its registered development certificate. Release OAuth registration is still being prepared; Beta, Daily, and other providers are not fully configured for independent distribution. See the [upstream fork requirements](README.thunderbird.md#forking).
+Forks must use their own OAuth registrations and signing keys. Check the package, certificate hash, and redirect URI together. OAuth client IDs are public identifiers, not client secrets. The existing debug callback only matches its registered development certificate. Debug and long-term signed Release Android callbacks are registered separately in the project-owned Microsoft application. Beta, Daily, and other mail providers are not fully configured for independent distribution. See the [upstream fork requirements](README.thunderbird.md#forking).
 
 ## Verification and limitations
 
@@ -71,7 +71,7 @@ These are local checks recorded on October 17, 2026, not a claim that every devi
 - Repeated view traversal during transitions was reduced. The same settings-navigation sequence recorded 4.71% slow frames in this round. Slow frames remain; consistent full-frame-rate rendering is not claimed.
 - Alias `From` / `Sender` / `Reply-To` headers and real recipient reply routing have not completed acceptance.
 - FCM and Honor Push only have API boundaries; no SDK, token registration, or push gateway is deployed. Existing upstream synchronization remains in use.
-- A local long-term signing key and signed candidate are available. Release OAuth registration/login validation, public APK publication, and store distribution remain incomplete.
+- The long-term signed APK is published as the alpha.2 prerelease. On a real device, the Release APK completed Microsoft OAuth return to the app and discovered mailbox folders. The Debug callback was preserved. No email was sent; store distribution remains incomplete.
 
 See the [diagnosis record](docs/engineering/technical-designs/0007-firephenix-diagnosis.md). Device screenshots, private emails, logs, keys, local configuration, and build outputs do not belong in the source repository.
 

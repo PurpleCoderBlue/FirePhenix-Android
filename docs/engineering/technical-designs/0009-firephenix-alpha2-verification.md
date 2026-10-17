@@ -88,5 +88,8 @@ ART 方法采样曾使真机设置页发生输入超时；采样已停止并退�
 最终复核 8446 个候选源码文件未命中所查的个人邮箱、本机目录及常见凭据特征；提交和 APK 仍需分别检查，模式扫描不构成绝对无泄漏保证。
 新提交使用 GitHub noreply 作者地址，保留远端历史，不强推或合入上游 Beta／开发改动。
 
-正式版微软回调需在既有 FirePhenix 注册中增加新包名和证书哈希。后台当前要求重新登录；未宣称已完成服务器登记或正式包 Outlook 登录。
-在该验证完成前，不把准备中的安装包冒充可正常登录的公开发行包。签名与回调准备见 [发行说明](../../releasing-firephenix.md)。
+2026-10-17 已通过内置浏览器在原有 FirePhenix 注册中新增正式包 Android 回调；刷新后核对正式与 Debug 两条回调同时存在。没有新建应用注册、覆盖 Debug 回调、新增 Client Secret 或改变授权范围。
+
+正式签名 APK 已在一台荣耀平板安装并正常启动，按正常流程完成 Microsoft OAuth 返回应用，并成功发现邮箱文件夹。未发送邮件、未运行新的 AI 推理。此检查不代表别名发信、其他邮件提供商或所有设备验收完成。
+
+[alpha.2 预发布](https://github.com/PurpleCoderBlue/FirePhenix-Android/releases/tag/v0.1.0-alpha.2) 已公开，仅附 APK 与 SHA256SUMS。APK 源码提交为 `b5ddf8a01149ef21907133461213a55c78b29179`，SHA-256 为 `7fe3583d75b0d1cf9e7a5fa429fdce4a02c405687d6390a08d98076a71fe8701`；下载后另行核对校验文件及长期签名。签名与回调见 [发行说明](../../releasing-firephenix.md)。

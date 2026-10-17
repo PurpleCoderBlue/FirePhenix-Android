@@ -1,6 +1,6 @@
-# FirePhenix 发行准备
+# FirePhenix 发行与签名
 
-当前准备版本：`0.1.0-alpha.2`，`versionCode = 35`，FOSS Release，应用 ID `app.firephenix.android`。
+当前发行版本：`0.1.0-alpha.2`，`versionCode = 35`，FOSS Release，应用 ID `app.firephenix.android`。
 Debug 使用不同包名 `app.firephenix.android.debug`，现有调试数据不会因正式包构建而迁移或删除。
 
 ## 长期签名
@@ -48,7 +48,9 @@ tb.release.keyPassword=REPLACE_LOCALLY
 
 依据：[Microsoft Android 回调配置](https://learn.microsoft.com/en-us/entra/identity-platform/tutorial-mobile-app-android-prepare-app?tabs=workforce-tenant)、[上游 Fork 约定](../README.thunderbird.md#forking)。
 
-后台当前停在登录页面，尚未完成新增登记，也未验收正式包 Outlook 登录。验证前只准备安装包，不公开为可用发行版。
+2026-10-17 已在既有 FirePhenix 注册中新增上述正式包 Android 回调，并在刷新后核对正式与 Debug 两条回调均保留。正式签名 APK 已在一台荣耀平板安装、启动，通过 Microsoft OAuth 返回应用并成功发现邮箱文件夹；未发送邮件。
+
+[0.1.0-alpha.2 预发布](https://github.com/PurpleCoderBlue/FirePhenix-Android/releases/tag/v0.1.0-alpha.2) 已公开，附件仅为签名 APK 和 SHA256SUMS。APK 对应源码提交 `b5ddf8a01149ef21907133461213a55c78b29179`；后续仅更新文档的提交不会改变该安装包。
 Beta、Daily 及其他提供商 OAuth 也不能借此视为已完成自有注册。
 
 ## 发布检查
