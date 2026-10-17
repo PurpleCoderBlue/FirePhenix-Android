@@ -18,6 +18,9 @@ import com.fsck.k9.mail.testing.security.FakeTrustManager
 import com.fsck.k9.mail.testing.security.SimpleTrustedSocketFactory
 import java.net.UnknownHostException
 import kotlin.test.Test
+import net.thunderbird.core.logging.testing.TestLogger
+import net.thunderbird.legacy.logging.Log
+import org.junit.Before
 
 private const val USERNAME = "user"
 private const val PASSWORD = "password"
@@ -36,6 +39,11 @@ class ImapServerSettingsValidatorTest {
         clientInfoAppName = CLIENT_NAME,
         clientInfoAppVersion = CLIENT_VERSION,
     )
+
+    @Before
+    fun setUp() {
+        Log.logger = TestLogger()
+    }
 
     @Test
     fun `valid server settings with password should return Success`() {
@@ -306,10 +314,11 @@ class ImapServerSettingsValidatorTest {
     }
 
     @Test
-    fun `non-existent hostname should return NetworkError`() {
+    fun `unresolvable address literal should return NetworkError`() {
         val serverSettings = ServerSettings(
             type = "imap",
-            host = "domain.invalid",
+            // An invalid literal fails locally even when system DNS synthesizes addresses.
+            host = "[invalid-ipv6]",
             port = 587,
             connectionSecurity = ConnectionSecurity.NONE,
             authenticationType = AuthType.PLAIN,

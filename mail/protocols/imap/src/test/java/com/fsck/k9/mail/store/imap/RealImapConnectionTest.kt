@@ -671,7 +671,8 @@ class RealImapConnectionTest {
 
     @Test
     fun `open() with invalid hostname should throw`() {
-        val settings = createImapSettings(host = "host name")
+        // Do not depend on the host machine returning NXDOMAIN for an invalid name.
+        val settings = createImapSettings(host = "[invalid-ipv6]")
         val imapConnection = createImapConnection(settings, socketFactory, oAuth2TokenProvider)
 
         assertFailure {

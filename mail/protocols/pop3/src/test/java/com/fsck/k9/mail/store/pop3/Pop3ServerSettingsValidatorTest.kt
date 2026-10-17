@@ -262,10 +262,11 @@ class Pop3ServerSettingsValidatorTest {
     }
 
     @Test
-    fun `non-existent hostname should return NetworkError`() {
+    fun `unresolvable address literal should return NetworkError`() {
         val serverSettings = ServerSettings(
             type = "pop3",
-            host = "domain.invalid",
+            // An invalid literal fails locally even when system DNS synthesizes addresses.
+            host = "[invalid-ipv6]",
             port = 587,
             connectionSecurity = ConnectionSecurity.NONE,
             authenticationType = AuthType.PLAIN,

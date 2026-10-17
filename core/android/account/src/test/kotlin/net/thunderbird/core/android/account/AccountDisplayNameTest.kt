@@ -6,6 +6,23 @@ import kotlin.test.Test
 
 class AccountDisplayNameTest {
     @Test
+    fun `notification display name works before identities are loaded`() {
+        val account = LegacyAccountDto("171b55b1-6482-42f5-ab62-59e38fd212d2").apply { name = "Work" }
+
+        assertThat(account.displayName).isEqualTo("Work")
+    }
+
+    @Test
+    fun `notification display name works with an identity without an email`() {
+        val account = LegacyAccountDto("171b55b1-6482-42f5-ab62-59e38fd212d2").apply {
+            name = "Work"
+            identities = mutableListOf(Identity())
+        }
+
+        assertThat(account.displayName).isEqualTo("Work")
+    }
+
+    @Test
     fun `unmodified email labels use their known provider`() {
         assertThat(resolveAccountDisplayName("person@outlook.com", "person@outlook.com", null)).isEqualTo("Outlook")
         assertThat(resolveAccountDisplayName(null, "person@GMAIL.COM", null)).isEqualTo("Gmail")

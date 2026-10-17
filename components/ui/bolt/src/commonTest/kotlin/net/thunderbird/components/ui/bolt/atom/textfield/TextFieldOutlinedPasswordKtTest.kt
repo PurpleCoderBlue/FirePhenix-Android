@@ -13,14 +13,17 @@ import androidx.compose.ui.text.AnnotatedString
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
+import kotlinx.coroutines.runBlocking
+import net.thunderbird.components.ui.bolt.resources.Res
+import net.thunderbird.components.ui.bolt.resources.bolt_atom_password_textfield_hide_password
+import net.thunderbird.components.ui.bolt.resources.bolt_atom_password_textfield_show_password
 import net.thunderbird.components.ui.testing.ComposeUiTestHarness
 import net.thunderbird.components.ui.testing.ComposeUiTestScope
+import org.jetbrains.compose.resources.getString
 import org.junit.Test
 
 private const val PASSWORD = "Password input"
 private const val PASSWORD_MASKED = "••••••••••••••"
-private const val SHOW_PASSWORD_DESCRIPTION = "Show password"
-private const val HIDE_PASSWORD_DESCRIPTION = "Hide password"
 private const val TEST_TAG = "TextFieldOutlinedPassword"
 
 class TextFieldOutlinedPasswordKtTest : ComposeUiTestHarness() {
@@ -218,11 +221,19 @@ class TextFieldOutlinedPasswordKtTest : ComposeUiTestHarness() {
     }
 
     private fun ComposeUiTestScope.onShowPasswordNode(): SemanticsNodeInteraction {
-        return onNodeWithContentDescription(SHOW_PASSWORD_DESCRIPTION)
+        return onNodeWithContentDescription(
+            runBlocking {
+                getString(Res.string.bolt_atom_password_textfield_show_password)
+            },
+        )
     }
 
     private fun ComposeUiTestScope.onHidePasswordNode(): SemanticsNodeInteraction {
-        return onNodeWithContentDescription(HIDE_PASSWORD_DESCRIPTION)
+        return onNodeWithContentDescription(
+            runBlocking {
+                getString(Res.string.bolt_atom_password_textfield_hide_password)
+            },
+        )
     }
 
     private fun ComposeUiTestScope.onPasswordTextField(): SemanticsNodeInteraction {

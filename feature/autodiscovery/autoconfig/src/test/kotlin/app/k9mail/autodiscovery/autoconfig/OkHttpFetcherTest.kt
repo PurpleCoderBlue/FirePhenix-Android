@@ -6,6 +6,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.prop
+import java.net.Proxy
 import java.net.UnknownHostException
 import kotlinx.coroutines.test.runTest
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -19,6 +20,12 @@ class OkHttpFetcherTest {
 
     @Test
     fun shouldHandleNonexistentUrl() = runTest {
+        val fetcher = OkHttpFetcher(
+            OkHttpClient.Builder()
+                .proxy(Proxy.NO_PROXY)
+                .dns { throw UnknownHostException("Synthetic DNS failure") }
+                .build(),
+        )
         val nonExistentUrl =
             "https://autoconfig.domain.invalid/mail/config-v1.1.xml?emailaddress=test%40domain.example".toHttpUrl()
 

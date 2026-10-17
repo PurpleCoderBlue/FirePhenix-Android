@@ -16,8 +16,6 @@ import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.unit.dp
-import net.thunderbird.components.ui.bolt.atom.Surface
-import net.thunderbird.components.ui.bolt.atom.text.TextBodyLarge
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsExactlyInAnyOrder
@@ -26,11 +24,15 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.runBlocking
+import net.thunderbird.components.ui.bolt.atom.Surface
+import net.thunderbird.components.ui.bolt.atom.text.TextBodyLarge
 import net.thunderbird.components.ui.bolt.molecule.swipe.SwipeDirectionAccessibilityAction.EndToStartAccessibilityAction
 import net.thunderbird.components.ui.bolt.molecule.swipe.SwipeDirectionAccessibilityAction.StartToEndAccessibilityAction
 import net.thunderbird.components.ui.bolt.setContentWithTheme
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
 import net.thunderbird.components.ui.testing.ComposeUiTestHarness
+import org.jetbrains.compose.resources.getString
 import org.junit.Test
 
 @Suppress("MaxLineLength")
@@ -177,8 +179,10 @@ class SwipeableRowTest : ComposeUiTestHarness() {
                 ),
             )
         }
-        val expectedStartToEnd = "Right: $RETRY_LABEL"
-        val expectedEndToStart = "Left: $RETRY_LABEL"
+        val expectedStartToEnd =
+            runBlocking { getString(StartToEndAccessibilityAction { RETRY_LABEL }.descriptionStringRes, RETRY_LABEL) }
+        val expectedEndToStart =
+            runBlocking { getString(EndToStartAccessibilityAction { RETRY_LABEL }.descriptionStringRes, RETRY_LABEL) }
 
         // Act
         val customActions = onNodeWithTag(TEST_TAG)
@@ -235,7 +239,10 @@ class SwipeableRowTest : ComposeUiTestHarness() {
                     ),
                 )
             }
-            val expectedEndToStart = "Left: $RETRY_LABEL"
+            val expectedEndToStart =
+                runBlocking {
+                    getString(EndToStartAccessibilityAction { RETRY_LABEL }.descriptionStringRes, RETRY_LABEL)
+                }
 
             // Act
             val customActions = onNodeWithTag(TEST_TAG)
@@ -263,7 +270,10 @@ class SwipeableRowTest : ComposeUiTestHarness() {
                     ),
                 )
             }
-            val expectedStartToEnd = "Right: $RETRY_LABEL"
+            val expectedStartToEnd =
+                runBlocking {
+                    getString(StartToEndAccessibilityAction { RETRY_LABEL }.descriptionStringRes, RETRY_LABEL)
+                }
 
             // Act
             val customActions = onNodeWithTag(TEST_TAG)
