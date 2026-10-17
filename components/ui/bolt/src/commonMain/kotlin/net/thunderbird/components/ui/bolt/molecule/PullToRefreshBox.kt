@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox as Material3PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -16,6 +15,7 @@ import net.thunderbird.components.ui.bolt.PreviewWithThemes
 import net.thunderbird.components.ui.bolt.atom.Surface
 import net.thunderbird.components.ui.bolt.atom.text.TextBodyLarge
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox as Material3PullToRefreshBox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

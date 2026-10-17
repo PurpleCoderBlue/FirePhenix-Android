@@ -1,7 +1,6 @@
 package net.thunderbird.components.ui.bolt.atom.tab
 
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab as Material3Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,6 +8,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import net.thunderbird.components.ui.bolt.PreviewWithThemeLightDark
+import androidx.compose.material3.Tab as Material3Tab
 
 /**
  * UI atom for a single tab within a tab. This is a wrapper around the Material 3 [androidx.compose.material3.Tab]

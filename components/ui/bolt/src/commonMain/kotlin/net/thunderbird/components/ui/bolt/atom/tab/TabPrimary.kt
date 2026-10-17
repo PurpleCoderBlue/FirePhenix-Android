@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab as Material3Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
@@ -25,8 +24,9 @@ import net.thunderbird.components.ui.bolt.PreviewWithThemeLightDark
 import net.thunderbird.components.ui.bolt.atom.icon.Icon
 import net.thunderbird.components.ui.bolt.atom.icon.Icons
 import net.thunderbird.components.ui.bolt.atom.text.TextLabelSmall
-import net.thunderbird.components.ui.bolt.theme.LocalContentColor
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.LocalContentColor
+import androidx.compose.material3.Tab as Material3Tab
 
 /**
  * UI atom for a single tab within a tab. This is a wrapper around the Material 3 [androidx.compose.material3.Tab]

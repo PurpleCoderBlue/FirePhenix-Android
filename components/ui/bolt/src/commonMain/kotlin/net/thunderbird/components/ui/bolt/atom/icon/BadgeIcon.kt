@@ -1,14 +1,14 @@
 package net.thunderbird.components.ui.bolt.atom.icon
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon as Material3Icon
-import androidx.compose.material3.LocalContentColor as Material3LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import androidx.compose.material3.Icon as Material3Icon
+import androidx.compose.material3.LocalContentColor as Material3LocalContentColor
 
 /**
  * Badge icon composable to display an badge icon.

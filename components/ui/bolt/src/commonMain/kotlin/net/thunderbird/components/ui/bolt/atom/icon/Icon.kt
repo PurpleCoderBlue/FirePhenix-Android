@@ -1,13 +1,13 @@
 package net.thunderbird.components.ui.bolt.atom.icon
 
-import androidx.compose.material3.Icon as Material3Icon
-import androidx.compose.material3.LocalContentColor as Material3LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import net.thunderbird.components.ui.bolt.PreviewWithThemes
+import androidx.compose.material3.Icon as Material3Icon
+import androidx.compose.material3.LocalContentColor as Material3LocalContentColor
 
 @Composable
 fun Icon(

@@ -2,10 +2,10 @@ package net.thunderbird.components.ui.bolt.organism
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.test.performClick
-import net.thunderbird.components.ui.bolt.atom.text.TextTitleMedium
 import assertk.assertThat
 import assertk.assertions.isTrue
 import kotlin.test.Test
+import net.thunderbird.components.ui.bolt.atom.text.TextTitleMedium
 import net.thunderbird.components.ui.bolt.setContentWithTheme
 import net.thunderbird.components.ui.testing.ComposeUiTestHarness
 

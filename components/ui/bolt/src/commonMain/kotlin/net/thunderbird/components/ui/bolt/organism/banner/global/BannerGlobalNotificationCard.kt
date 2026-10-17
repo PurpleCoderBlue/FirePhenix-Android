@@ -27,8 +27,8 @@ import net.thunderbird.components.ui.bolt.atom.icon.Icon
 import net.thunderbird.components.ui.bolt.atom.icon.Icons
 import net.thunderbird.components.ui.bolt.atom.text.TextTitleSmall
 import net.thunderbird.components.ui.bolt.organism.banner.BannerNotificationCardDefaults
-import net.thunderbird.components.ui.bolt.theme.LocalContentColor
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.LocalContentColor
 
 /**
  * Used to maintain the user’s awareness of a persistent irregular state of the application,

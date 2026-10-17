@@ -3,7 +3,6 @@ package net.thunderbird.components.ui.bolt.organism.drawer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBox
-import androidx.compose.material3.NavigationDrawerItem as Material3NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import net.thunderbird.components.ui.bolt.PreviewWithThemes
 import net.thunderbird.components.ui.bolt.atom.icon.Icon
 import net.thunderbird.components.ui.bolt.atom.text.TextLabelLarge
+import androidx.compose.material3.NavigationDrawerItem as Material3NavigationDrawerItem
 
 /**
  * A navigation drawer item that can be used in a navigation drawer.

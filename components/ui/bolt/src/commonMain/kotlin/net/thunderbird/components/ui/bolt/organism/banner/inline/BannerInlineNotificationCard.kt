@@ -34,8 +34,8 @@ import net.thunderbird.components.ui.bolt.atom.text.TextTitleSmall
 import net.thunderbird.components.ui.bolt.molecule.notification.NotificationActionButton
 import net.thunderbird.components.ui.bolt.organism.banner.BannerNotificationCardDefaults
 import net.thunderbird.components.ui.bolt.organism.banner.BannerNotificationCardDefaults.TEST_TAG_BANNER_INLINE_CARD_ACTION_ROW
-import net.thunderbird.components.ui.bolt.theme.LocalContentColor
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.LocalContentColor
 
 private const val MAX_TITLE_LENGTH = 100
 private const val MAX_SUPPORTING_TEXT_LENGTH = 200

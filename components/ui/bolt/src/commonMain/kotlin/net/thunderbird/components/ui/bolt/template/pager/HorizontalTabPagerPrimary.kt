@@ -12,12 +12,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import net.thunderbird.components.ui.bolt.atom.text.TextBodyLarge
-import net.thunderbird.components.ui.bolt.atom.text.TextLabelSmall
-import net.thunderbird.components.ui.bolt.atom.text.TextTitleMedium
 import kotlinx.coroutines.launch
 import net.thunderbird.components.ui.bolt.atom.icon.Icon
 import net.thunderbird.components.ui.bolt.atom.tab.TabPrimary
+import net.thunderbird.components.ui.bolt.atom.text.TextBodyLarge
+import net.thunderbird.components.ui.bolt.atom.text.TextLabelSmall
+import net.thunderbird.components.ui.bolt.atom.text.TextTitleMedium
 import net.thunderbird.components.ui.bolt.molecule.tab.TabRowPrimary
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
 

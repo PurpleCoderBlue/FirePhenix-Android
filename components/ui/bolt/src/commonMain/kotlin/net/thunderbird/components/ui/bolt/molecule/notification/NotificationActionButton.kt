@@ -14,8 +14,8 @@ import net.thunderbird.components.ui.bolt.PreviewWithThemesLightDark
 import net.thunderbird.components.ui.bolt.atom.button.ButtonText
 import net.thunderbird.components.ui.bolt.atom.icon.Icon
 import net.thunderbird.components.ui.bolt.atom.icon.Icons
-import net.thunderbird.components.ui.bolt.theme.LocalContentColor
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import net.thunderbird.components.ui.bolt.theme.LocalContentColor
 
 @Composable
 fun NotificationActionButton(

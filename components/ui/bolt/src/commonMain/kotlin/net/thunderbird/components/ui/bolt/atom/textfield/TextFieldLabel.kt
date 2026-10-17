@@ -1,9 +1,9 @@
 package net.thunderbird.components.ui.bolt.atom.textfield
 
-import androidx.compose.material3.Text as Material3Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import net.thunderbird.components.ui.bolt.PreviewWithThemes
+import androidx.compose.material3.Text as Material3Text
 
 private const val ASTERISK = "*"
 

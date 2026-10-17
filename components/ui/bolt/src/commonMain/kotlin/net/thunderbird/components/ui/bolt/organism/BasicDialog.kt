@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog as MaterialDialog
 import androidx.compose.ui.window.DialogProperties
 import net.thunderbird.components.ui.bolt.PreviewLightDarkLandscape
 import net.thunderbird.components.ui.bolt.PreviewWithThemesLightDark
@@ -33,6 +32,7 @@ import net.thunderbird.components.ui.bolt.atom.Surface
 import net.thunderbird.components.ui.bolt.atom.text.TextBodyMedium
 import net.thunderbird.components.ui.bolt.atom.text.TextHeadlineSmall
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
+import androidx.compose.ui.window.Dialog as MaterialDialog
 
 @Composable
 fun BasicDialog(
